@@ -1,4 +1,19 @@
++git checkout master
++git pull
 1.git checkout -b "feature/TNB-git-steps"
 2.create news files/changes
 3.git commit -m "feature/TNB-git-steps and comment"
 4.git push --set-upstream origin feature/TNB-git-steps
+
+5.if we stay on the same local branch: git pull origin master --rebase
+
++git checkout master
++git pull
+6.git checkout -b "ABC"
+7.git add .
+8.git commit -m "test"
+9.git checkout master
+10.git pull
+11.git checkout ABC
+12.git rebase master
+13.git push
