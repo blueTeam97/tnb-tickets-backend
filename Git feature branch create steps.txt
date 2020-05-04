@@ -1,0 +1,4 @@
+1.git checkout -b "feature/TNB-git-steps"
+2.create news files/changes
+3.git commit -m "feature/TNB-git-steps and comment"
+4.git push --set-upstream origin feature/TNB-git-steps
