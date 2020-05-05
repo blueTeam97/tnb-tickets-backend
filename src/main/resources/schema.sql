@@ -1,0 +1,37 @@
+CREATE TABLE IF NOT EXISTS `user` (
+  `id` int PRIMARY KEY AUTO_INCREMENT,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255),
+  `role_id` int,
+  `subscriber` boolean DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS `role` (
+  `id` int PRIMARY KEY AUTO_INCREMENT,
+  `role_name` varchar(55) DEFAULT "user"
+);
+
+CREATE TABLE IF NOT EXISTS `play` (
+  `id` int PRIMARY KEY AUTO_INCREMENT,
+  `name` varchar(255),
+  `available_date` timestamp NULL,
+  `play_date` timestamp NULL,
+  `registered_date` timestamp DEFAULT CURRENT_TIMESTAMP(),
+  `link` varchar(255),
+  `nr_tickets` int DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS `ticket` (
+  `id` int,
+  `user_id` int,
+  `play_id` int,
+  `status` varchar(55) DEFAULT "free",
+  `book_date` timestamp NULL,
+  `pickup_date` timestamp NULL
+);
+
+ALTER TABLE `user` ADD FOREIGN KEY (`role_id`) REFERENCES `role` (`id`);
+
+ALTER TABLE `ticket` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+
+ALTER TABLE `ticket` ADD FOREIGN KEY (`play_id`) REFERENCES `play` (`id`);
