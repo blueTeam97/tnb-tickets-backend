@@ -17,3 +17,17 @@
 11.git checkout ABC
 12.git rebase master
 13.git push
+
+#ENDPOINTS ==================
+[auth]
+/login   -> Check user credentials and create session
+
+[admin]
+/plays  -> Show all plays in the table
+/plays/{id} -> When you click a row in the table, open new page with details for that play and a list with all tickets
+
+[user] + https://sweetalert.js.org/guides/
+/plays
+/tickets
+
+[notifications] TBA
