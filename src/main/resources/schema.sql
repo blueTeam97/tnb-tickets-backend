@@ -1,5 +1,7 @@
 CREATE TABLE IF NOT EXISTS `user` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
+  first_name varchar(255) NOT NULL,
+  last_name varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255),
   `role_id` int,
@@ -22,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `play` (
 );
 
 CREATE TABLE IF NOT EXISTS `ticket` (
-  `id` int,
+  `id` int PRIMARY KEY AUTO_INCREMENT,
   `user_id` int,
   `play_id` int,
   `status` varchar(55) DEFAULT "free",
@@ -35,3 +37,5 @@ ALTER TABLE `user` ADD FOREIGN KEY (`role_id`) REFERENCES `role` (`id`);
 ALTER TABLE `ticket` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
 
 ALTER TABLE `ticket` ADD FOREIGN KEY (`play_id`) REFERENCES `play` (`id`);
+
+
