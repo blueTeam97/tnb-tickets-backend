@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 );
 
 CREATE TABLE IF NOT EXISTS `role` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
+  `role_id` int PRIMARY KEY AUTO_INCREMENT,
   `role_name` varchar(55) DEFAULT "user"
 );
 
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `ticket` (
   `pickup_date` timestamp NULL
 );
 
-ALTER TABLE `user` ADD FOREIGN KEY (`role_id`) REFERENCES `role` (`id`);
+ALTER TABLE `user` ADD FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`);
 
 ALTER TABLE `ticket` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
 
