@@ -42,11 +42,18 @@ public class Ticket {
     @JoinColumn(referencedColumnName = "id",nullable = false,insertable = false,updatable = false)
     private Play play;
 
-/*
+
+
+    /*
     @ManyToOne
+    @JoinColumn(referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+    private Play play;
+
+   /* @ManyToOne
     @JoinColumn(name="id")
     private User user;
 */
+    /*private User user;*/
 
     public Long getId() {
         return id;

@@ -43,6 +43,10 @@ public class TicketController {
     public List<TicketDTO> getAllByPlayId(@PathVariable Long playId) throws TicketNotFoundException {
         return ticketService.getAllByPlayId(playId);
     }
+    @GetMapping("/findTicketsByPlayId/{id}")
+    public List<TicketDTO> getAllByPlayId(@PathVariable Long id) {
+        return ticketService.getAllByPlayId(id);
+    }
 
     @PostMapping("/addTicket")
     public ResponseEntity<Ticket> addTicket(@RequestBody TicketDTO ticketDTO) throws ParseException {
@@ -68,4 +72,6 @@ public class TicketController {
         }
         else return ResponseEntity.badRequest().build();
     }
+
+
 }
