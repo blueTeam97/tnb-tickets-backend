@@ -40,10 +40,9 @@ public class TicketServiceImpl implements TicketService {
         return ticketMapper.ticketToTicketDTO(ticketRepository.getOne(ticketId));
     }
 
-    @Override
-    public List<TicketDTO> getAllByPlayId(Long playId) {
-        return ticketMapper.convertTicketToTicketDTOList(ticketRepository.findAll().stream()
-                .filter(ticket-> ticket.getPlayId().equals(playId))
-                .collect(Collectors.toList()));
+    public List<TicketDTO> getAllByPlayId(Long id) {
+        return ticketMapper.convertTicketToTicketDTOList(ticketRepository.findAllByPlayId(id));
     }
+
+
 }

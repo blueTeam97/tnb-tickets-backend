@@ -34,13 +34,13 @@ public class Ticket {
     @CreationTimestamp
     private Date pickUpDate;
 
- /*   @ManyToOne
-    @JoinColumn(name = "id",nullable = false)
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private Play play;
 
-    @ManyToOne
+   /* @ManyToOne
     @JoinColumn(name="id")
-    private User user*/;
+    private User user;*/
 
     public Long getId() {
         return id;

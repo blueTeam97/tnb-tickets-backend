@@ -18,7 +18,7 @@ public class PlayMapperImpl implements PlayMapper {
         if (playDTO == null) {
             return null;
         } else {
-            Play play = new Play();
+            Play play = new Play(playDTO); //
             return play;
         }
     }

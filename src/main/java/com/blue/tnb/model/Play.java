@@ -1,10 +1,12 @@
 package com.blue.tnb.model;
 
+import com.blue.tnb.dto.PlayDTO;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 public class Play {
@@ -39,8 +41,20 @@ public class Play {
     @Column(name ="nr_tickets")
     private int ticketsNumber;
 
-    /*@OneToMany(mappedBy = "play")
-    private List<Ticket> ticketList;*/
+    @OneToMany(mappedBy = "play", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Ticket> ticketList;
+
+    public Play() {}
+
+    public Play(PlayDTO playDTO) {
+        this.setId(playDTO.getId());
+        this.setAvailableDate(playDTO.getAvailableDate());
+        this.setLink(playDTO.getLink());
+        this.setPlayDate(playDTO.getPlayDate());
+        this.setRegisteredDate(playDTO.getRegisteredDate());
+        this.setPlayName(playDTO.getPlayName());
+        this.setTicketsNumber(playDTO.getTicketsNumber());
+    }
 
     public Long getId() {
         return id;
