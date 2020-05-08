@@ -39,14 +39,12 @@ public class Ticket {
     private Date pickUpDate;
 
     @ManyToOne
-    @JoinColumn(referencedColumnName = "id",nullable = false,insertable = false,updatable = false)
+    @JoinColumn(referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private Play play;
 
-/*
-    @ManyToOne
+   /* @ManyToOne
     @JoinColumn(name="id")
-    private User user;
-*/
+    private User user*/;
 
     public Long getId() {
         return id;
@@ -115,7 +113,7 @@ public class Ticket {
     public Ticket(){
 
     }
-    public Ticket(TicketDTO ticketDTO) throws ParseException {
+    public Ticket(TicketDTO ticketDTO){
         this.id=ticketDTO.getId();
         this.userId=ticketDTO.getUserId();
         this.playId=ticketDTO.getPlayId();

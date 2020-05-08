@@ -66,11 +66,10 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Ticket deleteTicket(Long ticketId) {
-        Optional<Ticket> existingTicket=ticketRepository.findById(ticketId);
-        if(existingTicket.isPresent()){
+        Optional<Ticket> existingTicket = ticketRepository.findById(ticketId);
+        if (existingTicket.isPresent()) {
             ticketRepository.delete(existingTicket.get());
             return existingTicket.get();
-        }
-        else return null;
+        } else return null;
     }
 }

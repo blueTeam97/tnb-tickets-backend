@@ -44,11 +44,13 @@ public class TicketController {
         return ticketService.getAllByPlayId(playId);
     }
 
+
+
     @PostMapping("/addTicket")
     public ResponseEntity<Ticket> addTicket(@RequestBody TicketDTO ticketDTO) throws ParseException {
         System.out.println(ticketDTO);
         if(ticketValidator.validateTicket(ticketDTO)){
-           return ResponseEntity.ok(ticketService.addTicket(ticketDTO));
+            return ResponseEntity.ok(ticketService.addTicket(ticketDTO));
         }
         else return ResponseEntity.badRequest() .build();
     }
@@ -68,4 +70,5 @@ public class TicketController {
         }
         else return ResponseEntity.badRequest().build();
     }
+
 }

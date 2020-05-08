@@ -1,6 +1,7 @@
 package com.blue.tnb.repository;
 
 import com.blue.tnb.model.Play;
+import com.blue.tnb.model.Ticket;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -25,4 +26,8 @@ public interface PlayRepository extends JpaRepository<Play, Long> {
     Optional<Play> findOneById(@Param("id") Long id);
 
     Play getOne(Long id);
+   /* @Query("SELECT u FROM User u where u.userId = :id")
+    List<Ticket> getAllByUserId(@Param("id") Long id);*/
+
+
 }
