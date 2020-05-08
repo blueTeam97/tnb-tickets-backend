@@ -3,11 +3,16 @@ package com.blue.tnb.service;
 import com.blue.tnb.dto.TicketDTO;
 import com.blue.tnb.exception.TicketNotFoundException;
 import com.blue.tnb.exception.TicketWithoutUserException;
+import com.blue.tnb.model.Play;
+import com.blue.tnb.model.Ticket;
 
+import java.text.ParseException;
 import java.util.List;
+import java.util.Optional;
 
 
 public interface TicketService {
+
 
     List<TicketDTO> getAllTickets();
 
@@ -15,5 +20,13 @@ public interface TicketService {
 
     TicketDTO getTicketById(Long ticketId) throws TicketNotFoundException;
 
-    List<TicketDTO> getAllByPlayId(Long playId);
+    List<TicketDTO> getAllByPlayId(Long playId) throws TicketNotFoundException;
+
+    //List<TicketDTO> getAllByPlay(Play play) throws TicketNotFoundException;
+
+    Ticket addTicket(TicketDTO ticketDTO) throws ParseException;
+
+    Ticket updateTicket(Long id,TicketDTO ticketDTO);
+    Ticket deleteTicket(Long ticketId);
+    //List<TicketDTO> getAllByUser(User user);
 }

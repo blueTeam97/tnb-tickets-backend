@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
@@ -21,29 +22,50 @@ public class TicketDTO {
 
     private String status;
 
-    private Date bookDate;
+    private String bookDate;
 
-    private Date pickUpDate;
+    private String pickUpDate;
 
-/*    private PlayDTO play;
+    private PlayDTO play;
 
-    private UserDTO user;*/
+//    private UserDTO user;
 
     public TicketDTO(Ticket ticket) {
+        this.id=ticket.getId();
         this.playId=ticket.getPlayId();
         this.userId=ticket.getUserId();
         this.status=ticket.getStatus().getValue();
-        this.bookDate=ticket.getBookDate();
-        this.pickUpDate=ticket.getPickUpDate();
+        System.out.println(ticket.getBookDate());
+        if(ticket.getBookDate()==null){
+            this.bookDate="";
+        }
+        else this.bookDate=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(ticket.getBookDate());
+
+        if(ticket.getPickUpDate()==null){
+            this.pickUpDate="";
+        }
+        else this.pickUpDate=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(ticket.getPickUpDate());
     }
 
-    public TicketDTO(Long userId, Long playId, Date bookDate, Date pickUpDate) {
+    public TicketDTO(Long userId, Long playId, String bookDate, String pickUpDate) {
         this.userId = userId;
         this.playId = playId;
         this.bookDate = bookDate;
         this.pickUpDate = pickUpDate;
         this.status=Status.FREE.getValue();
 
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public PlayDTO getPlay() {
+        return play;
+    }
+
+    public void setPlay(PlayDTO play) {
+        this.play = play;
     }
 
     public Long getId() {
@@ -78,19 +100,19 @@ public class TicketDTO {
         this.status = status.getValue();
     }
 
-    public Date getBookDate() {
+    public String getBookDate() {
         return bookDate;
     }
 
-    public void setBookDate(Date bookDate) {
+    public void setBookDate(String bookDate) {
         this.bookDate = bookDate;
     }
 
-    public Date getPickUpDate() {
+    public String getPickUpDate() {
         return pickUpDate;
     }
 
-    public void setPickUpDate(Date pickUpDate) {
+    public void setPickUpDate(String pickUpDate) {
         this.pickUpDate = pickUpDate;
     }
 
@@ -102,9 +124,21 @@ public class TicketDTO {
         TicketDTO ticketDTO = (TicketDTO) o;
         return  Objects.equals(userId, ticketDTO.userId) &&
                 playId.equals(ticketDTO.playId) &&
-                status == ticketDTO.status &&
+                status.equals(ticketDTO.status) &&
                 Objects.equals(bookDate, ticketDTO.bookDate) &&
                 Objects.equals(pickUpDate, ticketDTO.pickUpDate);
+    }
+
+    @Override
+    public String toString() {
+        return "TicketDTO{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", playId=" + playId +
+                ", status='" + status + '\'' +
+                ", bookDate=" + bookDate +
+                ", pickUpDate=" + pickUpDate +
+                '}';
     }
 
     @Override

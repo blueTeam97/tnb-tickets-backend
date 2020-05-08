@@ -3,6 +3,7 @@ package com.blue.tnb.controller;
 import com.blue.tnb.dto.PlayDTO;
 import com.blue.tnb.exception.PlayNotFoundException;
 import com.blue.tnb.service.PlayService;
+import com.blue.tnb.validator.TicketValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ public class PlayController {
 
     @Autowired
     private PlayService playService;
+
 
     @GetMapping("/findAllPlays")
     public List<PlayDTO> getAll(){

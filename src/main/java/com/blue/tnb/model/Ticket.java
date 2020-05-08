@@ -5,7 +5,11 @@ import com.blue.tnb.dto.TicketDTO;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Objects;
 
@@ -34,13 +38,15 @@ public class Ticket {
     @CreationTimestamp
     private Date pickUpDate;
 
- /*   @ManyToOne
-    @JoinColumn(name = "id",nullable = false)
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "id",nullable = false,insertable = false,updatable = false)
     private Play play;
 
+/*
     @ManyToOne
     @JoinColumn(name="id")
-    private User user*/;
+    private User user;
+*/
 
     public Long getId() {
         return id;
@@ -90,12 +96,26 @@ public class Ticket {
         this.pickUpDate = pickUpDate;
     }
 
+    public Play getPlay() {
+        return play;
+    }
 
+    public void setPlay(Play play) {
+        this.play = play;
+    }
+
+/*    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }*/
 
     public Ticket(){
 
     }
-    public Ticket(TicketDTO ticketDTO){
+    public Ticket(TicketDTO ticketDTO) throws ParseException {
         this.id=ticketDTO.getId();
         this.userId=ticketDTO.getUserId();
         this.playId=ticketDTO.getPlayId();
@@ -110,8 +130,9 @@ public class Ticket {
                 this.status=Status.PICKEDUP;
                 break;
         }
-        this.bookDate=ticketDTO.getBookDate();
-        this.pickUpDate=ticketDTO.getPickUpDate();
+        SimpleDateFormat dateTimeFormatter=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        this.bookDate=dateTimeFormatter.parse(ticketDTO.getBookDate());
+        this.pickUpDate=dateTimeFormatter.parse(ticketDTO.getPickUpDate());
     }
 
     @Override
