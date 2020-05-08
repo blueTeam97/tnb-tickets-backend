@@ -4,11 +4,15 @@ import com.blue.tnb.dto.TicketDTO;
 import com.blue.tnb.exception.TicketNotFoundException;
 import com.blue.tnb.exception.TicketWithoutUserException;
 import com.blue.tnb.mapper.TicketMapper;
+import com.blue.tnb.model.Play;
+import com.blue.tnb.model.Ticket;
 import com.blue.tnb.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,9 +45,32 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public List<TicketDTO> getAllByPlayId(Long playId) {
-        return ticketMapper.convertTicketToTicketDTOList(ticketRepository.findAll().stream()
-                .filter(ticket-> ticket.getPlayId().equals(playId))
-                .collect(Collectors.toList()));
+    public List<TicketDTO> getAllByPlayId(Long id) {
+        return ticketMapper.convertTicketToTicketDTOList(ticketRepository.findAllByPlayId(id));
+    }
+
+ /*   @Override
+    public List<TicketDTO> getAllByPlay(Play play) {
+        return ticketMapper.convertTicketToTicketDTOList(ticketRepository.findAllByPlayId(play.getId()));
+    }*/
+
+    @Override
+    public Ticket addTicket(TicketDTO ticketDTO) throws ParseException {
+        return ticketRepository.saveAndFlush(ticketMapper.ticketDTOToTicket(ticketDTO));
+    }
+
+    public Ticket updateTicket(Long id, TicketDTO ticketDTO){
+        Ticket ticket=ticketRepository.getOne(id);
+        return ticketRepository.saveAndFlush(ticket);
+    }
+
+    @Override
+    public Ticket deleteTicket(Long ticketId) {
+        Optional<Ticket> existingTicket=ticketRepository.findById(ticketId);
+        if(existingTicket.isPresent()){
+            ticketRepository.delete(existingTicket.get());
+            return existingTicket.get();
+        }
+        else return null;
     }
 }

@@ -4,13 +4,14 @@ import com.blue.tnb.dto.TicketDTO;
 import com.blue.tnb.model.Ticket;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class TicketMapperImpl implements TicketMapper {
     @Override
-    public List<Ticket> convertTicketDTOToTicketList(List<TicketDTO> tickets) {
+    public List<Ticket> convertTicketDTOToTicketList(List<TicketDTO> tickets) throws ParseException {
         if(tickets==null){
             return null;
         }
@@ -48,7 +49,7 @@ public class TicketMapperImpl implements TicketMapper {
     }
 
     @Override
-    public Ticket ticketDTOToTicket(TicketDTO ticketDTO) {
+    public Ticket ticketDTOToTicket(TicketDTO ticketDTO) throws ParseException {
         return ticketDTO==null?null:new Ticket(ticketDTO);
     }
 

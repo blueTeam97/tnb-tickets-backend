@@ -1,10 +1,13 @@
 package com.blue.tnb.model;
 
+import com.blue.tnb.dto.PlayDTO;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Play {
@@ -39,8 +42,8 @@ public class Play {
     @Column(name ="nr_tickets")
     private int ticketsNumber;
 
-    /*@OneToMany(mappedBy = "play")
-    private List<Ticket> ticketList;*/
+    @OneToMany(mappedBy = "play")
+    private List<Ticket> ticketList;
 
     public Long getId() {
         return id;
@@ -97,7 +100,37 @@ public class Play {
     public void setTicketsNumber(int ticketsNumber) {
         this.ticketsNumber = ticketsNumber;
     }
+    public Play(){
 
+    }
+    public Play(PlayDTO playDTO){
+        this.setId(playDTO.getId());
+        this.setAvailableDate(playDTO.getAvailableDate());
+        this.setLink(playDTO.getLink());
+        this.setPlayDate(playDTO.getPlayDate());
+        this.setRegisteredDate(playDTO.getRegisteredDate());
+        this.setPlayName(playDTO.getPlayName());
+        this.setTicketsNumber(playDTO.getTicketsNumber());
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Play)) return false;
+        Play play = (Play) o;
+        return ticketsNumber == play.ticketsNumber &&
+                id.equals(play.id) &&
+                playName.equals(play.playName) &&
+                availableDate.equals(play.availableDate) &&
+                playDate.equals(play.playDate) &&
+                registeredDate.equals(play.registeredDate) &&
+                link.equals(play.link) &&
+                Objects.equals(ticketList, play.ticketList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, playName, availableDate, playDate, registeredDate, link, ticketsNumber, ticketList);
+    }
 
     @Override
     public String toString() {
