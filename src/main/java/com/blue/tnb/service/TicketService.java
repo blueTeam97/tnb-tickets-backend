@@ -15,5 +15,5 @@ public interface TicketService {
 
     TicketDTO getTicketById(Long ticketId) throws TicketNotFoundException;
 
-    List<TicketDTO> getAllByPlayId(Long playId);
+
 }

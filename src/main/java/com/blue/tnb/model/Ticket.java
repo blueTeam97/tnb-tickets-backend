@@ -2,48 +2,65 @@ package com.blue.tnb.model;
 
 import com.blue.tnb.constants.Status;
 import com.blue.tnb.dto.TicketDTO;
-import org.hibernate.annotations.CreationTimestamp;
-
-import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Objects;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 public class Ticket {
-
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(
+            strategy = GenerationType.IDENTITY
+    )
     private Long id;
-
-    @Column(name = "user_id")
+    @Column(
+            name = "user_id"
+    )
     private Long userId;
-
-    @Column(name = "play_id",nullable = false)
+    @Column(
+            name = "play_id",
+            nullable = false
+    )
     private Long playId;
-
     private Status status;
-
-    @Column(name = "book_date")
+    @Column(
+            name = "book_date"
+    )
     @Temporal(TemporalType.TIMESTAMP)
-    @CreationTimestamp
     private Date bookDate;
-
-    @Column(name="pickup_date")
+    @Column(
+            name = "pickup_date"
+    )
     @Temporal(TemporalType.TIMESTAMP)
-    @CreationTimestamp
     private Date pickUpDate;
-
     @ManyToOne
-    @JoinColumn(referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(
+            name = "play_id",
+            referencedColumnName = "id",
+            nullable = false,
+            insertable = false,
+            updatable = false
+    )
     private Play play;
 
-   /* @ManyToOne
-    @JoinColumn(name="id")
-    private User user;*/
+    public Play getPlay() {
+        return this.play;
+    }
+
+    public void setPlay(Play play) {
+        this.play = play;
+    }
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(Long id) {
@@ -51,7 +68,7 @@ public class Ticket {
     }
 
     public Long getUserId() {
-        return userId;
+        return this.userId;
     }
 
     public void setUserId(Long userId) {
@@ -59,7 +76,7 @@ public class Ticket {
     }
 
     public Long getPlayId() {
-        return playId;
+        return this.playId;
     }
 
     public void setPlayId(Long playId) {
@@ -67,7 +84,7 @@ public class Ticket {
     }
 
     public Status getStatus() {
-        return status;
+        return this.status;
     }
 
     public void setStatus(Status status) {
@@ -75,7 +92,7 @@ public class Ticket {
     }
 
     public Date getBookDate() {
-        return bookDate;
+        return this.bookDate;
     }
 
     public void setBookDate(Date bookDate) {
@@ -83,64 +100,70 @@ public class Ticket {
     }
 
     public Date getPickUpDate() {
-        return pickUpDate;
+        return this.pickUpDate;
     }
 
     public void setPickUpDate(Date pickUpDate) {
         this.pickUpDate = pickUpDate;
     }
 
-
-
-    public Ticket(){
-
+    public Ticket() {
     }
-    public Ticket(TicketDTO ticketDTO){
-        this.id=ticketDTO.getId();
-        this.userId=ticketDTO.getUserId();
-        this.playId=ticketDTO.getPlayId();
-        switch(ticketDTO.getStatus()){
-            case "free":
-                this.status=Status.FREE;
+
+    public Ticket(TicketDTO ticketDTO) {
+        this.id = ticketDTO.getId();
+        this.userId = ticketDTO.getUserId();
+        this.playId = ticketDTO.getPlayId();
+        String var2 = ticketDTO.getStatus();
+        byte var3 = -1;
+        switch(var2.hashCode()) {
+            case -1383386808:
+                if (var2.equals("booked")) {
+                    var3 = 1;
+                }
                 break;
-            case "booked":
-                this.status=Status.BOOKED;
+            case -738920677:
+                if (var2.equals("pickedup")) {
+                    var3 = 2;
+                }
                 break;
-            case "pickedup":
-                this.status=Status.PICKEDUP;
-                break;
+            case 3151468:
+                if (var2.equals("free")) {
+                    var3 = 0;
+                }
         }
-        this.bookDate=ticketDTO.getBookDate();
-        this.pickUpDate=ticketDTO.getPickUpDate();
+
+        switch(var3) {
+            case 0:
+                this.status = Status.FREE;
+                break;
+            case 1:
+                this.status = Status.BOOKED;
+                break;
+            case 2:
+                this.status = Status.PICKEDUP;
+        }
+
+        this.bookDate = ticketDTO.getBookDate();
+        this.pickUpDate = ticketDTO.getPickUpDate();
     }
 
-    @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Ticket)) return false;
-        Ticket ticket = (Ticket) o;
-        return id.equals(ticket.id) &&
-                Objects.equals(userId, ticket.userId) &&
-                playId.equals(ticket.playId) &&
-                status == ticket.status &&
-                Objects.equals(bookDate, ticket.bookDate) &&
-                Objects.equals(pickUpDate, ticket.pickUpDate);
+        if (this == o) {
+            return true;
+        } else if (!(o instanceof Ticket)) {
+            return false;
+        } else {
+            Ticket ticket = (Ticket)o;
+            return this.id.equals(ticket.id) && Objects.equals(this.userId, ticket.userId) && this.playId.equals(ticket.playId) && this.status == ticket.status && Objects.equals(this.bookDate, ticket.bookDate) && Objects.equals(this.pickUpDate, ticket.pickUpDate);
+        }
     }
 
-    @Override
     public int hashCode() {
-        return Objects.hash(id, userId, playId, status, bookDate, pickUpDate);
+        return Objects.hash(new Object[]{this.id, this.userId, this.playId, this.status, this.bookDate, this.pickUpDate});
     }
 
-    @Override
     public String toString() {
-        return "Ticket{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", playId=" + playId +
-                ", status=" + status +
-                ", bookDate=" + bookDate +
-                ", pickUpDate=" + pickUpDate +
-                '}';
+        return "Ticket{id=" + this.id + ", userId=" + this.userId + ", playId=" + this.playId + ", status=" + this.status + ", bookDate=" + this.bookDate + ", pickUpDate=" + this.pickUpDate + '}';
     }
 }

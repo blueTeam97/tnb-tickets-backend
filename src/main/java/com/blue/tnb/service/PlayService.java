@@ -10,8 +10,8 @@ import java.util.List;
 public interface PlayService {
 
     List<PlayDTO> getAllPlays();
-    PlayDTO getPlayByName(String playName) throws PlayNotFoundException;
-    PlayDTO getPlayById(Long id) throws PlayNotFoundException;
+    PlayDTO getPlayByName(String playName);
+    PlayDTO getPlayById(Long id);
 
     Play addPlay(PlayDTO playDTO);
     Play updatePlay(PlayDTO playDTO, Long id);

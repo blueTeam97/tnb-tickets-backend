@@ -1,16 +1,34 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by Fernflower decompiler)
+//
+
 package com.blue.tnb.model;
 
 import com.blue.tnb.dto.PlayDTO;
-import org.hibernate.annotations.CreationTimestamp;
-
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 public class Play {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,17 +37,15 @@ public class Play {
     @Size(max = 255)
     private String playName;
 
-    @Column(name ="available_date")
+    @Column(name = "available_date")
     @Temporal(TemporalType.TIMESTAMP)
-    @CreationTimestamp
     private Date availableDate;
 
-    @Column(name ="play_date")
+    @Column(name = "play_date")
     @Temporal(TemporalType.TIMESTAMP)
-    @CreationTimestamp
     private Date playDate;
 
-    @Column(name ="registered_date")
+    @Column(name = "registered_date")
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     private Date registeredDate;
@@ -38,26 +54,36 @@ public class Play {
     @Size(max = 255)
     private String link;
 
-    @Column(name ="nr_tickets")
+    @Column(name = "nr_tickets")
+    @Min(value = 1)
+    @NotNull
     private int ticketsNumber;
-
-    @OneToMany(mappedBy = "play", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<Ticket> ticketList;
+    @OneToMany(
+            mappedBy = "play",
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.ALL}
+    )
+    private List<Ticket> ticketList = new ArrayList();
 
     public Play() {}
 
     public Play(PlayDTO playDTO) {
-        this.setId(playDTO.getId());
-        this.setAvailableDate(playDTO.getAvailableDate());
         this.setLink(playDTO.getLink());
-        this.setPlayDate(playDTO.getPlayDate());
-        this.setRegisteredDate(playDTO.getRegisteredDate());
         this.setPlayName(playDTO.getPlayName());
         this.setTicketsNumber(playDTO.getTicketsNumber());
+
+        try {
+            SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            this.setPlayDate(dateTimeFormatter.parse(playDTO.getPlayDate()));
+            this.setAvailableDate(dateTimeFormatter.parse(playDTO.getAvailableDate()));
+        } catch (ParseException var3) {
+            var3.printStackTrace();
+        }
+
     }
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(Long id) {
@@ -65,7 +91,7 @@ public class Play {
     }
 
     public String getPlayName() {
-        return playName;
+        return this.playName;
     }
 
     public void setPlayName(String playName) {
@@ -73,7 +99,7 @@ public class Play {
     }
 
     public Date getAvailableDate() {
-        return availableDate;
+        return this.availableDate;
     }
 
     public void setAvailableDate(Date availableDate) {
@@ -81,7 +107,7 @@ public class Play {
     }
 
     public Date getPlayDate() {
-        return playDate;
+        return this.playDate;
     }
 
     public void setPlayDate(Date playDate) {
@@ -89,7 +115,7 @@ public class Play {
     }
 
     public Date getRegisteredDate() {
-        return registeredDate;
+        return this.registeredDate;
     }
 
     public void setRegisteredDate(Date registeredDate) {
@@ -97,7 +123,7 @@ public class Play {
     }
 
     public String getLink() {
-        return link;
+        return this.link;
     }
 
     public void setLink(String link) {
@@ -105,24 +131,34 @@ public class Play {
     }
 
     public int getTicketsNumber() {
-        return ticketsNumber;
+        return this.ticketsNumber;
     }
 
     public void setTicketsNumber(int ticketsNumber) {
         this.ticketsNumber = ticketsNumber;
     }
 
-
-    @Override
-    public String toString() {
-        return "Play{" +
-                "id=" + id +
-                ", playName='" + playName + '\'' +
-                ", availableDate=" + availableDate +
-                ", playDate=" + playDate +
-                ", registeredDate=" + registeredDate +
-                ", link='" + link + '\'' +
-                ", ticketsNumber=" + ticketsNumber +
-                '}';
+    public List<Ticket> getTicketList() {
+        return this.ticketList;
     }
+
+    public void setTicketList(List<Ticket> ticketList) {
+        this.ticketList = ticketList;
+    }
+
+    public String toString() {
+        return "Play{id=" + this.id + ", playName='" + this.playName + '\'' + ", availableDate=" + this.availableDate + ", playDate=" + this.playDate + ", registeredDate=" + this.registeredDate + ", link='" + this.link + '\'' + ", ticketsNumber=" + this.ticketsNumber + ", ticketList=" + this.ticketList + '}';
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o != null && this.getClass() == o.getClass()) {
+            Play play = (Play)o;
+            return this.ticketsNumber == play.ticketsNumber && Objects.equals(this.id, play.id) && Objects.equals(this.playName, play.playName) && Objects.equals(this.availableDate, play.availableDate) && Objects.equals(this.playDate, play.playDate) && Objects.equals(this.registeredDate, play.registeredDate) && Objects.equals(this.link, play.link) && Objects.equals(this.ticketList, play.ticketList);
+        } else {
+            return false;
+        }
+    }
+
 }

@@ -37,10 +37,6 @@ public class TicketController {
         else return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/findTicketsByPlayId/{id}")
-    public List<TicketDTO> getAllByPlayId(@PathVariable Long id) {
-        return ticketService.getAllByPlayId(id);
-    }
 
 
 }
