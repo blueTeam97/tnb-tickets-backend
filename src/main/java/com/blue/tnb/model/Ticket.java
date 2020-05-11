@@ -3,6 +3,7 @@ package com.blue.tnb.model;
 import com.blue.tnb.constants.Status;
 import com.blue.tnb.dto.TicketDTO;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.text.ParseException;
@@ -45,6 +46,15 @@ public class Ticket {
    /* @ManyToOne
     @JoinColumn(name="id")
     private User user*/;
+
+    public Ticket(Long id, Long userId, Long playId, Status status, Date bookDate, Date pickUpDate) {
+        this.id = id;
+        this.userId = userId;
+        this.playId = playId;
+        this.status = status;
+        this.bookDate = bookDate;
+        this.pickUpDate = pickUpDate;
+    }
 
     public Long getId() {
         return id;
@@ -117,7 +127,7 @@ public class Ticket {
         this.id=ticketDTO.getId();
         this.userId=ticketDTO.getUserId();
         this.playId=ticketDTO.getPlayId();
-        switch(ticketDTO.getStatus()){
+        switch(ticketDTO.getStatus().toLowerCase()){
             case "free":
                 this.status=Status.FREE;
                 break;
@@ -129,8 +139,15 @@ public class Ticket {
                 break;
         }
         SimpleDateFormat dateTimeFormatter=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        this.bookDate=dateTimeFormatter.parse(ticketDTO.getBookDate());
-        this.pickUpDate=dateTimeFormatter.parse(ticketDTO.getPickUpDate());
+        if(StringUtils.isEmpty(ticketDTO.getBookDate())){
+            this.bookDate=null;
+        }
+        else this.bookDate=dateTimeFormatter.parse(ticketDTO.getBookDate());
+        if(StringUtils.isEmpty(ticketDTO.getBookDate())){
+            this.pickUpDate=null;
+        }
+        else this.pickUpDate=dateTimeFormatter.parse(ticketDTO.getPickUpDate());
+
     }
 
     @Override

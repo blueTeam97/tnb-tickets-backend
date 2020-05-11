@@ -17,6 +17,8 @@ import java.util.Optional;
 @Component
 public class TicketValidator {
 
+    private String correctDate;
+
     @Autowired
     private TicketRepository ticketRepository;
 
@@ -31,41 +33,46 @@ public class TicketValidator {
         if(StringUtils.isEmpty(ticketDate))
             return false;
         if(ticketDate.contentEquals("T")){
+            ticketDate.replace("T"," ");
+        }
+        String[] dateSplitted=ticketDate.split(" ");
+        char dateDelimiter=' ';
+        char timeDelimiter=' ';
+        for(char ch:dateSplitted[0].toCharArray()){
+            if(ch<'0' || ch>'9'){
+                dateDelimiter=ch;
+                break;
+            }
+        }
+        for(char ch:dateSplitted[1].toCharArray()){
+            if(ch<'0' || ch>'9'){
+                timeDelimiter=ch;
+                break;
+            }
+        }
+        StringBuilder format=new StringBuilder();
+        format.append("yyyy").append(dateDelimiter).append("MM")
+                             .append(dateDelimiter).append("dd");
+        format.append(" ");
+        String[] timeComponents=dateSplitted[1].split(String.valueOf(timeDelimiter));
+        if(timeComponents.length<3){
+            int offset=3-timeComponents.length;
+            for(int i=0;i<offset;i++){
+                dateSplitted[1]=timeDelimiter+"00";
+            }
+        }
+        format.append("hh").append(timeDelimiter)
+                .append("mm").append(timeDelimiter)
+                .append("ss");
+        DateTimeFormatter formatter= DateTimeFormatter.ofPattern(format.toString());
+        System.out.println(format.toString());
+        try{
+            formatter.parse(ticketDate);
+        }
+        catch (Exception ex){
             return false;
         }
-        else {
-            String[] dateSplitted=ticketDate.split(" ");
-            char dateDelimiter=' ';
-            char timeDelimiter=' ';
-            for(char ch:dateSplitted[0].toCharArray()){
-                if(ch<'0' || ch>'9'){
-                    dateDelimiter=ch;
-                    break;
-                }
-            }
-            for(char ch:dateSplitted[1].toCharArray()){
-                if(ch<'0' || ch>'9'){
-                    timeDelimiter=ch;
-                    break;
-                }
-            }
-            StringBuilder format=new StringBuilder();
-            format.append("yyyy").append(dateDelimiter).append("MM")
-                                 .append(dateDelimiter).append("dd");
-            format.append(" ");
-            format.append("hh").append(timeDelimiter)
-                    .append("mm").append(timeDelimiter)
-                    .append("ss");
-            DateTimeFormatter formatter= DateTimeFormatter.ofPattern(format.toString());
-            System.out.println(format.toString());
-            try{
-                formatter.parse(ticketDate);
-            }
-            catch (Exception ex){
-                return false;
-            }
-            return true;
-        }
+        return true;
     }
     public boolean validateTicketId(Long ticketId){
 

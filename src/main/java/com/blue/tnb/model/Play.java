@@ -133,6 +133,13 @@ public class Play {
     public int hashCode() {
         return Objects.hash(id, playName, availableDate, playDate, registeredDate, link, ticketsNumber, ticketList);
     }
+    public List<Ticket> getTicketList() {
+        return ticketList;
+    }
+
+    public void setTicketList(List<Ticket> ticketList) {
+        this.ticketList = ticketList;
+    }
 
     @Override
     public String toString() {

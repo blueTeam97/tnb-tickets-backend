@@ -4,7 +4,9 @@ import com.blue.tnb.dto.PlayDTO;
 import com.blue.tnb.exception.PlayNotFoundException;
 import com.blue.tnb.mapper.PlayMapperImpl;
 import com.blue.tnb.model.Play;
+import com.blue.tnb.model.Ticket;
 import com.blue.tnb.repository.PlayRepository;
+import com.blue.tnb.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,12 +26,18 @@ public class PlayServiceImpl implements PlayService {
     @Autowired
     private PlayMapperImpl playMapperImpl;
 
+    @Autowired
+    private TicketRepository ticketRepository;
 
     @Override
     public List<PlayDTO> getAllPlays() {
-        return playRepository.findAll().stream()
-                                .map(playMapperImpl::convertPlayToPlayDTO)
-                                .collect(Collectors.toList());
+        List<PlayDTO> plays=playRepository.findAll().stream()
+                .map(playMapperImpl::convertPlayToPlayDTO)
+                .collect(Collectors.toList());
+        for(PlayDTO playDTO: plays){
+            playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
+        }
+        return plays;
     }
 
     @Override
@@ -49,7 +57,13 @@ public class PlayServiceImpl implements PlayService {
 
     @Override
     public Play addPlay(PlayDTO playDTO) {
-        return playRepository.saveAndFlush(playMapperImpl.convertPlayDTOToPlay(playDTO));
+        Play play=playRepository.saveAndFlush(playMapperImpl.convertPlayDTOToPlay(playDTO));
+        System.out.println(play);
+        //Generate list of tickets
+        //        //foreach ticket, add play.id to ticket.play_id
+        //        //foreach ticket, add in database
+        return play;
+        //return playRepository.saveAndFlush(playMapperImpl.convertPlayDTOToPlay(playDTO));
     }
 
     @Override
@@ -71,7 +85,5 @@ public class PlayServiceImpl implements PlayService {
         existingPlay.ifPresent(play -> playRepository.delete(play));
         return existingPlay.orElse(new Play());
     }
-
-
 
 }

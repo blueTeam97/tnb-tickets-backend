@@ -1,10 +1,12 @@
 package com.blue.tnb.dto;
 
 import com.blue.tnb.model.Play;
+import com.blue.tnb.model.Ticket;
 import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Data
@@ -29,7 +31,8 @@ public class PlayDTO {
     @NotEmpty(message = "Specify the number of tickets for this play")
     private int ticketsNumber;
 
-    //List<Ticket> ticketList;
+    private Long availableTicketsNumber= 0L;
+    List<TicketDTO> ticketList;
 
     public PlayDTO(Play play) {
         this.id = play.getId();
@@ -39,7 +42,7 @@ public class PlayDTO {
         this.registeredDate = play.getRegisteredDate();
         this.link = play.getLink();
         this.ticketsNumber = play.getTicketsNumber();
-
+        this.availableTicketsNumber=0L;
     }
 
 
@@ -109,6 +112,14 @@ public class PlayDTO {
 
     public void setTicketsNumber(int ticketsNumber) {
         this.ticketsNumber = ticketsNumber;
+    }
+
+    public Long getAvailableTicketsNumber() {
+        return availableTicketsNumber;
+    }
+
+    public void setAvailableTicketsNumber(Long availableTicketsNumber) {
+        this.availableTicketsNumber = availableTicketsNumber;
     }
 
     @Override
