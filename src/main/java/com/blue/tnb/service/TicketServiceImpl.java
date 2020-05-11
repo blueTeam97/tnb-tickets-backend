@@ -1,22 +1,39 @@
 package com.blue.tnb.service;
 
+import com.blue.tnb.constants.Status;
+import com.blue.tnb.dto.BookResponse;
+import com.blue.tnb.dto.PlayDTO;
 import com.blue.tnb.dto.TicketDTO;
+import com.blue.tnb.dto.UserDTO;
 import com.blue.tnb.exception.TicketNotFoundException;
 import com.blue.tnb.exception.TicketWithoutUserException;
+import com.blue.tnb.mapper.PlayMapper;
 import com.blue.tnb.mapper.TicketMapper;
 import com.blue.tnb.model.Play;
 import com.blue.tnb.model.Ticket;
+import com.blue.tnb.repository.PlayRepository;
 import com.blue.tnb.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Book;
 import java.text.ParseException;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class TicketServiceImpl implements TicketService {
+
+    @Autowired
+    private PlayMapper playMapper;
+    @Autowired
+    private PlayRepository playRepository;
 
     @Autowired
     private TicketRepository ticketRepository;
@@ -72,5 +89,49 @@ public class TicketServiceImpl implements TicketService {
             return existingTicket.get();
         }
         else return null;
+    }
+
+    @Override
+    public Long countAvailableTicketsByPlayId(Long playId) {
+        return ticketRepository.countAllAvailableByPlayId(playId);
+    }
+
+    @Override
+    public List<TicketDTO> findAllTicketsByUserId(Long id) {
+        return ticketMapper.convertTicketToTicketDTOList(ticketRepository.findAllByUserId(id));
+    }
+
+    @Override
+    public List<TicketDTO> findAllAvailableTicketsByPlayId(Long id) {
+        return ticketRepository.findAllAvailableByPlayId(id).stream()
+                                                            .map(ticketMapper::ticketToTicketDTO)
+                                                            .collect(Collectors.toList());
+    }
+
+    @Override
+    public BookResponse bookTicket(Long playId, Long userId) {
+        BookResponse bookResponse=new BookResponse();
+
+        List<Ticket> availableTickets=ticketRepository.findAllAvailableByPlayId(playId);
+        if(availableTickets==null || availableTickets.size()==0){
+            Optional<Ticket> ticket= ticketRepository.findAllByPlayId(playId).stream()
+                                        .min((t1, t2) -> -t1.getBookDate().compareTo(t2.getBookDate()));
+            Date currentTime=java.sql.Date.valueOf(String.valueOf(LocalDateTime.now()));
+            Date diff=new Date(currentTime.getTime()-ticket.get().getBookDate().getTime());
+            bookResponse.setExpiredTime(diff);
+        }
+        else{
+            Optional<Ticket> freeTicket=availableTickets.stream().findAny();
+            PlayDTO play =playMapper.convertPlayToPlayDTO(playRepository.getOne(playId));
+            play.setTicketList(null);
+            bookResponse.setPlayDTO(play);
+            bookResponse.setTicketDTO(ticketMapper.ticketToTicketDTO(freeTicket.get()));
+            bookResponse.setExpiredTime(null);
+            freeTicket.get().setStatus(Status.BOOKED);
+            freeTicket.get().setUserId(userId);
+            freeTicket.get().setBookDate(new Date(System.currentTimeMillis()));
+            updateTicket(freeTicket.get().getId(),ticketMapper.ticketToTicketDTO(freeTicket.get()));
+        }
+        return bookResponse;
     }
 }

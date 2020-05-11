@@ -48,4 +48,6 @@ public class PlayController {
     public ResponseEntity<Play> removePlay(@PathVariable(value = "id") Long id) {
         return ResponseEntity.ok(playService.deletePlay(id));
     }
+
+   // @GetMapping("/user/{")
 }

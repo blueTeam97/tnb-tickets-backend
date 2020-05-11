@@ -26,7 +26,7 @@ public class TicketDTO {
 
     private String pickUpDate;
 
-    private PlayDTO play;
+    //private PlayDTO play;
 
 //    private UserDTO user;
 
@@ -35,16 +35,15 @@ public class TicketDTO {
         this.playId=ticket.getPlayId();
         this.userId=ticket.getUserId();
         this.status=ticket.getStatus().getValue();
-        System.out.println(ticket.getBookDate());
         if(ticket.getBookDate()==null){
             this.bookDate="";
         }
-        else this.bookDate=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(ticket.getBookDate());
+        else this.bookDate=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(ticket.getBookDate());
 
         if(ticket.getPickUpDate()==null){
             this.pickUpDate="";
         }
-        else this.pickUpDate=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(ticket.getPickUpDate());
+        else this.pickUpDate=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(ticket.getPickUpDate());
     }
 
     public TicketDTO(Long userId, Long playId, String bookDate, String pickUpDate) {
@@ -60,13 +59,6 @@ public class TicketDTO {
         this.status = status;
     }
 
-    public PlayDTO getPlay() {
-        return play;
-    }
-
-    public void setPlay(PlayDTO play) {
-        this.play = play;
-    }
 
     public Long getId() {
         return id;

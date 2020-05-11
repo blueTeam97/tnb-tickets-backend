@@ -114,6 +114,13 @@ public class Play {
         this.ticketsNumber = ticketsNumber;
     }
 
+    public List<Ticket> getTicketList() {
+        return ticketList;
+    }
+
+    public void setTicketList(List<Ticket> ticketList) {
+        this.ticketList = ticketList;
+    }
 
     @Override
     public String toString() {

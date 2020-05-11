@@ -1,5 +1,6 @@
 package com.blue.tnb.service;
 
+import com.blue.tnb.dto.BookResponse;
 import com.blue.tnb.dto.TicketDTO;
 import com.blue.tnb.exception.TicketNotFoundException;
 import com.blue.tnb.exception.TicketWithoutUserException;
@@ -28,5 +29,13 @@ public interface TicketService {
 
     Ticket updateTicket(Long id,TicketDTO ticketDTO);
     Ticket deleteTicket(Long ticketId);
+
+    Long countAvailableTicketsByPlayId(Long playId);
+
+    List<TicketDTO> findAllTicketsByUserId(Long id);
     //List<TicketDTO> getAllByUser(User user);
+
+    List<TicketDTO> findAllAvailableTicketsByPlayId(Long id);
+
+    BookResponse bookTicket(Long playId,Long userId);
 }
