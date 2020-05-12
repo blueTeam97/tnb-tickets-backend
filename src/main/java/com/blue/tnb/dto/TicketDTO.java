@@ -3,9 +3,6 @@ package com.blue.tnb.dto;
 import com.blue.tnb.constants.Status;
 import com.blue.tnb.model.Ticket;
 import javax.validation.constraints.NotEmpty;
-import java.text.SimpleDateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Objects;
 
 public class TicketDTO {
@@ -34,12 +31,11 @@ public class TicketDTO {
         if(ticket.getBookDate()==null){
             this.bookDate="";
         }
-        else this.bookDate=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(ticket.getBookDate());
-
+        else this.bookDate=ticket.getBookDate().toString().replace("T"," ");
         if(ticket.getPickUpDate()==null){
             this.pickUpDate="";
         }
-        else this.pickUpDate=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(ticket.getPickUpDate());
+        else this.pickUpDate=ticket.getPickUpDate().toString().replace("T"," ");
     }
 
     public TicketDTO(Long userId, Long playId, String bookDate, String pickUpDate) {

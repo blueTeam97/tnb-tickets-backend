@@ -7,11 +7,8 @@ import com.blue.tnb.exception.PlayExceptions.PlayNotFoundException;
 import com.blue.tnb.exception.PlayExceptions.PlayUpdateException;
 import com.blue.tnb.model.Play;
 import com.blue.tnb.service.PlayService;
-import com.blue.tnb.validator.PlayValidator;
-import java.text.ParseException;
 import java.util.List;
 import javax.validation.constraints.NotNull;
-import com.blue.tnb.validator.TicketValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -55,14 +52,12 @@ public class PlayController {
     }
 
     @PutMapping({"/play/{id}"})
-    public ResponseEntity<Play> updatePlay(@PathVariable @NotNull Long id, @RequestBody PlayDTO playDTO) throws PlayUpdateException {
+    public ResponseEntity<PlayDTO> updatePlay(@PathVariable @NotNull Long id, @RequestBody PlayDTO playDTO) throws PlayUpdateException {
         return ResponseEntity.ok(playService.updatePlay(playDTO, id)); //bad response exception
     }
 
     @DeleteMapping({"/play/{id}"})
-    public ResponseEntity<Play> removePlay(@PathVariable("id") @NotNull Long id) throws PlayDeleteException {
+    public ResponseEntity<PlayDTO> removePlay(@PathVariable("id") @NotNull Long id) throws PlayDeleteException {
         return ResponseEntity.ok(this.playService.deletePlay(id));
     }
-
-   // @GetMapping("/user/{")
 }

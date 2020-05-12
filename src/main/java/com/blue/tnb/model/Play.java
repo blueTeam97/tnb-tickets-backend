@@ -63,7 +63,7 @@ public class Play {
     @NotNull
     private int ticketsNumber;
 
-    @OneToMany(mappedBy = "play", fetch = FetchType.EAGER,  cascade = CascadeType.PERSIST) //orphanRemoval = true
+    @OneToMany(mappedBy = "play", fetch = FetchType.EAGER,  cascade = CascadeType.ALL) //orphanRemoval = true
     private List<Ticket> ticketList;
 
     public Play() {}

@@ -21,7 +21,6 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.blue.tnb.validator.DateValidator;
 import com.blue.tnb.validator.PlayValidator;
 
 
@@ -42,9 +41,6 @@ public class PlayServiceImpl implements PlayService {
 
     @Autowired
     private PlayValidator playValidator;
-
-    @Autowired
-    private DateValidator dateValidator;
 
     @Autowired
     private TicketServiceImpl ticketServiceImpl;
@@ -94,26 +90,27 @@ public class PlayServiceImpl implements PlayService {
         else {throw new InvalidDateException();}
     }
 
-    public Play updatePlay(PlayDTO playDTO, Long id) throws PlayUpdateException {
+    public PlayDTO updatePlay(PlayDTO playDTO, Long id) throws PlayUpdateException {
         if (playValidator.validateIdForUpdate(id)){
             Play existingPlay = playRepository.getOne(id);
             Play updatedPlay = this.playMapperImpl.convertPlayDTOToPlay(playDTO);
+
             existingPlay.setPlayName(updatedPlay.getPlayName());
             existingPlay.setPlayDate(updatedPlay.getPlayDate());
             existingPlay.setAvailableDate(updatedPlay.getAvailableDate());
             existingPlay.setRegisteredDate(existingPlay.getRegisteredDate());
             existingPlay.setLink(updatedPlay.getLink());
             existingPlay.setTicketsNumber(updatedPlay.getTicketsNumber()); //implement case when ticketsNumber changes
-            return playRepository.saveAndFlush(existingPlay);
+            return playMapperImpl.convertPlayToPlayDTO(playRepository.saveAndFlush(existingPlay));
         }
         else {throw new PlayUpdateException();}
     }
 
-    public Play deletePlay(Long id) throws PlayDeleteException {
+    public PlayDTO deletePlay(Long id) throws PlayDeleteException {
         if (playValidator.validateIdForDelete(id)) {
             Play play = playRepository.getOne(id);
             playRepository.deleteById(id);
-            return play;
+            return playMapperImpl.convertPlayToPlayDTO(play);
         } else {
             throw new PlayDeleteException();
         }

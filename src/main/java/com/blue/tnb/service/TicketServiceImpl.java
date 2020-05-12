@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -110,6 +111,8 @@ public class TicketServiceImpl implements TicketService {
             Date diff=new Date(currentTime.getTime()-ticket.get().getBookDate().getTime());
 
             bookResponse.setExpiredTime(diff);
+           // Date diff=new Date(currentTime.getTime()-ticket.get().getBookDate().getTime());
+           // bookResponse.setExpiredTime(diff);
         }
         else{
                 Optional<Ticket> freeTicket=availableTickets.stream().findFirst();

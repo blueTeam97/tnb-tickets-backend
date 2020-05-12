@@ -4,6 +4,7 @@ import com.blue.tnb.dto.TicketDTO;
 import com.blue.tnb.model.Ticket;
 import com.blue.tnb.repository.PlayRepository;
 import com.blue.tnb.repository.TicketRepository;
+import org.apache.commons.validator.GenericValidator;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,51 +29,8 @@ public class TicketValidator {
     public boolean validateTicketIdForUpdate(Long ticketId){
         return ticketRepository.findOneById(ticketId)!=null;
     }
-    public boolean validateTicketDate(String ticketDate){
-
-        if(StringUtils.isEmpty(ticketDate))
-            return false;
-        if(ticketDate.contentEquals("T")){
-            ticketDate.replace("T"," ");
-        }
-        String[] dateSplitted=ticketDate.split(" ");
-        char dateDelimiter=' ';
-        char timeDelimiter=' ';
-        for(char ch:dateSplitted[0].toCharArray()){
-            if(ch<'0' || ch>'9'){
-                dateDelimiter=ch;
-                break;
-            }
-        }
-        for(char ch:dateSplitted[1].toCharArray()){
-            if(ch<'0' || ch>'9'){
-                timeDelimiter=ch;
-                break;
-            }
-        }
-        StringBuilder format=new StringBuilder();
-        format.append("yyyy").append(dateDelimiter).append("MM")
-                             .append(dateDelimiter).append("dd");
-        format.append(" ");
-        String[] timeComponents=dateSplitted[1].split(String.valueOf(timeDelimiter));
-        if(timeComponents.length<3){
-            int offset=3-timeComponents.length;
-            for(int i=0;i<offset;i++){
-                dateSplitted[1]=timeDelimiter+"00";
-            }
-        }
-        format.append("hh").append(timeDelimiter)
-                .append("mm").append(timeDelimiter)
-                .append("ss");
-        DateTimeFormatter formatter= DateTimeFormatter.ofPattern(format.toString());
-        System.out.println(format.toString());
-        try{
-            formatter.parse(ticketDate);
-        }
-        catch (Exception ex){
-            return false;
-        }
-        return true;
+    public boolean validateTicketDate(String ticketDateTimeAsString){
+        return GenericValidator.isDate(ticketDateTimeAsString, "yyyy-MM-dd HH:mm:ss", true);
     }
     public boolean validateTicketId(Long ticketId){
 
