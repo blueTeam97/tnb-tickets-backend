@@ -69,7 +69,6 @@ public class PlayServiceImpl implements PlayService {
     }
 
     public Play addPlay(PlayDTO playDTO) throws InvalidDateException {
-        if(dateValidator.validateDate(playDTO.getAvailableDate()) && dateValidator.validateDate(playDTO.getPlayDate())) {
             Play play = playRepository.saveAndFlush(this.playMapperImpl.convertPlayDTOToPlay(playDTO));
             TicketDTO ticketDTO;
             for (int i = 0; i < play.getTicketsNumber(); ++i) {
@@ -79,9 +78,7 @@ public class PlayServiceImpl implements PlayService {
                 ticketRepository.saveAndFlush(this.ticketMapperImpl.ticketDTOToTicket(ticketDTO));
             }
             play = playRepository.getOne(play.getId()); //ticketList????
-            return play;
-        }
-        else {throw new InvalidDateException();}
+        return play;
     }
 
     public Play updatePlay(PlayDTO playDTO, Long id) throws PlayUpdateException {

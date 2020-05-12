@@ -3,9 +3,13 @@ package com.blue.tnb.dto;
 import com.blue.tnb.mapper.TicketMapperImpl;
 import com.blue.tnb.model.Play;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import com.blue.tnb.model.Ticket;
 import lombok.*;
+import org.apache.tomcat.jni.Local;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.Date;
@@ -51,30 +55,14 @@ public class PlayDTO {
         this.ticketsNumber = play.getTicketsNumber();
         this.availableTicketsNumber=0L;
 
-        if (play.getPlayDate() == null) {
-            this.playDate = "";
-        } else {
-            this.playDate = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(play.getPlayDate());
-        }
-
-        if (play.getAvailableDate() == null) {
-            this.availableDate = "";
-        } else {
-            this.availableDate = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(play.getAvailableDate());
-        }
-
-        if (play.getRegisteredDate() == null) {
-            this.registeredDate = "";
-        } else {
-            this.registeredDate = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(play.getRegisteredDate());
-        }
+        this.playDate = play.getPlayDate().toString();
+        this.availableDate = play.getAvailableDate().toString();
+        this.registeredDate = play.getRegisteredDate().toString();
 
         TicketMapperImpl ticketMapper = new TicketMapperImpl();
         this.ticketDTOList = ticketMapper.convertTicketToTicketDTOList(play.getTicketList());
 
     }
-
-
 
     public Long getId() {
         return id;
