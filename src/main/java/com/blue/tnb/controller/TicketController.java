@@ -80,9 +80,10 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.findAllTicketsByUserId(id));
     }
 
-    @GetMapping("/play/{playId}/book/{userId}")
+    @PostMapping("/play/{playId}/book/{userId}")
     public ResponseEntity<BookResponse> bookTicket(@PathVariable(value = "playId") Long playId,
                                                    @PathVariable(value = "userId") Long userId){
+
         return ResponseEntity.ok(ticketService.bookTicket(playId,userId));
     }
 
