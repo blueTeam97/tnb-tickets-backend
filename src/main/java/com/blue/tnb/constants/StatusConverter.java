@@ -1,7 +1,6 @@
 package com.blue.tnb.constants;
 
 import javax.persistence.AttributeConverter;
-import javax.persistence.Convert;
 import javax.persistence.Converter;
 
 @Converter(autoApply = true)
