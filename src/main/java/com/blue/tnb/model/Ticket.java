@@ -3,6 +3,8 @@ package com.blue.tnb.model;
 import com.blue.tnb.constants.Status;
 import com.blue.tnb.dto.TicketDTO;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -40,6 +42,7 @@ public class Ticket {
     private Date pickUpDate;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(referencedColumnName = "id",nullable = false,insertable = false,updatable = false)
     private Play play;
 

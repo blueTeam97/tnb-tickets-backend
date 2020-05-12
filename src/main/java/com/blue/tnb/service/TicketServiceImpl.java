@@ -110,7 +110,7 @@ public class TicketServiceImpl implements TicketService {
         else{
             Optional<Ticket> freeTicket=availableTickets.stream().findAny();
             PlayDTO play =playMapper.convertPlayToPlayDTO(playRepository.getOne(playId));
-            //play.setTicketList(null); ?????
+            play.setTicketDTOList(null);
             bookResponse.setPlayDTO(play);
             bookResponse.setTicketDTO(ticketMapper.ticketToTicketDTO(freeTicket.get()));
             bookResponse.setExpiredTime(null);

@@ -1,8 +1,12 @@
 package com.blue.tnb.model;
 
+import com.blue.tnb.constants.DateUtils;
 import com.blue.tnb.dto.PlayDTO;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +25,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import org.apache.tomcat.jni.Local;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Objects;
@@ -36,19 +42,16 @@ public class Play {
     private String playName;
 
     @Column(name = "available_date")
-    @Temporal(TemporalType.TIMESTAMP)
     @NotNull
-    private Date availableDate;
+    private LocalDateTime availableDate;
 
     @Column(name = "play_date")
-    @Temporal(TemporalType.TIMESTAMP)
     @NotNull
-    private Date playDate;
+    private LocalDateTime playDate;
 
     @Column(name = "registered_date")
-    @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
-    private Date registeredDate;
+    private LocalDateTime registeredDate;
 
     @Column(name = "link")
     @Size(max = 255)
@@ -60,7 +63,7 @@ public class Play {
     @NotNull
     private int ticketsNumber;
 
-    @OneToMany(mappedBy = "play", fetch = FetchType.EAGER,  cascade = CascadeType.ALL) //orphanRemoval = true
+    @OneToMany(mappedBy = "play", fetch = FetchType.EAGER,  cascade = CascadeType.PERSIST) //orphanRemoval = true
     private List<Ticket> ticketList;
 
     public Play() {}
@@ -69,15 +72,14 @@ public class Play {
         this.setLink(playDTO.getLink());
         this.setPlayName(playDTO.getPlayName());
         this.setTicketsNumber(playDTO.getTicketsNumber());
+        this.setPlayDate(convertStringToLocalDateTime(playDTO.getPlayDate()));
+        this.setAvailableDate(convertStringToLocalDateTime(playDTO.getAvailableDate()));
+    }
 
-        try {
-            SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            this.setPlayDate(dateTimeFormatter.parse(playDTO.getPlayDate()));
-            this.setAvailableDate(dateTimeFormatter.parse(playDTO.getAvailableDate()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
+    public LocalDateTime convertStringToLocalDateTime(String dateAsString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(dateAsString, formatter);
+        return dateTime;
     }
 
     public Long getId() {
@@ -96,27 +98,27 @@ public class Play {
         this.playName = playName;
     }
 
-    public Date getAvailableDate() {
+    public LocalDateTime getAvailableDate() {
         return this.availableDate;
     }
 
-    public void setAvailableDate(Date availableDate) {
+    public void setAvailableDate(LocalDateTime availableDate) {
         this.availableDate = availableDate;
     }
 
-    public Date getPlayDate() {
+    public LocalDateTime getPlayDate() {
         return this.playDate;
     }
 
-    public void setPlayDate(Date playDate) {
+    public void setPlayDate(LocalDateTime playDate) {
         this.playDate = playDate;
     }
 
-    public Date getRegisteredDate() {
+    public LocalDateTime getRegisteredDate() {
         return this.registeredDate;
     }
 
-    public void setRegisteredDate(Date registeredDate) {
+    public void setRegisteredDate(LocalDateTime registeredDate) {
         this.registeredDate = registeredDate;
     }
 

@@ -7,6 +7,7 @@ package com.blue.tnb.validator;
 
 import com.blue.tnb.model.Play;
 import com.blue.tnb.repository.PlayRepository;
+import org.apache.commons.validator.GenericValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,5 +42,8 @@ public class PlayValidator {
         return validateIdForDelete(id);
     }
 
+    public boolean validateDateTime(String localDateTimeAsString) {
+        return GenericValidator.isDate(localDateTimeAsString, "yyyy-MM-dd HH:mm:ss", true);
+    }
 
 }

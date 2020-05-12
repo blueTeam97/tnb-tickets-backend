@@ -1,6 +1,8 @@
 package com.blue.tnb.constants;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 public class DateUtils {
@@ -12,5 +14,11 @@ public class DateUtils {
             dateString.replace("T"," ");
         }
         return dateString;
+    }
+
+    public static LocalDateTime convertToLocalDateTimeViaInstant(Date dateToConvert) {
+        return dateToConvert.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
     }
 }
