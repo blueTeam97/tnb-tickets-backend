@@ -44,7 +44,6 @@ public class PlayDTO {
     List<TicketDTO> ticketDTOList;
 
     private Long availableTicketsNumber= 0L;
-    List<TicketDTO> ticketList;
 
     public PlayDTO() {}
 
@@ -137,10 +136,6 @@ public class PlayDTO {
         this.ticketDTOList = ticketDTOList;
     }
 
-    public void addTicketDTO(TicketDTO ticketDTO) {
-        System.out.println(ticketDTO);
-        this.ticketDTOList.add(ticketDTO);
-    }
 
     @Override
     public boolean equals(Object o) {
