@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,10 @@ public interface PlayRepository extends JpaRepository<Play, Long> {
     //@Query("SELECT p FROM Play p") - for admin
     @Query("Select p FROM Play p WHERE p.playDate > current_timestamp") // - for user
     List<Play> findAll();
+
+    Optional<Play> findAllByPlayName(String playName);
+
+    Optional<Play> findAllById(@Param("id") Long id);
 
     Optional<Play> findById(Long id);
 

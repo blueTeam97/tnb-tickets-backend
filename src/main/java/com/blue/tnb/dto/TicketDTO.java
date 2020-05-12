@@ -4,6 +4,8 @@ import com.blue.tnb.constants.Status;
 import com.blue.tnb.model.Ticket;
 import javax.validation.constraints.NotEmpty;
 import java.text.SimpleDateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Objects;
 
 public class TicketDTO {
@@ -56,6 +58,7 @@ public class TicketDTO {
     public void setStatus(String status) {
         this.status = status;
     }
+
 
     public Long getId() {
         return id;

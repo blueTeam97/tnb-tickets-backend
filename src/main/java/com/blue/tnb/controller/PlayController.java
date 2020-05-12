@@ -11,6 +11,7 @@ import com.blue.tnb.validator.PlayValidator;
 import java.text.ParseException;
 import java.util.List;
 import javax.validation.constraints.NotNull;
+import com.blue.tnb.validator.TicketValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping({"/v1"})
+@RequestMapping("/v1")
 public class PlayController {
 
     @Autowired
@@ -62,4 +63,6 @@ public class PlayController {
     public ResponseEntity<Play> removePlay(@PathVariable("id") @NotNull Long id) throws PlayDeleteException {
         return ResponseEntity.ok(this.playService.deletePlay(id));
     }
+
+   // @GetMapping("/user/{")
 }

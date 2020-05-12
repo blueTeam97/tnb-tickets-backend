@@ -1,19 +1,21 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.blue.tnb.dto;
 
 import com.blue.tnb.mapper.TicketMapperImpl;
 import com.blue.tnb.model.Play;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import com.blue.tnb.model.Ticket;
+import lombok.*;
+
+import javax.validation.constraints.NotEmpty;
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+@Data
 public class PlayDTO {
 
     private Long id;
@@ -37,6 +39,9 @@ public class PlayDTO {
     private int ticketsNumber;
     List<TicketDTO> ticketDTOList;
 
+    private Long availableTicketsNumber= 0L;
+    List<TicketDTO> ticketList;
+
     public PlayDTO() {}
 
     public PlayDTO(Play play) {
@@ -44,6 +49,8 @@ public class PlayDTO {
         this.playName = play.getPlayName();
         this.link = play.getLink();
         this.ticketsNumber = play.getTicketsNumber();
+        this.availableTicketsNumber=0L;
+
         if (play.getPlayDate() == null) {
             this.playDate = "";
         } else {
@@ -64,10 +71,13 @@ public class PlayDTO {
 
         TicketMapperImpl ticketMapper = new TicketMapperImpl();
         this.ticketDTOList = ticketMapper.convertTicketToTicketDTOList(play.getTicketList());
+
     }
 
+
+
     public Long getId() {
-        return this.id;
+        return id;
     }
 
     public void setId(Long id) {
@@ -75,7 +85,7 @@ public class PlayDTO {
     }
 
     public String getPlayName() {
-        return this.playName;
+        return playName;
     }
 
     public void setPlayName(String playName) {
@@ -83,7 +93,7 @@ public class PlayDTO {
     }
 
     public String getAvailableDate() {
-        return this.availableDate;
+        return availableDate;
     }
 
     public void setAvailableDate(String availableDate) {
@@ -115,12 +125,21 @@ public class PlayDTO {
     }
 
     public int getTicketsNumber() {
-        return this.ticketsNumber;
+        return ticketsNumber;
     }
 
     public void setTicketsNumber(int ticketsNumber) {
         this.ticketsNumber = ticketsNumber;
     }
+
+    public Long getAvailableTicketsNumber() {
+        return availableTicketsNumber;
+    }
+
+    public void setAvailableTicketsNumber(Long availableTicketsNumber) {
+        this.availableTicketsNumber = availableTicketsNumber;
+    }
+
 
     public List<TicketDTO> getTicketDTOList() {
         return this.ticketDTOList;
@@ -135,15 +154,22 @@ public class PlayDTO {
         this.ticketDTOList.add(ticketDTO);
     }
 
+    @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o != null && this.getClass() == o.getClass()) {
-            PlayDTO playDTO = (PlayDTO)o;
-            return this.ticketsNumber == playDTO.ticketsNumber && Objects.equals(this.id, playDTO.id) && Objects.equals(this.playName, playDTO.playName) && Objects.equals(this.availableDate, playDTO.availableDate) && Objects.equals(this.playDate, playDTO.playDate) && Objects.equals(this.link, playDTO.link);
-        } else {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PlayDTO playDTO = (PlayDTO) o;
+        return ticketsNumber == playDTO.ticketsNumber &&
+                Objects.equals(id, playDTO.id) &&
+                Objects.equals(playName, playDTO.playName) &&
+                Objects.equals(availableDate, playDTO.availableDate) &&
+                Objects.equals(playDate, playDTO.playDate) &&
+                Objects.equals(link, playDTO.link);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, playName, availableDate, playDate, link, ticketsNumber);
     }
 
     public String toString() {

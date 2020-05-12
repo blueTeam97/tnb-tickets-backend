@@ -11,17 +11,18 @@ import com.blue.tnb.exception.PlayExceptions.PlayUpdateException;
 import com.blue.tnb.mapper.PlayMapperImpl;
 import com.blue.tnb.mapper.TicketMapperImpl;
 import com.blue.tnb.model.Play;
-import com.blue.tnb.model.Ticket;
 import com.blue.tnb.repository.PlayRepository;
 import com.blue.tnb.repository.TicketRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.blue.tnb.validator.DateValidator;
 import com.blue.tnb.validator.PlayValidator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+
 
 @Service("playService")
 public class PlayServiceImpl implements PlayService {
@@ -44,13 +45,15 @@ public class PlayServiceImpl implements PlayService {
     @Autowired
     private DateValidator dateValidator;
 
-    public PlayServiceImpl() {
-    }
-
+    @Override
     public List<PlayDTO> getAllPlays() {
-        return playRepository.findAll().stream()
-                            .map(playMapperImpl::convertPlayToPlayDTO)
-                            .collect(Collectors.toList());
+        List<PlayDTO> plays=playRepository.findAll().stream()
+                .map(playMapperImpl::convertPlayToPlayDTO)
+                .collect(Collectors.toList());
+        for(PlayDTO playDTO: plays){
+            playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
+        }
+        return plays;
     }
 
     public PlayDTO getPlayById(Long id) throws PlayNotFoundException {

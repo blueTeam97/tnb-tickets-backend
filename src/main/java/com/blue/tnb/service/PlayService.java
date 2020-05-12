@@ -6,6 +6,7 @@ import com.blue.tnb.exception.PlayExceptions.PlayDeleteException;
 import com.blue.tnb.exception.PlayExceptions.PlayNotFoundException;
 import com.blue.tnb.exception.PlayExceptions.PlayUpdateException;
 import com.blue.tnb.model.Play;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 

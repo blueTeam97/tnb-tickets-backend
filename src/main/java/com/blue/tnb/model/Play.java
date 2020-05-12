@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.blue.tnb.model;
 
 import com.blue.tnb.dto.PlayDTO;
@@ -28,6 +23,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.util.Objects;
 @Entity
 public class Play {
     @Id
@@ -148,19 +144,36 @@ public class Play {
         this.ticketList = ticketList;
     }
 
-    public String toString() {
-        return "Play{id=" + this.id + ", playName='" + this.playName + '\'' + ", availableDate=" + this.availableDate + ", playDate=" + this.playDate + ", registeredDate=" + this.registeredDate + ", link='" + this.link + '\'' + ", ticketsNumber=" + this.ticketsNumber + ", ticketList=" + this.ticketList + '}';
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, playName, availableDate, playDate, registeredDate, link, ticketsNumber, ticketList);
     }
 
+    @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o != null && this.getClass() == o.getClass()) {
-            Play play = (Play)o;
-            return this.ticketsNumber == play.ticketsNumber && Objects.equals(this.id, play.id) && Objects.equals(this.playName, play.playName) && Objects.equals(this.availableDate, play.availableDate) && Objects.equals(this.playDate, play.playDate) && Objects.equals(this.registeredDate, play.registeredDate) && Objects.equals(this.link, play.link) && Objects.equals(this.ticketList, play.ticketList);
-        } else {
-            return false;
-        }
+        if (this == o) return true;
+        if (!(o instanceof Play)) return false;
+        Play play = (Play) o;
+        return ticketsNumber == play.ticketsNumber &&
+                id.equals(play.id) &&
+                playName.equals(play.playName) &&
+                availableDate.equals(play.availableDate) &&
+                playDate.equals(play.playDate) &&
+                registeredDate.equals(play.registeredDate) &&
+                link.equals(play.link) &&
+                Objects.equals(ticketList, play.ticketList);
     }
 
+    @Override
+    public String toString() {
+        return "Play{" +
+                "id=" + id +
+                ", playName='" + playName + '\'' +
+                ", availableDate=" + availableDate +
+                ", playDate=" + playDate +
+                ", registeredDate=" + registeredDate +
+                ", link='" + link + '\'' +
+                ", ticketsNumber=" + ticketsNumber +
+                '}';
+    }
 }

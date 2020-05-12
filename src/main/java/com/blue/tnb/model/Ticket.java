@@ -11,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
@@ -106,12 +108,7 @@ public class Ticket {
         this.play = play;
     }
 
-/*    public User getUser() {
-        return user;
-    }
-    public void setUser(User user) {
-        this.user = user;
-    }*/
+
 
     public Ticket(){
 

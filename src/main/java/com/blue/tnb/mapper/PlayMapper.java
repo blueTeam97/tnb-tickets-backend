@@ -5,6 +5,7 @@ import com.blue.tnb.model.Play;
 
 import java.util.List;
 
+
 public interface PlayMapper {
 
     Play convertPlayDTOToPlay(PlayDTO playDTO);
