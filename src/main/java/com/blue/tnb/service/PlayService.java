@@ -1,6 +1,7 @@
 package com.blue.tnb.service;
 
 import com.blue.tnb.dto.PlayDTO;
+import com.blue.tnb.exception.PlayExceptions.InvalidDateException;
 import com.blue.tnb.exception.PlayExceptions.PlayDeleteException;
 import com.blue.tnb.exception.PlayExceptions.PlayNotFoundException;
 import com.blue.tnb.exception.PlayExceptions.PlayUpdateException;
@@ -14,7 +15,7 @@ public interface PlayService {
     PlayDTO getPlayByName(String playName) throws PlayNotFoundException;
     PlayDTO getPlayById(Long id) throws PlayNotFoundException;
 
-    Play addPlay(PlayDTO playDTO);
+    Play addPlay(PlayDTO playDTO) throws InvalidDateException;
     Play updatePlay(PlayDTO playDTO, Long id) throws PlayUpdateException;
     Play deletePlay(Long id) throws PlayDeleteException;
 

@@ -41,12 +41,6 @@ public class Ticket {
     @JoinColumn(referencedColumnName = "id",nullable = false,insertable = false,updatable = false)
     private Play play;
 
-   /* @ManyToOne
-    @JoinColumn(name="id")
-    private User user;
-*/
-    /*private User user;*/
-
     public Ticket(Long id, Long userId, Long playId, Status status, Date bookDate, Date pickUpDate) {
         this.id = id;
         this.userId = userId;

@@ -21,10 +21,10 @@ public class PlayDTO {
     @NotEmpty(message = "Play must have a name specified")
     private String playName;
 
-    @NotNull
+    @NotNull(message = "Insert Date")
     private String availableDate;
 
-    @NotNull
+    @NotNull(message = "Insert Date")
     private String playDate;
 
     private String registeredDate;

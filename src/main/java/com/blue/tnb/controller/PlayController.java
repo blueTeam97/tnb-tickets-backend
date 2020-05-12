@@ -1,6 +1,7 @@
 package com.blue.tnb.controller;
 
 import com.blue.tnb.dto.PlayDTO;
+import com.blue.tnb.exception.PlayExceptions.InvalidDateException;
 import com.blue.tnb.exception.PlayExceptions.PlayDeleteException;
 import com.blue.tnb.exception.PlayExceptions.PlayNotFoundException;
 import com.blue.tnb.exception.PlayExceptions.PlayUpdateException;
@@ -48,14 +49,13 @@ public class PlayController {
     }
 
     @PostMapping({"/add"})
-    public ResponseEntity<Play> addPlay(@RequestBody PlayDTO playDTO)  {
+    public ResponseEntity<Play> addPlay(@RequestBody PlayDTO playDTO) throws InvalidDateException {
             return ResponseEntity.ok(playService.addPlay(playDTO));
     }
 
     @PutMapping({"/play/{id}"})
     public ResponseEntity<Play> updatePlay(@PathVariable @NotNull Long id, @RequestBody PlayDTO playDTO) throws PlayUpdateException {
-        System.out.println(ResponseEntity.ok(playService.updatePlay(playDTO, id)));
-        return ResponseEntity.ok(playService.updatePlay(playDTO, id));
+        return ResponseEntity.ok(playService.updatePlay(playDTO, id)); //bad response exception
     }
 
     @DeleteMapping({"/play/{id}"})
