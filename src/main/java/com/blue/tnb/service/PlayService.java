@@ -17,7 +17,7 @@ public interface PlayService {
     PlayDTO getPlayById(Long id) throws PlayNotFoundException;
 
     Play addPlay(PlayDTO playDTO) throws InvalidDateException;
-    Play updatePlay(PlayDTO playDTO, Long id) throws PlayUpdateException;
-    Play deletePlay(Long id) throws PlayDeleteException;
+    PlayDTO updatePlay(PlayDTO playDTO, Long id) throws PlayUpdateException;
+    PlayDTO deletePlay(Long id) throws PlayDeleteException;
 
 }

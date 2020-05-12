@@ -34,19 +34,16 @@ public class Ticket {
     private Status status;
 
     @Column(name = "book_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date bookDate;
+    private LocalDateTime bookDate;
 
     @Column(name="pickup_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date pickUpDate;
+    private LocalDateTime pickUpDate;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(referencedColumnName = "id",nullable = false,insertable = false,updatable = false)
     private Play play;
 
-    public Ticket(Long id, Long userId, Long playId, Status status, Date bookDate, Date pickUpDate) {
+    public Ticket(Long id, Long userId, Long playId, Status status, LocalDateTime bookDate, LocalDateTime pickUpDate) {
         this.id = id;
         this.userId = userId;
         this.playId = playId;
@@ -87,19 +84,19 @@ public class Ticket {
         this.status = status;
     }
 
-    public Date getBookDate() {
+    public LocalDateTime getBookDate() {
         return bookDate;
     }
 
-    public void setBookDate(Date bookDate) {
+    public void setBookDate(LocalDateTime bookDate) {
         this.bookDate = bookDate;
     }
 
-    public Date getPickUpDate() {
+    public LocalDateTime getPickUpDate() {
         return pickUpDate;
     }
 
-    public void setPickUpDate(Date pickUpDate) {
+    public void setPickUpDate(LocalDateTime pickUpDate) {
         this.pickUpDate = pickUpDate;
     }
 
@@ -120,6 +117,14 @@ public class Ticket {
         this.id=ticketDTO.getId();
         this.userId=ticketDTO.getUserId();
         this.playId=ticketDTO.getPlayId();
+        if(!StringUtils.isEmpty(ticketDTO.getBookDate())){
+            this.bookDate=convertStringToLocalDateTime(ticketDTO.getBookDate());
+        }
+        else this.bookDate=null;
+        if(!StringUtils.isEmpty(ticketDTO.getPickUpDate())){
+            this.pickUpDate=convertStringToLocalDateTime(ticketDTO.getPickUpDate());
+        }
+        else this.pickUpDate=null;
         switch(ticketDTO.getStatus().toLowerCase()){
             case "free":
                 this.status=Status.FREE;
@@ -132,20 +137,14 @@ public class Ticket {
                 break;
         }
 
-        SimpleDateFormat dateTimeFormatter=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
-        if(StringUtils.isEmpty(ticketDTO.getBookDate())){
-            this.bookDate=null;
-        }
-        else this.bookDate=dateTimeFormatter.parse(ticketDTO.getBookDate());
-
-        if(StringUtils.isEmpty(ticketDTO.getBookDate())){
-            this.pickUpDate=null;
-        }
-        else this.pickUpDate=dateTimeFormatter.parse(ticketDTO.getPickUpDate());
 
     }
-
+    public LocalDateTime convertStringToLocalDateTime(String dateAsString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(dateAsString, formatter);
+        return dateTime;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

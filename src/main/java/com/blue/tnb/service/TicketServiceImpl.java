@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -96,29 +97,40 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public BookResponse bookTicket(Long playId, Long userId) {
+    public synchronized BookResponse bookTicket(Long playId, Long userId){
         BookResponse bookResponse=new BookResponse();
+
+        System.out.println(userId);
 
         List<Ticket> availableTickets=ticketRepository.findAllAvailableByPlayId(playId);
         if(availableTickets==null || availableTickets.size()==0){
             Optional<Ticket> ticket= ticketRepository.findAllByPlayId(playId).stream()
                                         .min((t1, t2) -> -t1.getBookDate().compareTo(t2.getBookDate()));
+
             Date currentTime=new Date(System.currentTimeMillis());
             Date diff=new Date(currentTime.getTime()-ticket.get().getBookDate().getTime());
+
             bookResponse.setExpiredTime(diff);
+           // Date diff=new Date(currentTime.getTime()-ticket.get().getBookDate().getTime());
+           // bookResponse.setExpiredTime(diff);
         }
         else{
-            Optional<Ticket> freeTicket=availableTickets.stream().findAny();
-            PlayDTO play =playMapper.convertPlayToPlayDTO(playRepository.getOne(playId));
-            play.setTicketDTOList(null);
-            bookResponse.setPlayDTO(play);
-            bookResponse.setTicketDTO(ticketMapper.ticketToTicketDTO(freeTicket.get()));
-            bookResponse.setExpiredTime(null);
-            freeTicket.get().setStatus(Status.BOOKED);
-            freeTicket.get().setUserId(userId);
-            freeTicket.get().setBookDate(new Date(System.currentTimeMillis()));
-            bookResponse.setTicketDTO(ticketMapper.ticketToTicketDTO(freeTicket.get()));
-            updateTicket(freeTicket.get().getId(),ticketMapper.ticketToTicketDTO(freeTicket.get()));
+                Optional<Ticket> freeTicket=availableTickets.stream().findFirst();
+                System.out.println(freeTicket.get()+": "+userId);
+                PlayDTO play =playMapper.convertPlayToPlayDTO(playRepository.getOne(playId));
+
+                //play.setTicketList(null); ?????
+
+                bookResponse.setPlayDTO(play);
+                bookResponse.setTicketDTO(ticketMapper.ticketToTicketDTO(freeTicket.get()));
+                bookResponse.setExpiredTime(null);
+
+                freeTicket.get().setStatus(Status.BOOKED);
+                freeTicket.get().setUserId(userId);
+                freeTicket.get().setBookDate(new Date(System.currentTimeMillis()));
+
+                bookResponse.setTicketDTO(ticketMapper.ticketToTicketDTO(freeTicket.get()));
+                updateTicket(freeTicket.get().getId(),ticketMapper.ticketToTicketDTO(freeTicket.get()));
         }
         return bookResponse;
     }

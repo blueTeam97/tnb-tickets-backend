@@ -19,9 +19,6 @@ public class PlayValidator {
     @Autowired
     private PlayRepository playRepository;
 
-    @Autowired
-    private DateValidator dateValidator;
-
     public PlayValidator() {}
 
     public boolean validateIdForDelete(Long id) {
