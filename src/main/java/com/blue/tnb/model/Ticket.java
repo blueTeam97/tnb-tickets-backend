@@ -120,7 +120,7 @@ public class Ticket {
     public Ticket(){
 
     }
-    public Ticket(TicketDTO ticketDTO){
+    public Ticket(TicketDTO ticketDTO) throws ParseException {
         this.id=ticketDTO.getId();
         this.userId=ticketDTO.getUserId();
         this.playId=ticketDTO.getPlayId();
