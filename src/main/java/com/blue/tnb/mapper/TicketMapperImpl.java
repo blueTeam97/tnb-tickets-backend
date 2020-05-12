@@ -11,7 +11,7 @@ import java.util.List;
 @Component
 public class TicketMapperImpl implements TicketMapper {
     @Override
-    public List<Ticket> convertTicketDTOToTicketList(List<TicketDTO> tickets) throws ParseException {
+    public List<Ticket> convertTicketDTOToTicketList(List<TicketDTO> tickets) {
         if(tickets==null){
             return null;
         }
@@ -22,7 +22,11 @@ public class TicketMapperImpl implements TicketMapper {
             else{
                 List<Ticket> ticketList=new ArrayList<>();
                 for(TicketDTO ticketDTO:tickets){
-                    ticketList.add(new Ticket(ticketDTO));
+                    try {
+                        ticketList.add(new Ticket(ticketDTO));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
                 return ticketList;
             }
@@ -49,8 +53,13 @@ public class TicketMapperImpl implements TicketMapper {
     }
 
     @Override
-    public Ticket ticketDTOToTicket(TicketDTO ticketDTO) throws ParseException {
-        return ticketDTO==null?null:new Ticket(ticketDTO);
+    public Ticket ticketDTOToTicket(TicketDTO ticketDTO)  {
+        try {
+            return ticketDTO==null?null:new Ticket(ticketDTO);
+        } catch (ParseException parseException) {
+            parseException.printStackTrace();
+        }
+        return null;
     }
 
     @Override

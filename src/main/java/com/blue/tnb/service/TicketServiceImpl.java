@@ -4,8 +4,8 @@ import com.blue.tnb.constants.Status;
 import com.blue.tnb.dto.BookResponse;
 import com.blue.tnb.dto.PlayDTO;
 import com.blue.tnb.dto.TicketDTO;
-import com.blue.tnb.exception.TicketNotFoundException;
-import com.blue.tnb.exception.TicketWithoutUserException;
+import com.blue.tnb.exception.TicketExceptions.TicketNotFoundException;
+import com.blue.tnb.exception.TicketExceptions.TicketWithoutUserException;
 import com.blue.tnb.mapper.PlayMapper;
 import com.blue.tnb.mapper.TicketMapper;
 import com.blue.tnb.model.Ticket;
@@ -59,11 +59,6 @@ public class TicketServiceImpl implements TicketService {
         return ticketMapper.convertTicketToTicketDTOList(ticketRepository.findAllByPlayId(id));
     }
 
- /*   @Override
-    public List<TicketDTO> getAllByPlay(Play play) {
-        return ticketMapper.convertTicketToTicketDTOList(ticketRepository.findAllByPlayId(play.getId()));
-    }*/
-
     @Override
     public Ticket addTicket(TicketDTO ticketDTO) throws ParseException {
         return ticketRepository.saveAndFlush(ticketMapper.ticketDTOToTicket(ticketDTO));
@@ -115,7 +110,7 @@ public class TicketServiceImpl implements TicketService {
         else{
             Optional<Ticket> freeTicket=availableTickets.stream().findAny();
             PlayDTO play =playMapper.convertPlayToPlayDTO(playRepository.getOne(playId));
-            play.setTicketList(null);
+            //play.setTicketList(null); ?????
             bookResponse.setPlayDTO(play);
             bookResponse.setTicketDTO(ticketMapper.ticketToTicketDTO(freeTicket.get()));
             bookResponse.setExpiredTime(null);

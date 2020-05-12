@@ -1,15 +1,28 @@
 package com.blue.tnb.controller;
 
 import com.blue.tnb.dto.PlayDTO;
-import com.blue.tnb.exception.PlayNotFoundException;
+import com.blue.tnb.exception.PlayExceptions.InvalidDateException;
+import com.blue.tnb.exception.PlayExceptions.PlayDeleteException;
+import com.blue.tnb.exception.PlayExceptions.PlayNotFoundException;
+import com.blue.tnb.exception.PlayExceptions.PlayUpdateException;
 import com.blue.tnb.model.Play;
 import com.blue.tnb.service.PlayService;
+import com.blue.tnb.validator.PlayValidator;
+import java.text.ParseException;
+import java.util.List;
+import javax.validation.constraints.NotNull;
 import com.blue.tnb.validator.TicketValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1")
@@ -18,35 +31,37 @@ public class PlayController {
     @Autowired
     private PlayService playService;
 
+    public PlayController() {}
 
-    @GetMapping("/findAllPlays")
-    public List<PlayDTO> getAll(){
-        return playService.getAllPlays();
+    @GetMapping({"/findAll"})
+    public ResponseEntity<List<PlayDTO>> getAll() {
+        return playService.getAllPlays() == null ?
+                ResponseEntity.noContent().build() : ResponseEntity.ok(this.playService.getAllPlays());
     }
 
-    @GetMapping("/findPlayById/{id}")
-    public ResponseEntity<PlayDTO> getById(@PathVariable(value = "id") Long id) throws PlayNotFoundException {
+    @GetMapping({"/findById/{id}"})
+    public ResponseEntity<PlayDTO> getById(@PathVariable("id") @NotNull Long id) throws PlayNotFoundException {
         return ResponseEntity.ok(playService.getPlayById(id));
     }
 
-    @GetMapping("/findPlayByName/playName")
-    public ResponseEntity<PlayDTO> getPlayByName(@RequestParam String playName) throws PlayNotFoundException {
+    @GetMapping({"/findByName"})
+    public ResponseEntity<PlayDTO> getPlayByName(@RequestParam("playName") String playName) throws PlayNotFoundException {
         return ResponseEntity.ok(playService.getPlayByName(playName));
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<Play> addPlay(@RequestBody PlayDTO playDTO) {
-        return ResponseEntity.ok(playService.addPlay(playDTO));
+    @PostMapping({"/add"})
+    public ResponseEntity<Play> addPlay(@RequestBody PlayDTO playDTO) throws InvalidDateException {
+            return ResponseEntity.ok(playService.addPlay(playDTO));
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Play> updatePlay(@PathVariable Long id, @RequestBody PlayDTO playDTO) {
-        return ResponseEntity.ok(playService.updatePlay(playDTO, id));
+    @PutMapping({"/play/{id}"})
+    public ResponseEntity<Play> updatePlay(@PathVariable @NotNull Long id, @RequestBody PlayDTO playDTO) throws PlayUpdateException {
+        return ResponseEntity.ok(playService.updatePlay(playDTO, id)); //bad response exception
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Play> removePlay(@PathVariable(value = "id") Long id) {
-        return ResponseEntity.ok(playService.deletePlay(id));
+    @DeleteMapping({"/play/{id}"})
+    public ResponseEntity<Play> removePlay(@PathVariable("id") @NotNull Long id) throws PlayDeleteException {
+        return ResponseEntity.ok(this.playService.deletePlay(id));
     }
 
    // @GetMapping("/user/{")

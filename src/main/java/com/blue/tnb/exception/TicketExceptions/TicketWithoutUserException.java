@@ -1,4 +1,4 @@
-package com.blue.tnb.exception;
+package com.blue.tnb.exception.TicketExceptions;
 
 
 import org.springframework.http.HttpStatus;

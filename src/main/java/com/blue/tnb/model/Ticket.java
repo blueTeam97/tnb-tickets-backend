@@ -8,6 +8,11 @@ import org.springframework.util.StringUtils;
 import javax.persistence.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
@@ -28,21 +33,15 @@ public class Ticket {
 
     @Column(name = "book_date")
     @Temporal(TemporalType.TIMESTAMP)
-    @CreationTimestamp
     private Date bookDate;
 
     @Column(name="pickup_date")
     @Temporal(TemporalType.TIMESTAMP)
-    @CreationTimestamp
     private Date pickUpDate;
 
-    @ManyToOne
-    @JoinColumn(referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(referencedColumnName = "id",nullable = false,insertable = false,updatable = false)
     private Play play;
-
-   /* @ManyToOne
-    @JoinColumn(name="id")
-    private User user*/;
 
     public Ticket(Long id, Long userId, Long playId, Status status, Date bookDate, Date pickUpDate) {
         this.id = id;
@@ -109,13 +108,7 @@ public class Ticket {
         this.play = play;
     }
 
-/*    public User getUser() {
-        return user;
-    }
 
-    public void setUser(User user) {
-        this.user = user;
-    }*/
 
     public Ticket(){
 
@@ -135,11 +128,14 @@ public class Ticket {
                 this.status=Status.PICKEDUP;
                 break;
         }
+
         SimpleDateFormat dateTimeFormatter=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
         if(StringUtils.isEmpty(ticketDTO.getBookDate())){
             this.bookDate=null;
         }
         else this.bookDate=dateTimeFormatter.parse(ticketDTO.getBookDate());
+
         if(StringUtils.isEmpty(ticketDTO.getBookDate())){
             this.pickUpDate=null;
         }

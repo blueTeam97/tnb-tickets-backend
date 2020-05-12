@@ -1,63 +1,87 @@
 package com.blue.tnb.model;
 
 import com.blue.tnb.dto.PlayDTO;
-import org.hibernate.annotations.CreationTimestamp;
-
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.util.Objects;
 @Entity
 public class Play {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "name")
     @Size(max = 255)
+    @NotEmpty
     private String playName;
 
-    @Column(name ="available_date")
+    @Column(name = "available_date")
     @Temporal(TemporalType.TIMESTAMP)
-    @CreationTimestamp
+    @NotNull
     private Date availableDate;
 
-    @Column(name ="play_date")
+    @Column(name = "play_date")
     @Temporal(TemporalType.TIMESTAMP)
-    @CreationTimestamp
+    @NotNull
     private Date playDate;
 
-    @Column(name ="registered_date")
+    @Column(name = "registered_date")
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     private Date registeredDate;
 
     @Column(name = "link")
     @Size(max = 255)
+    @NotEmpty
     private String link;
 
-    @Column(name ="nr_tickets")
+    @Column(name = "nr_tickets")
+    @Min(value = 1)
+    @NotNull
     private int ticketsNumber;
 
-    @OneToMany(mappedBy = "play", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "play", fetch = FetchType.EAGER,  cascade = CascadeType.ALL) //orphanRemoval = true
     private List<Ticket> ticketList;
 
     public Play() {}
 
     public Play(PlayDTO playDTO) {
-        this.setId(playDTO.getId());
-        this.setAvailableDate(playDTO.getAvailableDate());
         this.setLink(playDTO.getLink());
-        this.setPlayDate(playDTO.getPlayDate());
-        this.setRegisteredDate(playDTO.getRegisteredDate());
         this.setPlayName(playDTO.getPlayName());
         this.setTicketsNumber(playDTO.getTicketsNumber());
+
+        try {
+            SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            this.setPlayDate(dateTimeFormatter.parse(playDTO.getPlayDate()));
+            this.setAvailableDate(dateTimeFormatter.parse(playDTO.getAvailableDate()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(Long id) {
@@ -65,7 +89,7 @@ public class Play {
     }
 
     public String getPlayName() {
-        return playName;
+        return this.playName;
     }
 
     public void setPlayName(String playName) {
@@ -73,7 +97,7 @@ public class Play {
     }
 
     public Date getAvailableDate() {
-        return availableDate;
+        return this.availableDate;
     }
 
     public void setAvailableDate(Date availableDate) {
@@ -81,7 +105,7 @@ public class Play {
     }
 
     public Date getPlayDate() {
-        return playDate;
+        return this.playDate;
     }
 
     public void setPlayDate(Date playDate) {
@@ -89,7 +113,7 @@ public class Play {
     }
 
     public Date getRegisteredDate() {
-        return registeredDate;
+        return this.registeredDate;
     }
 
     public void setRegisteredDate(Date registeredDate) {
@@ -97,7 +121,7 @@ public class Play {
     }
 
     public String getLink() {
-        return link;
+        return this.link;
     }
 
     public void setLink(String link) {
@@ -105,11 +129,24 @@ public class Play {
     }
 
     public int getTicketsNumber() {
-        return ticketsNumber;
+        return this.ticketsNumber;
     }
 
     public void setTicketsNumber(int ticketsNumber) {
         this.ticketsNumber = ticketsNumber;
+    }
+
+    public List<Ticket> getTicketList() {
+        return this.ticketList;
+    }
+
+    public void setTicketList(List<Ticket> ticketList) {
+        this.ticketList = ticketList;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, playName, availableDate, playDate, registeredDate, link, ticketsNumber, ticketList);
     }
 
     @Override
@@ -125,18 +162,6 @@ public class Play {
                 registeredDate.equals(play.registeredDate) &&
                 link.equals(play.link) &&
                 Objects.equals(ticketList, play.ticketList);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, playName, availableDate, playDate, registeredDate, link, ticketsNumber, ticketList);
-    }
-    public List<Ticket> getTicketList() {
-        return ticketList;
-    }
-
-    public void setTicketList(List<Ticket> ticketList) {
-        this.ticketList = ticketList;
     }
 
     @Override

@@ -1,6 +1,9 @@
 package com.blue.tnb.dto;
 
+import com.blue.tnb.mapper.TicketMapperImpl;
 import com.blue.tnb.model.Play;
+import java.text.SimpleDateFormat;
+import java.util.List;
 import com.blue.tnb.model.Ticket;
 import lombok.*;
 
@@ -8,6 +11,9 @@ import javax.validation.constraints.NotEmpty;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Data
 public class PlayDTO {
@@ -17,50 +23,58 @@ public class PlayDTO {
     @NotEmpty(message = "Play must have a name specified")
     private String playName;
 
-    @NotEmpty(message = "Play must have an available date specified")
-    private Date availableDate;
+    @NotNull(message = "Insert Date")
+    private String availableDate;
 
-    @NotEmpty(message = "Play must have a valid start date specified")
-    private Date playDate;
+    @NotNull(message = "Insert Date")
+    private String playDate;
 
-    private Date registeredDate;
+    private String registeredDate;
 
-    @NotEmpty(message = "Insert a link")
+    @NotEmpty(message = "Play must have a link")
     private String link;
 
-    @NotEmpty(message = "Specify the number of tickets for this play")
+    @NotNull(message = "Specify the number of tickets for this play")
+    @Min(value = 1)
     private int ticketsNumber;
+    List<TicketDTO> ticketDTOList;
 
     private Long availableTicketsNumber= 0L;
     List<TicketDTO> ticketList;
 
+    public PlayDTO() {}
+
     public PlayDTO(Play play) {
         this.id = play.getId();
         this.playName = play.getPlayName();
-        this.availableDate = play.getAvailableDate();
-        this.playDate = play.getPlayDate();
-        this.registeredDate = play.getRegisteredDate();
         this.link = play.getLink();
         this.ticketsNumber = play.getTicketsNumber();
         this.availableTicketsNumber=0L;
+
+        if (play.getPlayDate() == null) {
+            this.playDate = "";
+        } else {
+            this.playDate = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(play.getPlayDate());
+        }
+
+        if (play.getAvailableDate() == null) {
+            this.availableDate = "";
+        } else {
+            this.availableDate = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(play.getAvailableDate());
+        }
+
+        if (play.getRegisteredDate() == null) {
+            this.registeredDate = "";
+        } else {
+            this.registeredDate = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(play.getRegisteredDate());
+        }
+
+        TicketMapperImpl ticketMapper = new TicketMapperImpl();
+        this.ticketDTOList = ticketMapper.convertTicketToTicketDTOList(play.getTicketList());
+
     }
 
 
-    public PlayDTO(Long id,
-                   @NotEmpty(message = "Play must have a name specified") String playName,
-                   @NotEmpty(message = "Play must have an available date specified") Date availableDate,
-                   @NotEmpty(message = "Play must have a valid start date specified") Date playDate,
-                   Date registeredDate,
-                   @NotEmpty(message = "Insert a link") String link,
-                   @NotEmpty(message = "Specify the number of tickets for this play") int ticketsNumber) {
-        this.id = id;
-        this.playName = playName;
-        this.availableDate = availableDate;
-        this.playDate = playDate;
-        this.registeredDate = registeredDate;
-        this.link = link;
-        this.ticketsNumber = ticketsNumber;
-    }
 
     public Long getId() {
         return id;
@@ -78,28 +92,32 @@ public class PlayDTO {
         this.playName = playName;
     }
 
-    public Date getAvailableDate() {
+    public String getAvailableDate() {
         return availableDate;
     }
 
-    public void setAvailableDate(Date availableDate) {
+    public void setAvailableDate(String availableDate) {
         this.availableDate = availableDate;
     }
 
-    public Date getPlayDate() {
-        return playDate;
+    public String getPlayDate() {
+        return this.playDate;
     }
 
-    public void setPlayDate(Date playDate) {
+    public void setPlayDate(String playDate) {
         this.playDate = playDate;
     }
 
-    public Date getRegisteredDate() {return registeredDate;}
+    public String getRegisteredDate() {
+        return this.registeredDate;
+    }
 
-    public void setRegisteredDate(Date registeredDate) {this.registeredDate = registeredDate;}
+    public void setRegisteredDate(String registeredDate) {
+        this.registeredDate = registeredDate;
+    }
 
     public String getLink() {
-        return link;
+        return this.link;
     }
 
     public void setLink(String link) {
@@ -122,6 +140,20 @@ public class PlayDTO {
         this.availableTicketsNumber = availableTicketsNumber;
     }
 
+
+    public List<TicketDTO> getTicketDTOList() {
+        return this.ticketDTOList;
+    }
+
+    public void setTicketDTOList(List<TicketDTO> ticketDTOList) {
+        this.ticketDTOList = ticketDTOList;
+    }
+
+    public void addTicketDTO(TicketDTO ticketDTO) {
+        System.out.println(ticketDTO);
+        this.ticketDTOList.add(ticketDTO);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -138,5 +170,9 @@ public class PlayDTO {
     @Override
     public int hashCode() {
         return Objects.hash(id, playName, availableDate, playDate, link, ticketsNumber);
+    }
+
+    public String toString() {
+        return "PlayDTO(id=" + this.getId() + ", playName=" + this.getPlayName() + ", availableDate=" + this.getAvailableDate() + ", playDate=" + this.getPlayDate() + ", registeredDate=" + this.getRegisteredDate() + ", link=" + this.getLink() + ", ticketsNumber=" + this.getTicketsNumber() + ", ticketDTOList=" + this.getTicketDTOList() + ")";
     }
 }

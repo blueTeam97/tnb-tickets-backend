@@ -2,10 +2,8 @@ package com.blue.tnb.dto;
 
 import com.blue.tnb.constants.Status;
 import com.blue.tnb.model.Ticket;
-import org.hibernate.annotations.CreationTimestamp;
-
-import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import java.text.SimpleDateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
@@ -26,9 +24,7 @@ public class TicketDTO {
 
     private String pickUpDate;
 
-    //private PlayDTO play;
-
-//    private UserDTO user;
+   public TicketDTO() {}
 
     public TicketDTO(Ticket ticket) {
         this.id=ticket.getId();
@@ -51,8 +47,12 @@ public class TicketDTO {
         this.playId = playId;
         this.bookDate = bookDate;
         this.pickUpDate = pickUpDate;
-        this.status=Status.FREE.getValue();
+        this.status= Status.FREE.getValue();
+    }
 
+
+    public String getStatus() {
+        return status;
     }
 
     public void setStatus(String status) {
@@ -82,10 +82,6 @@ public class TicketDTO {
 
     public void setPlayId(Long playId) {
         this.playId = playId;
-    }
-
-    public String getStatus() {
-        return status;
     }
 
     public void setStatus(Status status) {

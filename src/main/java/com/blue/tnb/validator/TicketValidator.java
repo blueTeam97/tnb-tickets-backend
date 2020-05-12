@@ -96,7 +96,7 @@ public class TicketValidator {
            return false;
        }
        else{
-           return playRepository.findOneById(ticketPlayId).isPresent();
+           return playRepository.findById(ticketPlayId).isPresent();
        }
     }
     public boolean validateTicketStatus(String ticketDTOStatus){

@@ -15,19 +15,18 @@ import java.util.Optional;
 @Repository
 @ComponentScan
 public interface PlayRepository extends JpaRepository<Play, Long> {
-    @Query("SELECT p FROM Play p")
+
+    //@Query("SELECT p FROM Play p") - for admin
+    @Query("Select p FROM Play p WHERE p.playDate > current_timestamp") // - for user
     List<Play> findAll();
 
     Optional<Play> findAllByPlayName(String playName);
 
     Optional<Play> findAllById(@Param("id") Long id);
 
-    @Query("SELECT p FROM Play p WHERE p.id=:id")
-    Optional<Play> findOneById(@Param("id") Long id);
+    Optional<Play> findById(Long id);
 
-    Play getOne(Long id);
-   /* @Query("SELECT u FROM User u where u.userId = :id")
-    List<Ticket> getAllByUserId(@Param("id") Long id);*/
+    Optional<Play> findByPlayName(String playName);
 
 
 }
