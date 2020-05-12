@@ -1,6 +1,9 @@
 package com.blue.tnb.controller;
 
 import com.blue.tnb.dto.PlayDTO;
+import com.blue.tnb.exception.PlayExceptions.PlayDeleteException;
+import com.blue.tnb.exception.PlayExceptions.PlayNotFoundException;
+import com.blue.tnb.exception.PlayExceptions.PlayUpdateException;
 import com.blue.tnb.model.Play;
 import com.blue.tnb.service.PlayService;
 import com.blue.tnb.validator.PlayValidator;
@@ -22,47 +25,41 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping({"/v1"})
 public class PlayController {
+
     @Autowired
     private PlayService playService;
-    @Autowired
-    private PlayValidator playValidator;
 
-    public PlayController() {
-    }
+    public PlayController() {}
 
     @GetMapping({"/findAll"})
     public ResponseEntity<List<PlayDTO>> getAll() {
-        return this.playService.getAllPlays() == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(this.playService.getAllPlays());
+        return playService.getAllPlays() == null ?
+                ResponseEntity.noContent().build() : ResponseEntity.ok(this.playService.getAllPlays());
     }
 
     @GetMapping({"/findById/{id}"})
-    public ResponseEntity<PlayDTO> getById(@PathVariable("id") @NotNull Long id) {
-        return ResponseEntity.ok(this.playService.getPlayById(id));
+    public ResponseEntity<PlayDTO> getById(@PathVariable("id") @NotNull Long id) throws PlayNotFoundException {
+        return ResponseEntity.ok(playService.getPlayById(id));
     }
 
     @GetMapping({"/findByName"})
-    public ResponseEntity<PlayDTO> getPlayByName(@RequestParam("playName") String playName) {
-        return this.playService.getPlayByName(playName) != null ? ResponseEntity.ok(this.playService.getPlayByName(playName)) : ResponseEntity.notFound().build();
+    public ResponseEntity<PlayDTO> getPlayByName(@RequestParam("playName") String playName) throws PlayNotFoundException {
+        return ResponseEntity.ok(playService.getPlayByName(playName));
     }
 
     @PostMapping({"/add"})
-    public ResponseEntity<Play> addPlay(@RequestBody PlayDTO playDTO) throws ParseException {
-        if (this.playValidator.validateTicketsNumber(playDTO.getTicketsNumber())) {
-            Play play = this.playService.addPlay(playDTO);
-            System.out.println(play);
-            return ResponseEntity.ok(play);
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Play> addPlay(@RequestBody PlayDTO playDTO)  {
+            return ResponseEntity.ok(playService.addPlay(playDTO));
     }
 
     @PutMapping({"/play/{id}"})
-    public ResponseEntity<Play> updatePlay(@PathVariable @NotNull Long id, @RequestBody PlayDTO playDTO) throws ParseException {
-        return this.playValidator.validateUpdate(playDTO) ? ResponseEntity.ok(this.playService.updatePlay(playDTO, id)) : ResponseEntity.badRequest().build();
+    public ResponseEntity<Play> updatePlay(@PathVariable @NotNull Long id, @RequestBody PlayDTO playDTO) throws PlayUpdateException {
+        System.out.println(ResponseEntity.ok(playService.updatePlay(playDTO, id)));
+        return ResponseEntity.ok(playService.updatePlay(playDTO, id));
     }
 
     @DeleteMapping({"/play/{id}"})
-    public ResponseEntity<Play> removePlay(@PathVariable("id") @NotNull Long id) {
-        return this.playValidator.validateId(id) ? ResponseEntity.ok(this.playService.deletePlay(id)) : ResponseEntity.badRequest().build();
+    public ResponseEntity<Play> removePlay(@PathVariable("id") @NotNull Long id) throws PlayDeleteException {
+        return ResponseEntity.ok(this.playService.deletePlay(id));
     }
 }

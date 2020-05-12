@@ -1,50 +1,64 @@
-
 package com.blue.tnb.dto;
 
 import com.blue.tnb.constants.Status;
 import com.blue.tnb.model.Ticket;
-import java.util.Date;
-import java.util.Objects;
 import javax.validation.constraints.NotEmpty;
+import java.text.SimpleDateFormat;
+import java.util.Objects;
 
 public class TicketDTO {
-    @NotEmpty(message = "A ticket MUST have an ID associated")
 
+    @NotEmpty(message = "A ticket MUST have an ID associated")
     private Long id;
 
     private Long userId;
 
     @NotEmpty(message = "A ticket MUST have a play associated")
-
     private Long playId;
 
     private String status;
 
-    private Date bookDate;
+    private String bookDate;
 
-    private Date pickUpDate;
+    private String pickUpDate;
 
-    public TicketDTO() {}
+   public TicketDTO() {}
 
     public TicketDTO(Ticket ticket) {
-        this.id = ticket.getId();
-        this.playId = ticket.getPlayId();
-        this.userId = ticket.getUserId();
-        this.status = ticket.getStatus().getValue();
-        this.bookDate = ticket.getBookDate();
-        this.pickUpDate = ticket.getPickUpDate();
+        this.id=ticket.getId();
+        this.playId=ticket.getPlayId();
+        this.userId=ticket.getUserId();
+        this.status=ticket.getStatus().getValue();
+        if(ticket.getBookDate()==null){
+            this.bookDate="";
+        }
+        else this.bookDate=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(ticket.getBookDate());
+
+        if(ticket.getPickUpDate()==null){
+            this.pickUpDate="";
+        }
+        else this.pickUpDate=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(ticket.getPickUpDate());
     }
 
-    public TicketDTO(Long userId, Long playId, Date bookDate, Date pickUpDate) {
+    public TicketDTO(Long userId, Long playId, String bookDate, String pickUpDate) {
         this.userId = userId;
         this.playId = playId;
         this.bookDate = bookDate;
         this.pickUpDate = pickUpDate;
-        this.status = Status.FREE.getValue();
+        this.status= Status.FREE.getValue();
+    }
+
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Long getId() {
-        return this.id;
+        return id;
     }
 
     public void setId(Long id) {
@@ -52,7 +66,7 @@ public class TicketDTO {
     }
 
     public Long getUserId() {
-        return this.userId;
+        return userId;
     }
 
     public void setUserId(Long userId) {
@@ -60,49 +74,60 @@ public class TicketDTO {
     }
 
     public Long getPlayId() {
-        return this.playId;
+        return playId;
     }
 
     public void setPlayId(Long playId) {
         this.playId = playId;
     }
 
-    public String getStatus() {
-        return this.status;
-    }
-
     public void setStatus(Status status) {
         this.status = status.getValue();
     }
 
-    public Date getBookDate() {
-        return this.bookDate;
+    public String getBookDate() {
+        return bookDate;
     }
 
-    public void setBookDate(Date bookDate) {
+    public void setBookDate(String bookDate) {
         this.bookDate = bookDate;
     }
 
-    public Date getPickUpDate() {
-        return this.pickUpDate;
+    public String getPickUpDate() {
+        return pickUpDate;
     }
 
-    public void setPickUpDate(Date pickUpDate) {
+    public void setPickUpDate(String pickUpDate) {
         this.pickUpDate = pickUpDate;
     }
 
+
+    @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (!(o instanceof TicketDTO)) {
-            return false;
-        } else {
-            TicketDTO ticketDTO = (TicketDTO)o;
-            return Objects.equals(this.userId, ticketDTO.userId) && this.playId.equals(ticketDTO.playId) && this.status == ticketDTO.status && Objects.equals(this.bookDate, ticketDTO.bookDate) && Objects.equals(this.pickUpDate, ticketDTO.pickUpDate);
-        }
+        if (this == o) return true;
+        if (!(o instanceof TicketDTO)) return false;
+        TicketDTO ticketDTO = (TicketDTO) o;
+        return  Objects.equals(userId, ticketDTO.userId) &&
+                playId.equals(ticketDTO.playId) &&
+                status.equals(ticketDTO.status) &&
+                Objects.equals(bookDate, ticketDTO.bookDate) &&
+                Objects.equals(pickUpDate, ticketDTO.pickUpDate);
     }
 
+    @Override
+    public String toString() {
+        return "TicketDTO{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", playId=" + playId +
+                ", status='" + status + '\'' +
+                ", bookDate=" + bookDate +
+                ", pickUpDate=" + pickUpDate +
+                '}';
+    }
+
+    @Override
     public int hashCode() {
-        return Objects.hash(new Object[]{this.userId, this.playId, this.status, this.bookDate, this.pickUpDate});
+        return Objects.hash(userId, playId, status, bookDate, pickUpDate);
     }
 }

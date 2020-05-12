@@ -1,8 +1,8 @@
 package com.blue.tnb.service;
 
 import com.blue.tnb.dto.TicketDTO;
-import com.blue.tnb.exception.TicketNotFoundException;
-import com.blue.tnb.exception.TicketWithoutUserException;
+import com.blue.tnb.exception.TicketExceptions.TicketNotFoundException;
+import com.blue.tnb.exception.TicketExceptions.TicketWithoutUserException;
 
 import java.util.List;
 

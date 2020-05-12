@@ -10,6 +10,7 @@ import com.blue.tnb.model.Play;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Objects;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -20,8 +21,10 @@ public class PlayDTO {
     @NotEmpty(message = "Play must have a name specified")
     private String playName;
 
+    @NotNull
     private String availableDate;
 
+    @NotNull
     private String playDate;
 
     private String registeredDate;
@@ -30,6 +33,7 @@ public class PlayDTO {
     private String link;
 
     @NotNull(message = "Specify the number of tickets for this play")
+    @Min(value = 1)
     private int ticketsNumber;
     List<TicketDTO> ticketDTOList;
 

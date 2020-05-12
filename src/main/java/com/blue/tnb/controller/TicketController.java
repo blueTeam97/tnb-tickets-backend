@@ -1,8 +1,8 @@
 package com.blue.tnb.controller;
 
 import com.blue.tnb.dto.TicketDTO;
-import com.blue.tnb.exception.TicketNotFoundException;
-import com.blue.tnb.exception.TicketWithoutUserException;
+import com.blue.tnb.exception.TicketExceptions.TicketNotFoundException;
+import com.blue.tnb.exception.TicketExceptions.TicketWithoutUserException;
 import com.blue.tnb.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

@@ -23,6 +23,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.hibernate.annotations.CreationTimestamp;
@@ -35,14 +36,17 @@ public class Play {
 
     @Column(name = "name")
     @Size(max = 255)
+    @NotEmpty
     private String playName;
 
     @Column(name = "available_date")
     @Temporal(TemporalType.TIMESTAMP)
+    @NotNull
     private Date availableDate;
 
     @Column(name = "play_date")
     @Temporal(TemporalType.TIMESTAMP)
+    @NotNull
     private Date playDate;
 
     @Column(name = "registered_date")
@@ -52,18 +56,16 @@ public class Play {
 
     @Column(name = "link")
     @Size(max = 255)
+    @NotEmpty
     private String link;
 
     @Column(name = "nr_tickets")
     @Min(value = 1)
     @NotNull
     private int ticketsNumber;
-    @OneToMany(
-            mappedBy = "play",
-            fetch = FetchType.EAGER,
-            cascade = {CascadeType.ALL}
-    )
-    private List<Ticket> ticketList = new ArrayList();
+
+    @OneToMany(mappedBy = "play", fetch = FetchType.EAGER,  cascade = CascadeType.ALL) //orphanRemoval = true
+    private List<Ticket> ticketList;
 
     public Play() {}
 
@@ -76,8 +78,8 @@ public class Play {
             SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             this.setPlayDate(dateTimeFormatter.parse(playDTO.getPlayDate()));
             this.setAvailableDate(dateTimeFormatter.parse(playDTO.getAvailableDate()));
-        } catch (ParseException var3) {
-            var3.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
 
     }
