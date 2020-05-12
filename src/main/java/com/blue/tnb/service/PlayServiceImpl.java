@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,9 @@ public class PlayServiceImpl implements PlayService {
     @Autowired
     private DateValidator dateValidator;
 
+    @Autowired
+    private TicketServiceImpl ticketServiceImpl;
+
     @Override
     public List<PlayDTO> getAllPlays() {
         List<PlayDTO> plays=playRepository.findAll().stream()
@@ -69,16 +73,25 @@ public class PlayServiceImpl implements PlayService {
     }
 
     public Play addPlay(PlayDTO playDTO) throws InvalidDateException {
+        if(playValidator.validateDateTime(playDTO.getPlayDate()) && playValidator.validateDateTime(playDTO.getAvailableDate())) {
+
             Play play = playRepository.saveAndFlush(this.playMapperImpl.convertPlayDTOToPlay(playDTO));
             TicketDTO ticketDTO;
             for (int i = 0; i < play.getTicketsNumber(); ++i) {
                 ticketDTO = new TicketDTO();
                 ticketDTO.setPlayId(play.getId());
                 ticketDTO.setStatus(Status.FREE);
-                ticketRepository.saveAndFlush(this.ticketMapperImpl.ticketDTOToTicket(ticketDTO));
+                try {
+                    ticketServiceImpl.addTicket(ticketDTO);
+                } catch (ParseException parseException) {
+                    parseException.printStackTrace();
+                }
             }
             play = playRepository.getOne(play.getId()); //ticketList????
-        return play;
+            return play;
+
+        }
+        else {throw new InvalidDateException();}
     }
 
     public Play updatePlay(PlayDTO playDTO, Long id) throws PlayUpdateException {
@@ -94,7 +107,6 @@ public class PlayServiceImpl implements PlayService {
             return playRepository.saveAndFlush(existingPlay);
         }
         else {throw new PlayUpdateException();}
-
     }
 
     public Play deletePlay(Long id) throws PlayDeleteException {

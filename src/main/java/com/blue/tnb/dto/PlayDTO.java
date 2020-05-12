@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import com.blue.tnb.model.Ticket;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.apache.tomcat.jni.Local;
 
@@ -41,6 +42,8 @@ public class PlayDTO {
     @NotNull(message = "Specify the number of tickets for this play")
     @Min(value = 1)
     private int ticketsNumber;
+
+    @JsonIgnore
     List<TicketDTO> ticketDTOList;
 
     private Long availableTicketsNumber= 0L;
@@ -135,6 +138,7 @@ public class PlayDTO {
     public void setTicketDTOList(List<TicketDTO> ticketDTOList) {
         this.ticketDTOList = ticketDTOList;
     }
+
 
 
     @Override
