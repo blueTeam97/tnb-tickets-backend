@@ -5,9 +5,9 @@ import java.util.Objects;
 
 public class BookResponse {
 
-    private TicketDTO ticketDTO;
+    private TicketDTO ticketDTO; //Scapa de el
 
-    private UserDTO userDTO;
+    private UserDTO userDTO; //Si de asta
 
     private PlayDTO playDTO;
 
