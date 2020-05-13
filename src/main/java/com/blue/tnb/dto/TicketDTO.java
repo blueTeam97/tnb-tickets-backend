@@ -38,6 +38,20 @@ public class TicketDTO {
         else this.pickUpDate=ticket.getPickUpDate().toString().replace("T"," ");
     }
 
+    public TicketDTO(@NotEmpty(message = "A ticket MUST have an ID associated") Long id,
+                     Long userId,
+                     @NotEmpty(message = "A ticket MUST have a play associated") Long playId,
+                     String status,
+                     String bookDate,
+                     String pickUpDate) {
+        this.id = id;
+        this.userId = userId;
+        this.playId = playId;
+        this.status = status;
+        this.bookDate = bookDate;
+        this.pickUpDate = pickUpDate;
+    }/*
+
     public TicketDTO(Long userId, Long playId, String bookDate, String pickUpDate) {
         this.userId = userId;
         this.playId = playId;
@@ -45,7 +59,7 @@ public class TicketDTO {
         this.pickUpDate = pickUpDate;
         this.status= Status.FREE.getValue();
     }
-
+*/
 
     public String getStatus() {
         return status;

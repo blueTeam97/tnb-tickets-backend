@@ -5,67 +5,29 @@ import java.util.Objects;
 
 public class BookResponse {
 
-    private TicketDTO ticketDTO; //Scapa de el
+    private Long expiredTime;
 
-    private PlayDTO playDTO;
-
-    private Date expiredTime;
-
+    private boolean allowedToBook;
 
     public BookResponse(){}
 
-    public BookResponse(TicketDTO ticketDTO, PlayDTO playDTO, Date expiredTime) {
-        this.ticketDTO = ticketDTO;
-        this.playDTO = playDTO;
+    public BookResponse(TicketDTO ticketDTO, PlayDTO playDTO, Long expiredTime) {
         this.expiredTime = expiredTime;
     }
 
-    @Override
-    public String toString() {
-        return "BookResponse{" +
-                "ticketDTO=" + ticketDTO +
-                ", playDTO=" + playDTO +
-                ", expiredTime=" + expiredTime +
-                '}';
+    public boolean isAllowedToBook() {
+        return allowedToBook;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BookResponse)) return false;
-        BookResponse that = (BookResponse) o;
-        return Objects.equals(ticketDTO, that.ticketDTO) &&
-                Objects.equals(playDTO, that.playDTO) &&
-                Objects.equals(expiredTime, that.expiredTime);
+    public void setAllowedToBook(boolean allowedToBook) {
+        this.allowedToBook = allowedToBook;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(ticketDTO, playDTO, expiredTime);
-    }
-
-    public TicketDTO getTicketDTO() {
-        return ticketDTO;
-    }
-
-    public void setTicketDTO(TicketDTO ticketDTO) {
-        this.ticketDTO = ticketDTO;
-    }
-
-
-    public PlayDTO getPlayDTO() {
-        return playDTO;
-    }
-
-    public void setPlayDTO(PlayDTO playDTO) {
-        this.playDTO = playDTO;
-    }
-
-    public Date getExpiredTime() {
+    public Long getExpiredTime() {
         return expiredTime;
     }
 
-    public void setExpiredTime(Date expiredTime) {
+    public void setExpiredTime(Long expiredTime) {
         this.expiredTime = expiredTime;
     }
 }

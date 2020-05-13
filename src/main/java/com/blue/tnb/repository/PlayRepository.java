@@ -17,8 +17,11 @@ import java.util.Optional;
 @ComponentScan
 public interface PlayRepository extends JpaRepository<Play, Long> {
 
-    @Query("Select p FROM Play p WHERE p.playDate > current_timestamp")
+    @Query("Select p FROM Play p WHERE p.playDate > current_timestamp") // - for user
     List<Play> findAll();
+
+    @Query(value = "Select p.* from Play p Join Ticket t on p.id=t.play_id",nativeQuery = true)
+    List<Play> findAllNoRestriction();
 
     Optional<Play> findAllByPlayName(String playName);
 

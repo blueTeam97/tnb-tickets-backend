@@ -48,6 +48,8 @@ public class PlayDTO {
 
     private Long availableTicketsNumber= 0L;
 
+    private Long bookedTicketsNumber=0L;
+
     public PlayDTO() {}
 
     public PlayDTO(Play play) {
@@ -65,7 +67,6 @@ public class PlayDTO {
         this.ticketDTOList = ticketMapper.convertTicketToTicketDTOList(play.getTicketList());
 
     }
-
 
     public Long getId() {
         return id;
