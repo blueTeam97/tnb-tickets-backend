@@ -20,6 +20,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -188,8 +189,10 @@ public class TicketServiceImpl{
                 String[] headerSplitted=userCredential.substring("Bearer".length()).trim().split("\\.");
                 byte[] userDecoded= Base64.getDecoder().decode(headerSplitted[1]);
                 String userCredentialDecoded=new String(userDecoded);
+          
                 String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
                 userEmail=userEmail.substring(1,userEmail.length()-1);
+          
                 Optional<Ticket> freeTicket=availableTickets.stream().findFirst();
                 System.out.println(freeTicket.get()+": "+userCredential);
                 PlayDTO play =playMapper.convertPlayToPlayDTO(playRepository.getOne(playId));
