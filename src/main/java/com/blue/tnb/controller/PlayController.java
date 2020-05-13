@@ -47,12 +47,12 @@ public class PlayController {
     }
 
     @PostMapping({"/add"})
-    public ResponseEntity<Play> addPlay(@RequestBody PlayDTO playDTO) throws InvalidDateException {
-            return ResponseEntity.ok(playService.addPlay(playDTO));
+    public ResponseEntity<PlayDTO> addPlay(@RequestBody PlayDTO playDTO) throws InvalidDateException {
+        return ResponseEntity.ok(playService.addPlay(playDTO));
     }
 
     @PutMapping({"/play/{id}"})
-    public ResponseEntity<PlayDTO> updatePlay(@PathVariable @NotNull Long id, @RequestBody PlayDTO playDTO) throws PlayUpdateException {
+    public ResponseEntity<PlayDTO> updatePlay(@PathVariable @NotNull Long id, @RequestBody PlayDTO playDTO) throws PlayUpdateException, InvalidDateException {
         return ResponseEntity.ok(playService.updatePlay(playDTO, id)); //bad response exception
     }
 

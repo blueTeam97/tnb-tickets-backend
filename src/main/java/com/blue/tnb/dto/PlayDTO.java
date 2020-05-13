@@ -43,7 +43,7 @@ public class PlayDTO {
     @Min(value = 1)
     private int ticketsNumber;
 
-    @JsonIgnore
+    //@JsonIgnore
     List<TicketDTO> ticketDTOList;
 
     private Long availableTicketsNumber= 0L;

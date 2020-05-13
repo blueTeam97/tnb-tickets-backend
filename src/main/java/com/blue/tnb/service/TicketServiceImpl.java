@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -107,10 +108,10 @@ public class TicketServiceImpl implements TicketService {
             Optional<Ticket> ticket= ticketRepository.findAllByPlayId(playId).stream()
                                         .min((t1, t2) -> -t1.getBookDate().compareTo(t2.getBookDate()));
 
-            Date currentTime=new Date(System.currentTimeMillis());
-            Date diff=new Date(currentTime.getTime()-ticket.get().getBookDate().getTime());
+           // Date currentTime=new Date(System.currentTimeMillis());
+           // Date diff=new Date(currentTime.getTime()-ticket.get().getBookDate().getTime());
 
-            bookResponse.setExpiredTime(diff);
+            //bookResponse.setExpiredTime(diff);
            // Date diff=new Date(currentTime.getTime()-ticket.get().getBookDate().getTime());
            // bookResponse.setExpiredTime(diff);
         }
@@ -127,7 +128,7 @@ public class TicketServiceImpl implements TicketService {
 
                 freeTicket.get().setStatus(Status.BOOKED);
                 freeTicket.get().setUserId(userId);
-                freeTicket.get().setBookDate(new Date(System.currentTimeMillis()));
+                freeTicket.get().setBookDate(LocalDateTime.now());
 
                 bookResponse.setTicketDTO(ticketMapper.ticketToTicketDTO(freeTicket.get()));
                 updateTicket(freeTicket.get().getId(),ticketMapper.ticketToTicketDTO(freeTicket.get()));
