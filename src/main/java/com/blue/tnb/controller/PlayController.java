@@ -5,6 +5,7 @@ import com.blue.tnb.exception.PlayExceptions.InvalidDateException;
 import com.blue.tnb.exception.PlayExceptions.PlayDeleteException;
 import com.blue.tnb.exception.PlayExceptions.PlayNotFoundException;
 import com.blue.tnb.exception.PlayExceptions.PlayUpdateException;
+import com.blue.tnb.exception.TicketExceptions.TicketsNumberException;
 import com.blue.tnb.model.Play;
 import com.blue.tnb.service.PlayService;
 import java.util.List;
@@ -52,7 +53,7 @@ public class PlayController {
     }
 
     @PutMapping({"/play/{id}"})
-    public ResponseEntity<PlayDTO> updatePlay(@PathVariable @NotNull Long id, @RequestBody PlayDTO playDTO) throws PlayUpdateException, InvalidDateException {
+    public ResponseEntity<PlayDTO> updatePlay(@PathVariable @NotNull Long id, @RequestBody PlayDTO playDTO) throws PlayUpdateException, InvalidDateException, TicketsNumberException {
         return ResponseEntity.ok(playService.updatePlay(playDTO, id)); //bad response exception
     }
 

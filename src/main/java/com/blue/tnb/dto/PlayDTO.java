@@ -43,7 +43,7 @@ public class PlayDTO {
     @Min(value = 1)
     private int ticketsNumber;
 
-    //@JsonIgnore
+    @JsonIgnore
     List<TicketDTO> ticketDTOList;
 
     private Long availableTicketsNumber= 0L;
@@ -57,14 +57,15 @@ public class PlayDTO {
         this.ticketsNumber = play.getTicketsNumber();
         this.availableTicketsNumber=0L;
 
-        this.playDate = play.getPlayDate().toString();
-        this.availableDate = play.getAvailableDate().toString();
-        this.registeredDate = play.getRegisteredDate().toString();
+        this.playDate = play.getPlayDate().toString().replace("T", " ");
+        this.availableDate = play.getAvailableDate().toString().replace("T", " ");
+        this.registeredDate = play.getRegisteredDate().toString().replace("T", " ");
 
         TicketMapperImpl ticketMapper = new TicketMapperImpl();
         this.ticketDTOList = ticketMapper.convertTicketToTicketDTOList(play.getTicketList());
 
     }
+
 
     public Long getId() {
         return id;

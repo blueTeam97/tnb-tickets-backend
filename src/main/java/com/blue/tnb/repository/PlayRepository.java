@@ -17,8 +17,7 @@ import java.util.Optional;
 @ComponentScan
 public interface PlayRepository extends JpaRepository<Play, Long> {
 
-    //@Query("SELECT p FROM Play p") - for admin
-    @Query("Select p FROM Play p WHERE p.playDate > current_timestamp") // - for user
+    @Query("Select p FROM Play p WHERE p.playDate > current_timestamp")
     List<Play> findAll();
 
     Optional<Play> findAllByPlayName(String playName);
@@ -29,12 +28,5 @@ public interface PlayRepository extends JpaRepository<Play, Long> {
 
     Optional<Play> findByPlayName(String playName);
 
-  /*  @Query(value="CALL add_play_with_tickets(:playName,:availableDate,:playDate,:linkLink,:nrTickets,:generatedD)", nativeQuery = true)
-    Long addPlay(@Param("playName") String playName,
-                 @Param("availableDate") LocalDateTime availableDate,
-                 @Param("playDate") LocalDateTime playDate,
-                 @Param("linkLink") String link,
-                 @Param("nrTickets") int nrTickets,
-                 @PathVariable("generatedD") int generatedD);*/
 
 }
