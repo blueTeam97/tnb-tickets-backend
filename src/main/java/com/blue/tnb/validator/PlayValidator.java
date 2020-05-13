@@ -40,6 +40,7 @@ public class PlayValidator {
     }
 
     public boolean validateDateTime(String localDateTimeAsString) {
+        System.out.println(localDateTimeAsString);
         return GenericValidator.isDate(localDateTimeAsString, "yyyy-MM-dd HH:mm:ss", true);
     }
 

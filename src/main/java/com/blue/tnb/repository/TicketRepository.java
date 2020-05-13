@@ -22,8 +22,8 @@ public interface TicketRepository extends JpaRepository<Ticket,Long> {
     @Query("SELECT t FROM Ticket t WHERE t.playId= :playId")
     List<Ticket> findAllByPlayId(@Param("playId")Long playId);
 
-    /* @Query("SELECT u FROM User u where u.userId = :id")
-    List<Ticket> getAllByUserId(@Param("id") Long id);*/
+    @Query(value = "Select Count(t.id) FROM Ticket t WHERE t.status='booked' and t.play_id= :play_id",nativeQuery = true)
+    Long countAllBookedTicketsByPlayId(@Param("play_id") Long playId);
 
     @Query(value = "SELECT Count(t.id) FROM Ticket t WHERE t.status='free' AND t.play_id= :playId",nativeQuery = true)
     Long countAllAvailableByPlayId(@Param("playId") Long playId);

@@ -19,15 +19,16 @@ public class TicketBookingTest implements Callable<String> {
 
     private String userId;
 
+    private String url;
+
     private RestTemplate restTemplate=new RestTemplate();
 
-    public TicketBookingTest(String userId){
+    public TicketBookingTest(String userId,String url){
         this.userId=userId;
+        this.url=url;
     }
 
     private String reserveTicket(String userId){
-
-        String url="http://localhost:8081/tasks/play/1/book/{id}";
 
         HttpHeaders headers = new HttpHeaders();
         // set `content-type` header
@@ -39,11 +40,7 @@ public class TicketBookingTest implements Callable<String> {
         // create a map for post parameters
         HttpEntity request=new HttpEntity(headers);
         try{
-            System.out.println(userId);
             ResponseEntity<String> response = this.restTemplate.exchange(url, HttpMethod.GET,request,String.class,userId);
-
-            System.out.println(response.getStatusCode());
-            System.out.println(response.getBody());
             return response.getStatusCode()+": "+response.getBody();
         }
         catch(Exception ex){

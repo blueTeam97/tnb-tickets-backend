@@ -5,24 +5,42 @@ import com.blue.tnb.dto.TicketDTO;
 import com.blue.tnb.exception.TicketExceptions.TicketNotFoundException;
 import com.blue.tnb.exception.TicketExceptions.TicketWithoutUserException;
 import com.blue.tnb.model.Ticket;
+import com.blue.tnb.model.User;
 import com.blue.tnb.service.TicketService;
+import com.blue.tnb.service.TicketServiceImpl;
 import com.blue.tnb.validator.TicketValidator;
+import com.hazelcast.core.HazelcastInstance;
+import io.jsonwebtoken.Jwt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.http.HttpProperties;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.LockModeType;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
+import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/tasks")
 public class TicketController {
 
     @Autowired
-    private TicketService ticketService;
+    private TicketServiceImpl ticketService;
 
     @Autowired
     private TicketValidator ticketValidator;
+
+    @Autowired
+    HazelcastInstance hazelcastInstance;
+
 
     @GetMapping("/findAll")
     public List<TicketDTO> findAllTickets(){
@@ -44,8 +62,6 @@ public class TicketController {
     public List<TicketDTO> getAllByPlayId(@PathVariable Long playId) throws TicketNotFoundException {
         return ticketService.getAllByPlayId(playId);
     }
-
-
 
     @PostMapping("/addTicket")
     public ResponseEntity<Ticket> addTicket(@RequestBody TicketDTO ticketDTO) throws ParseException {
@@ -71,7 +87,12 @@ public class TicketController {
         }
         else return ResponseEntity.badRequest().build();
     }
+    @GetMapping("/play/{id}/findAllAvailableTickets")
+    public ResponseEntity<List<TicketDTO>> findAllAvailableTickets(@PathVariable("id") Long id){
+        return ResponseEntity.ok(ticketService.findAllAvailableTicketsByPlayId(id));
+    }
     @GetMapping("/play/{id}/availableTickets")
+    @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
     public ResponseEntity<Long> getAllAvailableTickets(@PathVariable Long id){
         return ResponseEntity.ok(ticketService.countAvailableTicketsByPlayId(id));
     }
@@ -80,11 +101,11 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.findAllTicketsByUserId(id));
     }
 
-    @PostMapping("/play/{playId}/book/{userId}")
+    @GetMapping("/play/{playId}/book")
     public ResponseEntity<BookResponse> bookTicket(@PathVariable(value = "playId") Long playId,
-                                                   @PathVariable(value = "userId") Long userId){
+                                                   @RequestHeader(value="authorization") String headers){
 
-        return ResponseEntity.ok(ticketService.bookTicket(playId,userId));
+        return ResponseEntity.ok(ticketService.bookTicket(playId,headers));
     }
 
  // /play/{playId}/book/{userId} -> booking pentru un bilet
