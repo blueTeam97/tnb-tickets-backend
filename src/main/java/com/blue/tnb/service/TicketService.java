@@ -6,11 +6,12 @@ import com.blue.tnb.exception.TicketExceptions.TicketNotFoundException;
 import com.blue.tnb.exception.TicketExceptions.TicketWithoutUserException;
 import com.blue.tnb.model.Play;
 import com.blue.tnb.model.Ticket;
+import com.blue.tnb.model.User;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
-
 
 public interface TicketService {
 
@@ -31,12 +32,11 @@ public interface TicketService {
     Ticket deleteTicket(Long ticketId);
 
     Long countAvailableTicketsByPlayId(Long playId);
-
     List<TicketDTO> findAllTicketsByUserId(Long id);
     //List<TicketDTO> getAllByUser(User user);
 
     List<TicketDTO> findAllAvailableTicketsByPlayId(Long id);
 
-    BookResponse bookTicket(Long playId,Long userId);
+    BookResponse bookTicket(Long playId, String userCredential);
 
 }

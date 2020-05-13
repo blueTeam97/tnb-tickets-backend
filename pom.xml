@@ -74,6 +74,16 @@
 			<artifactId>commons-validator</artifactId>
 			<version>1.6</version>
 		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+			<version>3.7.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-client</artifactId>
+			<version>3.7.2</version>
+		</dependency>
     </dependencies>
 	<build>
 		<plugins>

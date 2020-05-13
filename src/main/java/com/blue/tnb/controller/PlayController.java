@@ -11,6 +11,7 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +33,7 @@ public class PlayController {
 
     @GetMapping({"/findAll"})
     public ResponseEntity<List<PlayDTO>> getAll() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return playService.getAllPlays() == null ?
                 ResponseEntity.noContent().build() : ResponseEntity.ok(this.playService.getAllPlays());
     }

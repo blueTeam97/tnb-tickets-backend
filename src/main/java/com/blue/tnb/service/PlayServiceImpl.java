@@ -13,15 +13,15 @@ import com.blue.tnb.mapper.TicketMapperImpl;
 import com.blue.tnb.model.Play;
 import com.blue.tnb.repository.PlayRepository;
 import com.blue.tnb.repository.TicketRepository;
+import com.blue.tnb.validator.PlayValidator;
+import com.hazelcast.core.HazelcastInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.blue.tnb.validator.PlayValidator;
 
 
 @Service("playService")
@@ -45,6 +45,9 @@ public class PlayServiceImpl implements PlayService {
     @Autowired
     private TicketServiceImpl ticketServiceImpl;
 
+    @Autowired
+    private HazelcastInstance hazelcastInstance;
+
     @Override
     public List<PlayDTO> getAllPlays() {
         List<PlayDTO> plays=playRepository.findAll().stream()
@@ -52,6 +55,7 @@ public class PlayServiceImpl implements PlayService {
                 .collect(Collectors.toList());
         for(PlayDTO playDTO: plays){
             playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
+            playDTO.setBookedTicketsNumber(ticketRepository.countAllBookedTicketsByPlayId(playDTO.getId()));
         }
         return plays;
     }
@@ -72,6 +76,7 @@ public class PlayServiceImpl implements PlayService {
         if(playValidator.validateDateTime(playDTO.getPlayDate()) && playValidator.validateDateTime(playDTO.getAvailableDate())) {
 
             Play play = playRepository.saveAndFlush(this.playMapperImpl.convertPlayDTOToPlay(playDTO));
+
             TicketDTO ticketDTO;
             for (int i = 0; i < play.getTicketsNumber(); ++i) {
                 ticketDTO = new TicketDTO();
@@ -83,6 +88,10 @@ public class PlayServiceImpl implements PlayService {
                     parseException.printStackTrace();
                 }
             }
+            Map<Long, List<Long>> availableTickets=hazelcastInstance.getMap("tickets");
+            List<Long> availableTicketsId=play.getTicketList().stream().map(ticket -> ticket.getId())
+                                                                .collect(Collectors.toList());
+            availableTickets.put(play.getId(),availableTicketsId);
             play = playRepository.getOne(play.getId()); //ticketList????
             return play;
 

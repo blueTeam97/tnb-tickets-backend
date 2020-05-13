@@ -48,6 +48,8 @@ public class PlayDTO {
 
     private Long availableTicketsNumber= 0L;
 
+    private Long bookedTicketsNumber=0L;
+
     public PlayDTO() {}
 
     public PlayDTO(Play play) {
@@ -66,7 +68,7 @@ public class PlayDTO {
 
     }
 
-    public Long getId() {
+   /* public Long getId() {
         return id;
     }
 
@@ -128,7 +130,7 @@ public class PlayDTO {
 
     public void setAvailableTicketsNumber(Long availableTicketsNumber) {
         this.availableTicketsNumber = availableTicketsNumber;
-    }
+    }*/
 
 
     public List<TicketDTO> getTicketDTOList() {
