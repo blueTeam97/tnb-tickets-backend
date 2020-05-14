@@ -87,16 +87,25 @@ public class TicketServiceImpl{
         Status status=ticketDTO.equals("free")?Status.FREE:(ticketDTO.getStatus().equals("booked")?Status.BOOKED:Status.PICKEDUP);
         ticket.setStatus(status);
         ticket.setUserId(ticketDTO.getUserId());
+        String date;
         DateTimeFormatter formatter=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         if(StringUtils.isEmpty(ticketDTO.getBookDate())){
             ticket.setBookDate(null);
         }
-        else ticket.setBookDate(LocalDateTime.parse(ticketDTO.getBookDate(),formatter));
+        else {
+            date=ticketDTO.getBookDate();
+            date=date.indexOf('.')>=0?date.substring(0,date.indexOf('.')):date;
+            ticket.setBookDate(LocalDateTime.parse(date,formatter));
+        }
 
         if(StringUtils.isEmpty(ticketDTO.getPickUpDate())){
             ticket.setPickUpDate(null);
         }
-        else ticket.setPickUpDate(LocalDateTime.parse(ticketDTO.getPickUpDate(),formatter));;
+        else {
+            date =ticketDTO.getPickUpDate();
+            date=date.indexOf('.')>=0?date.substring(0,date.indexOf('.')):date;
+            ticket.setPickUpDate(LocalDateTime.parse(date,formatter));
+        }
 
         ticket.getPlay().setTicketList(null);
         return ticketRepository.saveAndFlush(ticket);
@@ -157,7 +166,7 @@ public class TicketServiceImpl{
     //Decomentezi pe propria raspundere
    @Async
     private void saveTicket(Long playId,Long ticketId,Long userId){
-        updateTicket(ticketId,new TicketDTO(ticketId,userId,playId,Status.BOOKED.getValue(), LocalDateTime.now().toString(),null));
+        updateTicket(ticketId,new TicketDTO(ticketId,userId,playId,Status.BOOKED.getValue(), LocalDateTime.now().toString().replace("T"," "),null));
     }
     public ResponseEntity<BookResponse> bookTicketAsync(Long playId,Long userId){
 

@@ -25,7 +25,7 @@ public interface TicketRepository extends JpaRepository<Ticket,Long> {
     List<Ticket> findAllByPlayId(@Param("playId")Long playId);
 
     @Query(value = "SELECT Count(t.id) FROM Ticket t WHERE t.status='free' AND t.play_id= :playId",nativeQuery = true)
-    int countAllAvailableByPlayId(@Param("playId") Long playId);
+    Long countAllAvailableByPlayId(@Param("playId") Long playId);
 
     @Query(value = "Select t.* from Ticket t Join Play p On t.play_id=p.id where t.user_id= :userId",nativeQuery = true)
     List<Ticket> findAllByUserId(@Param("userId") Long userId);
@@ -37,4 +37,7 @@ public interface TicketRepository extends JpaRepository<Ticket,Long> {
     @Transactional
     @Query(value="DELETE FROM Ticket WHERE id=:ticket_id",nativeQuery = true)
     void deleteTicket(@Param("ticket_id") Long id);
+
+    @Query(value = "SELECT Count(t.id) FROM Ticket t WHERE t.status='booked' AND t.play_id= :playId",nativeQuery = true)
+    Long countAllBookedTicketsByPlayId(Long playId);
 }

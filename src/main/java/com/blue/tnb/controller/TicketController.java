@@ -35,7 +35,7 @@ import java.util.Map;
 public class TicketController {
 
     @Autowired
-    private TicketService ticketService;
+    private TicketServiceImpl ticketService;
 
     @Autowired
     private TicketValidator ticketValidator;
@@ -104,11 +104,10 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.findAllTicketsByUserId(id));
     }
 
-    @PostMapping("/play/{playId}/book/{userId}")
+    @PostMapping("/play/{playId}/book")
     public ResponseEntity<BookResponse> bookTicket(@PathVariable(value = "playId") Long playId,
-                                                   @PathVariable(value = "userId") Long userId){
-
-        return ResponseEntity.ok(ticketService.bookTicket(playId,userId));
+                                                   @RequestHeader(value = "authorization") String header){
+        return ResponseEntity.ok(ticketService.bookTicket(playId,header));
     }
     @GetMapping("/play/{playId}/book/{userId}")
     public ResponseEntity<BookResponse> bookTicketTest(@PathVariable(value = "playId") Long playId,

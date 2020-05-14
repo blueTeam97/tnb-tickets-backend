@@ -43,7 +43,8 @@ public class TicketDTO {
             this.pickUpDate="";
         }
         else this.pickUpDate=ticket.getPickUpDate().toString().replace("T"," ");
-        playDTO=new PlayDTO(ticket.getPlay().getPlayName(),ticket.getPlay().getPlayDate().toString(),ticket.getPlay().getLink());
+        playDTO=new PlayMapperImpl().convertPlayToPlayDTO(ticket.getPlay());
+        //playDTO=new PlayDTO(ticket.getPlay().getPlayName(),ticket.getPlay().getPlayDate().toString(),ticket.getPlay().getLink());
     }
 
     public TicketDTO(@NotEmpty(message = "A ticket MUST have an ID associated") Long id,

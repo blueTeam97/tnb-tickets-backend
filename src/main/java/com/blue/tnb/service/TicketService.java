@@ -28,7 +28,7 @@ public interface TicketService {
     Ticket updateTicket(Long id,TicketDTO ticketDTO);
     Ticket deleteTicket(Long ticketId);
 
-    int countAvailableTicketsByPlayId(Long playId);
+    Long countAvailableTicketsByPlayId(Long playId);
 
     List<TicketDTO> findAllTicketsByUserId(Long id);
     //List<TicketDTO> getAllByUser(User user);
