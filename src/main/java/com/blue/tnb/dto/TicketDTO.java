@@ -24,7 +24,7 @@ public class TicketDTO {
 
     private String bookDate;
 
-    //private String pickUpDate;
+    private String pickUpDate;
 
     private String name;
     private String date;
@@ -46,17 +46,17 @@ public class TicketDTO {
             this.bookDate="";
         }
         else this.bookDate=ticket.getBookDate().toString().replace("T"," ");
-        /*if(ticket.getPickUpDate()==null){
+        if(ticket.getPickUpDate()==null){
             this.pickUpDate="";
         }
-        else this.pickUpDate=ticket.getPickUpDate().toString().replace("T"," ");*/
+        else this.pickUpDate=ticket.getPickUpDate().toString().replace("T"," ");
     }
 
     public TicketDTO(Long userId, Long playId, String bookDate, String pickUpDate) {
         this.userId = userId;
         this.playId = playId;
         this.bookDate = bookDate;
-       // this.pickUpDate = pickUpDate;
+        this.pickUpDate = pickUpDate;
         this.status= Status.FREE.getValue();
     }
 
@@ -87,11 +87,6 @@ public class TicketDTO {
     public String getStatus() {
         return status;
     }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
 
     public Long getId() {
         return id;
@@ -129,13 +124,13 @@ public class TicketDTO {
         this.bookDate = bookDate;
     }
 
-    //public String getPickUpDate() {
-      //  return pickUpDate;
-   // }
+    public String getPickUpDate() {
+        return pickUpDate;
+    }
 
-   // public void setPickUpDate(String pickUpDate) {
-        //this.pickUpDate = pickUpDate;
-    //}
+    public void setPickUpDate(String pickUpDate) {
+        this.pickUpDate = pickUpDate;
+    }
 
 
    /* @Override

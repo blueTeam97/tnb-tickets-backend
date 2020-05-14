@@ -47,7 +47,6 @@ public class TicketController {
     }
 
 
-
     @PostMapping("/addTicket")
     public ResponseEntity<Ticket> addTicket(@RequestBody TicketDTO ticketDTO) throws ParseException {
         System.out.println(ticketDTO);
