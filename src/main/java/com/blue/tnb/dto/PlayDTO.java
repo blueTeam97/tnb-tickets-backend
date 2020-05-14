@@ -49,6 +49,7 @@ public class PlayDTO {
     private Long availableTicketsNumber= 0L;
 
     private Long bookedTicketsNumber=0L;
+    //List<TicketDTO> ticketList;
 
     public PlayDTO() {}
 
