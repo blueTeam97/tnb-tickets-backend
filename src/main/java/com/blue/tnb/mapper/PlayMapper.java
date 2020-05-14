@@ -11,7 +11,7 @@ public interface PlayMapper {
     Play convertPlayDTOToPlay(PlayDTO playDTO);
     PlayDTO convertPlayToPlayDTO(Play play);
 
-    List<Play> convertPlayDTOToPlayList(List<PlayDTO> playDTOList);
-    List<PlayDTO> convertPlayToPlayDTOList(List<Play> playList);
+    //List<Play> convertPlayDTOToPlayList(List<PlayDTO> playDTOList);
+    //List<PlayDTO> convertPlayToPlayDTOList(List<Play> playList);
 
 }

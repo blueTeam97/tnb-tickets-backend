@@ -70,9 +70,9 @@ public class TicketValidator {
             if(validateTicketDate(ticketDTO.getBookDate())){
                 ticketDTO.getBookDate().replace("T"," ");
             }
-            if(validateTicketDate(ticketDTO.getPickUpDate())){
+           /* if(validateTicketDate(ticketDTO.getPickUpDate())){
                 ticketDTO.getPickUpDate().replace("T"," ");
-            }
+            }*/
             return validateTicketPlayId(ticketDTO.getPlayId()) && validateTicketStatus(ticketDTO.getStatus());
         }
     }

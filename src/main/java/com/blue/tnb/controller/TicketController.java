@@ -25,9 +25,10 @@ public class TicketController {
     private TicketValidator ticketValidator;
 
     @GetMapping("/findAll")
-    public List<TicketDTO> findAllTickets(){
+    public List<TicketDTO> findAllTickets() {
         return ticketService.getAllTickets();
     }
+
     @GetMapping("/findByUserId/{userId}")
     public TicketDTO findTicketByUserId(@PathVariable Long userId) throws TicketWithoutUserException {
 
@@ -72,7 +73,7 @@ public class TicketController {
         else return ResponseEntity.badRequest().build();
     }
     @GetMapping("/play/{id}/availableTickets")
-    public ResponseEntity<Long> getAllAvailableTickets(@PathVariable Long id){
+    public ResponseEntity<Integer> getAllAvailableTickets(@PathVariable Long id){
         return ResponseEntity.ok(ticketService.countAvailableTicketsByPlayId(id));
     }
     @GetMapping("/user/{id}/history")
@@ -87,12 +88,4 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.bookTicket(playId,userId));
     }
 
- // /play/{playId}/book/{userId} -> booking pentru un bilet
-    // Verificare peste 30 zile(conditie)
-    //else eroare cu returnare nr zile ramase pana la urmatorul book
-
-    // pick-up user + ticket
-    //Get all plays-verificare pentru playurile active(de azi, in viitor)
-    //              -si care au numarul de tickete free cel putin 1
-    // de adaugat availableTicketsCount in PlayDTO a. i. sa trimit in front numarul de tichete free pentru fiecare piesa
 }

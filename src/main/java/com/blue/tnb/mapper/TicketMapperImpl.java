@@ -67,3 +67,4 @@ public class TicketMapperImpl implements TicketMapper {
         return ticket==null?null:new TicketDTO(ticket);
     }
 }
+

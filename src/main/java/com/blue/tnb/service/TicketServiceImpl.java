@@ -15,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -81,7 +79,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public Long countAvailableTicketsByPlayId(Long playId) {
+    public int countAvailableTicketsByPlayId(Long playId) {
         return ticketRepository.countAllAvailableByPlayId(playId);
     }
 

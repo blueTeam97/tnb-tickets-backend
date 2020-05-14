@@ -121,10 +121,10 @@ public class Ticket {
             this.bookDate=convertStringToLocalDateTime(ticketDTO.getBookDate());
         }
         else this.bookDate=null;
-        if(!StringUtils.isEmpty(ticketDTO.getPickUpDate())){
+       /* if(!StringUtils.isEmpty(ticketDTO.getPickUpDate())){
             this.pickUpDate=convertStringToLocalDateTime(ticketDTO.getPickUpDate());
-        }
-        else this.pickUpDate=null;
+        }*/
+        //else this.pickUpDate=null;
         switch(ticketDTO.getStatus().toLowerCase()){
             case "free":
                 this.status=Status.FREE;
