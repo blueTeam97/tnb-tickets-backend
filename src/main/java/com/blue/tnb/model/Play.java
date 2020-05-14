@@ -21,11 +21,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.validation.constraints.*;
+
 import org.apache.tomcat.jni.Local;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -38,7 +35,7 @@ public class Play {
 
     @Column(name = "name")
     @Size(max = 255)
-    @NotEmpty
+    @NotBlank
     private String playName;
 
     @Column(name = "available_date")
@@ -55,32 +52,18 @@ public class Play {
 
     @Column(name = "link")
     @Size(max = 255)
-    @NotEmpty
+    @NotBlank
     private String link;
 
     @Column(name = "nr_tickets")
-    @Min(value = 1)
+    @Min(value = 2)
     @NotNull
     private int ticketsNumber;
 
-    @OneToMany(mappedBy = "play", fetch = FetchType.EAGER,  cascade = CascadeType.ALL) //orphanRemoval = true
+    @OneToMany(mappedBy = "play", fetch = FetchType.EAGER,  cascade = CascadeType.ALL)
     private List<Ticket> ticketList;
 
     public Play() {}
-
-    public Play(PlayDTO playDTO) {
-        this.setLink(playDTO.getLink());
-        this.setPlayName(playDTO.getPlayName());
-        this.setTicketsNumber(playDTO.getTicketsNumber());
-        this.setPlayDate(convertStringToLocalDateTime(playDTO.getPlayDate()));
-        this.setAvailableDate(convertStringToLocalDateTime(playDTO.getAvailableDate()));
-    }
-
-    public LocalDateTime convertStringToLocalDateTime(String dateAsString) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime dateTime = LocalDateTime.parse(dateAsString, formatter);
-        return dateTime;
-    }
 
     public Long getId() {
         return this.id;
@@ -145,6 +128,8 @@ public class Play {
     public void setTicketList(List<Ticket> ticketList) {
         this.ticketList = ticketList;
     }
+
+
 
     @Override
     public int hashCode() {

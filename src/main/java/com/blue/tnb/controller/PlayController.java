@@ -58,7 +58,7 @@ public class PlayController {
 
     @PutMapping({"/play/{id}"})
     public ResponseEntity<PlayDTO> updatePlay(@PathVariable @NotNull Long id, @RequestBody PlayDTO playDTO) throws PlayUpdateException, InvalidDateException, TicketsNumberException {
-        return ResponseEntity.ok(playService.updatePlay(playDTO, id)); //bad response exception
+        return ResponseEntity.ok(playService.updatePlay(playDTO, id));
     }
 
     @DeleteMapping({"/play/{id}"})

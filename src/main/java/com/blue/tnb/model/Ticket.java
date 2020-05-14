@@ -39,21 +39,11 @@ public class Ticket {
     @Column(name="pickup_date")
     private LocalDateTime pickUpDate;
 
-//    @Version
-//    private Long version;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(referencedColumnName = "id",nullable = false,insertable = false,updatable = false)
     private Play play;
 
-    public Ticket(Long id, Long userId, Long playId, Status status, LocalDateTime bookDate, LocalDateTime pickUpDate) {
-        this.id = id;
-        this.userId = userId;
-        this.playId = playId;
-        this.status = status;
-        this.bookDate = bookDate;
-        this.pickUpDate = pickUpDate;
-    }
+    public Ticket(){}
 
     public Long getId() {
         return id;
@@ -111,66 +101,23 @@ public class Ticket {
         this.play = play;
     }
 
-
-//    public Long getVersion() {
-//        return version;
-//    }
-//
-//    public void setVersion(Long version) {
-//        this.version = version;
-//    }
-
-    public Ticket(){
-
-    }
-    public Ticket(TicketDTO ticketDTO) throws ParseException {
-        this.id=ticketDTO.getId();
-        this.userId=ticketDTO.getUserId();
-        this.playId=ticketDTO.getPlayId();
-        if(!StringUtils.isEmpty(ticketDTO.getBookDate())){
-            this.bookDate=convertStringToLocalDateTime(ticketDTO.getBookDate());
-        }
-        else this.bookDate=null;
-        if(!StringUtils.isEmpty(ticketDTO.getPickUpDate())){
-            this.pickUpDate=convertStringToLocalDateTime(ticketDTO.getPickUpDate());
-        }
-        else this.pickUpDate=null;
-        switch(ticketDTO.getStatus().toLowerCase()){
-            case "free":
-                this.status=Status.FREE;
-                break;
-            case "booked":
-                this.status=Status.BOOKED;
-                break;
-            case "pickedup":
-                this.status=Status.PICKEDUP;
-                break;
-        }
-
-
-
-    }
-    public LocalDateTime convertStringToLocalDateTime(String dateAsString) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime dateTime = LocalDateTime.parse(dateAsString, formatter);
-        return dateTime;
-    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Ticket)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         Ticket ticket = (Ticket) o;
-        return id.equals(ticket.id) &&
+        return Objects.equals(id, ticket.id) &&
                 Objects.equals(userId, ticket.userId) &&
-                playId.equals(ticket.playId) &&
+                Objects.equals(playId, ticket.playId) &&
                 status == ticket.status &&
                 Objects.equals(bookDate, ticket.bookDate) &&
-                Objects.equals(pickUpDate, ticket.pickUpDate);
+                Objects.equals(pickUpDate, ticket.pickUpDate) &&
+                Objects.equals(play, ticket.play);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userId, playId, status, bookDate, pickUpDate);
+        return Objects.hash(id, userId, playId, status, bookDate, pickUpDate, play);
     }
 
     @Override
@@ -182,6 +129,7 @@ public class Ticket {
                 ", status=" + status +
                 ", bookDate=" + bookDate +
                 ", pickUpDate=" + pickUpDate +
+                ", play=" + play +
                 '}';
     }
 }
