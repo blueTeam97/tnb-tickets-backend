@@ -77,9 +77,9 @@ public class PlayServiceImpl implements PlayService {
         if(playValidator.validateDateTime(playDTO.getPlayDate())
                 && playValidator.validateDateTime(playDTO.getAvailableDate())) {
 
-         Play play = playRepository.save(this.playMapperImpl.convertPlayDTOToPlay(playDTO));
-         populateTicketsListPlay(play);
-         return playMapperImpl.convertPlayToPlayDTO(playRepository.save(play));
+            Play play = playRepository.save(this.playMapperImpl.convertPlayDTOToPlay(playDTO));
+            populateTicketsListPlay(play);
+            return playMapperImpl.convertPlayToPlayDTO(playRepository.save(play));
         }
         else {throw new InvalidDateException();}
     }
