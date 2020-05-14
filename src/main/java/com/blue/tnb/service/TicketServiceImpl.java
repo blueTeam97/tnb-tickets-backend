@@ -22,7 +22,10 @@ import org.springframework.util.StringUtils;
 import java.text.ParseException;;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -229,6 +232,11 @@ public class TicketServiceImpl{
     //@Override
     public BookResponse bookTicket(Long playId, String userCredential){
         BookResponse bookResponse=new BookResponse();
+
+        //read All available Tickets from Hazel map
+        //Pick the ticket
+        //Update hazel Map
+        //check if available date is
         List<Ticket> availableTickets=ticketRepository.findAllAvailableByPlayId(playId);
         if(availableTickets==null || availableTickets.size()==0){
             Optional<Ticket> ticket= ticketRepository.findAllByPlayId(playId).stream()
@@ -247,7 +255,6 @@ public class TicketServiceImpl{
                 Optional<Ticket> lastBookedTicket=ticketRepository.findAllByUserId(userId).stream()
                                                         .filter(ticket->ticket.getStatus().equals(Status.BOOKED))
                                                         .max((t1,t2)->t1.getBookDate().compareTo(t2.getBookDate()));
-
                 if(lastBookedTicket.isPresent() &&
                    lastBookedTicket.get().getBookDate().until(LocalDateTime.now(),ChronoUnit.DAYS)>30){
                     bookResponse.setAllowedToBook(true);

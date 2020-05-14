@@ -5,11 +5,13 @@
 
 package com.blue.tnb.validator;
 
+import com.blue.tnb.dto.PlayDTO;
 import com.blue.tnb.model.Play;
 import com.blue.tnb.repository.PlayRepository;
 import org.apache.commons.validator.GenericValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
@@ -37,6 +39,29 @@ public class PlayValidator {
 
     public boolean validateIdForUpdate(Long id) {
         return validateIdForDelete(id);
+    }
+
+    public String checkDateTimeFormat(String localDateTimeAsString) {
+        String[] parts = localDateTimeAsString.split("-");
+        StringBuilder str = new StringBuilder(parts[1]);
+        StringBuilder localDateTime = new StringBuilder(localDateTimeAsString);
+        String secondStr;
+        if(parts[1].length() != 2) {
+            str.insert(0, "0");
+            localDateTime.replace(5,6, str.toString());
+        }
+
+        secondStr = localDateTime.toString();
+
+        if(localDateTime.toString().contains("T")) {
+            secondStr = localDateTime.toString().replace("T", " ");
+        }
+
+        if(localDateTimeAsString.equals(secondStr)) {
+            return localDateTimeAsString;
+        }
+        else {return secondStr;}
+
     }
 
     public boolean validateDateTime(String localDateTimeAsString) {

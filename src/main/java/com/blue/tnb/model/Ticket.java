@@ -146,14 +146,15 @@ public class Ticket {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Ticket)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         Ticket ticket = (Ticket) o;
-        return id.equals(ticket.id) &&
+        return Objects.equals(id, ticket.id) &&
                 Objects.equals(userId, ticket.userId) &&
-                playId.equals(ticket.playId) &&
+                Objects.equals(playId, ticket.playId) &&
                 status == ticket.status &&
                 Objects.equals(bookDate, ticket.bookDate) &&
-                Objects.equals(pickUpDate, ticket.pickUpDate);
+                Objects.equals(pickUpDate, ticket.pickUpDate) &&
+                Objects.equals(play, ticket.play);
     }
 
     @Override
@@ -170,6 +171,7 @@ public class Ticket {
                 ", status=" + status +
                 ", bookDate=" + bookDate +
                 ", pickUpDate=" + pickUpDate +
+                ", play=" + play +
                 '}';
     }
 }

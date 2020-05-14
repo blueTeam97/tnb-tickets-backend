@@ -1,11 +1,16 @@
 package com.blue.tnb.dto;
 
 import com.blue.tnb.constants.Status;
+import com.blue.tnb.mapper.PlayMapperImpl;
+import com.blue.tnb.model.Play;
 import com.blue.tnb.model.Ticket;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.validation.constraints.NotEmpty;
 import java.util.Objects;
 
 public class TicketDTO {
+
 
     @NotEmpty(message = "A ticket MUST have an ID associated")
     private Long id;

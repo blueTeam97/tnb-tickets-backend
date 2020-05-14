@@ -35,17 +35,13 @@ import java.util.Map;
 public class TicketController {
 
     @Autowired
-    private TicketServiceImpl ticketService;
+    private TicketService ticketService;
 
     @Autowired
     private TicketValidator ticketValidator;
 
-    @Autowired
-    HazelcastInstance hazelcastInstance;
-
-
     @GetMapping("/findAll")
-    public List<TicketDTO> findAllTickets(){
+    public List<TicketDTO> findAllTickets() {
         return ticketService.getAllTickets();
     }
 
@@ -65,6 +61,7 @@ public class TicketController {
     public List<TicketDTO> getAllByPlayId(@PathVariable Long playId) throws TicketNotFoundException {
         return ticketService.getAllByPlayId(playId);
     }
+
 
     @PostMapping("/addTicket")
     public Ticket addTicket(@RequestBody TicketDTO ticketDTO) throws ParseException, InvalidDateException {
@@ -107,11 +104,11 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.findAllTicketsByUserId(id));
     }
 
-    @GetMapping("/play/{playId}/book")
+    @PostMapping("/play/{playId}/book/{userId}")
     public ResponseEntity<BookResponse> bookTicket(@PathVariable(value = "playId") Long playId,
-                                                   @RequestHeader(value="authorization") String headers){
+                                                   @PathVariable(value = "userId") Long userId){
 
-        return ResponseEntity.ok(ticketService.bookTicket(playId,headers));
+        return ResponseEntity.ok(ticketService.bookTicket(playId,userId));
     }
     @GetMapping("/play/{playId}/book/{userId}")
     public ResponseEntity<BookResponse> bookTicketTest(@PathVariable(value = "playId") Long playId,
@@ -129,12 +126,4 @@ public class TicketController {
         else return ResponseEntity.badRequest().build();
     }
 
- // /play/{playId}/book/{userId} -> booking pentru un bilet
-    // Verificare peste 30 zile(conditie)
-    //else eroare cu returnare nr zile ramase pana la urmatorul book
-
-    // pick-up user + ticket
-    //Get all plays-verificare pentru playurile active(de azi, in viitor)
-    //              -si care au numarul de tickete free cel putin 1
-    // de adaugat availableTicketsCount in PlayDTO a. i. sa trimit in front numarul de tichete free pentru fiecare piesa
 }

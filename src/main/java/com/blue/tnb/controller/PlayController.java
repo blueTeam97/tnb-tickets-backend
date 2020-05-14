@@ -22,9 +22,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class PlayController {
 
     @Autowired
@@ -55,7 +57,7 @@ public class PlayController {
 
     @PutMapping({"/play/{id}"})
     public ResponseEntity<PlayDTO> updatePlay(@PathVariable @NotNull Long id, @RequestBody PlayDTO playDTO) throws PlayUpdateException, InvalidDateException, TicketsNumberException {
-        return ResponseEntity.ok(playService.updatePlay(playDTO, id)); //bad response exception
+        return ResponseEntity.ok(playService.updatePlay(playDTO, id));
     }
 
     @DeleteMapping({"/play/{id}"})
