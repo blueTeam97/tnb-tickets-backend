@@ -52,6 +52,14 @@ public class PlayDTO {
 
     public PlayDTO() {}
 
+    public PlayDTO(@NotEmpty(message = "Play must have a name specified") String playName,
+                   @NotNull(message = "Insert Date") String playDate,
+                   @NotEmpty(message = "Play must have a link") String link) {
+        this.playName = playName;
+        this.playDate = playDate;
+        this.link = link;
+    }
+
     public PlayDTO(Play play) {
         this.id = play.getId();
         this.playName = play.getPlayName();

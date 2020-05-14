@@ -15,7 +15,6 @@ import com.blue.tnb.model.Play;
 import com.blue.tnb.repository.PlayRepository;
 import com.blue.tnb.repository.TicketRepository;
 import com.blue.tnb.validator.PlayValidator;
-import com.hazelcast.core.HazelcastInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,9 +42,6 @@ public class PlayServiceImpl implements PlayService {
 
     @Autowired
     private TicketMapperImpl ticketMapperImpl;
-
-    @Autowired
-    private HazelcastInstance hazelcastInstance;
 
     @Override
     public List<PlayDTO> getAllPlays() {

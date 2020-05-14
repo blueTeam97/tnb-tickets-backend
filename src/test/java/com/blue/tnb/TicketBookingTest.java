@@ -35,7 +35,7 @@ public class TicketBookingTest implements Callable<String> {
         headers.setContentType(MediaType.APPLICATION_JSON);
         // set `accept` header
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.add("Authorization","Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJtYWR5LmNyb2l0b3Jlc2N1QGdtYWlsLmNvbSIsImlhdCI6MTU4OTI4MzczMSwiZXhwIjoxNTg5MzcwMTMxfQ.qPpeMHyRNvLIgLmiGxAkgPxMrlLjcCrxHNd0iytvDXR8Xl8VW80QiZV4NhgR5oVK7zTzBXhutmw_5UbdouD3zA");
+        headers.add("Authorization","Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJtYWR5LmNyb2l0b3Jlc2N1QGdtYWlsLmNvbSIsImlhdCI6MTU4OTQ0MzcyMywiZXhwIjoxNTg5NTMwMTIzfQ.-BC-NGa18QIR8O3KL63pUI7Ixza0eO76XD1uXk5XZrbbisYQWLMpmT15KDYkHYFU3gg9jAbnYEbpGRru0hS6FQ");
         // build the request
         // create a map for post parameters
         HttpEntity request=new HttpEntity(headers);

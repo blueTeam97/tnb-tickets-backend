@@ -29,7 +29,9 @@ public class TicketValidator {
     public boolean validateTicketIdForUpdate(Long ticketId){
         return ticketRepository.findOneById(ticketId)!=null;
     }
-    public boolean validateTicketDate(String ticketDateTimeAsString){
+    public boolean validateTicketDate(String ticketDateTimeAsString,boolean isForUpdate){
+        if(StringUtils.isEmpty(ticketDateTimeAsString) || ticketDateTimeAsString.equals(" "))
+            return !isForUpdate;
         return GenericValidator.isDate(ticketDateTimeAsString, "yyyy-MM-dd HH:mm:ss", true);
     }
     public boolean validateTicketId(Long ticketId){
@@ -67,10 +69,10 @@ public class TicketValidator {
         else{
             boolean ok=validateTicketPlayId(ticketDTO.getPlayId());
             System.out.println(ok);
-            if(validateTicketDate(ticketDTO.getBookDate())){
+            if(validateTicketDate(ticketDTO.getBookDate(),false)){
                 ticketDTO.getBookDate().replace("T"," ");
             }
-            if(validateTicketDate(ticketDTO.getPickUpDate())){
+            if(validateTicketDate(ticketDTO.getPickUpDate(),false)){
                 ticketDTO.getPickUpDate().replace("T"," ");
             }
             return validateTicketPlayId(ticketDTO.getPlayId()) && validateTicketStatus(ticketDTO.getStatus());
@@ -82,8 +84,10 @@ public class TicketValidator {
        }
        else{
            boolean ok=validateTicketPlayId(ticketDTO.getPlayId());
-           System.out.println(ok);
-           return validateTicketPlayId(ticketDTO.getPlayId()) && validateTicketStatus(ticketDTO.getStatus());
+           return validateTicketPlayId(ticketDTO.getPlayId()) &&
+                   validateTicketStatus(ticketDTO.getStatus()) &&
+                   validateTicketDate(ticketDTO.getBookDate(),false) &&
+                   validateTicketDate(ticketDTO.getPickUpDate(), false);
        }
     }
 }

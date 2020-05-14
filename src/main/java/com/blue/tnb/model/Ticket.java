@@ -39,9 +39,6 @@ public class Ticket {
     @Column(name="pickup_date")
     private LocalDateTime pickUpDate;
 
-    @Version
-    private Long version;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(referencedColumnName = "id",nullable = false,insertable = false,updatable = false)
     private Play play;
@@ -109,15 +106,6 @@ public class Ticket {
 
     public void setPlay(Play play) {
         this.play = play;
-    }
-
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
     }
 
     public Ticket(){

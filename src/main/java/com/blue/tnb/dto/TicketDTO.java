@@ -21,6 +21,8 @@ public class TicketDTO {
 
     private String pickUpDate;
 
+    private PlayDTO playDTO;
+
    public TicketDTO() {}
 
     public TicketDTO(Ticket ticket) {
@@ -36,6 +38,7 @@ public class TicketDTO {
             this.pickUpDate="";
         }
         else this.pickUpDate=ticket.getPickUpDate().toString().replace("T"," ");
+        playDTO=new PlayDTO(ticket.getPlay().getPlayName(),ticket.getPlay().getPlayDate().toString(),ticket.getPlay().getLink());
     }
 
     public TicketDTO(@NotEmpty(message = "A ticket MUST have an ID associated") Long id,
@@ -50,16 +53,15 @@ public class TicketDTO {
         this.status = status;
         this.bookDate = bookDate;
         this.pickUpDate = pickUpDate;
-    }/*
-
-    public TicketDTO(Long userId, Long playId, String bookDate, String pickUpDate) {
-        this.userId = userId;
-        this.playId = playId;
-        this.bookDate = bookDate;
-        this.pickUpDate = pickUpDate;
-        this.status= Status.FREE.getValue();
     }
-*/
+
+    public PlayDTO getPlayDTO() {
+        return playDTO;
+    }
+
+    public void setPlayDTO(PlayDTO playDTO) {
+        this.playDTO = playDTO;
+    }
 
     public String getStatus() {
         return status;

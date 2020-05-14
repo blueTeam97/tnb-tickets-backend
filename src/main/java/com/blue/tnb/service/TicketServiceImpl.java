@@ -2,24 +2,31 @@ package com.blue.tnb.service;
 
 import com.blue.tnb.constants.Status;
 import com.blue.tnb.dto.BookResponse;
-import com.blue.tnb.dto.PlayDTO;
 import com.blue.tnb.dto.TicketDTO;
 import com.blue.tnb.exception.TicketExceptions.TicketNotFoundException;
 import com.blue.tnb.exception.TicketExceptions.TicketWithoutUserException;
 import com.blue.tnb.mapper.PlayMapper;
 import com.blue.tnb.mapper.TicketMapper;
 import com.blue.tnb.model.Ticket;
+import com.blue.tnb.model.User;
 import com.blue.tnb.repository.PlayRepository;
 import com.blue.tnb.repository.TicketRepository;
 import com.blue.tnb.repository.UserRepository;
 import com.hazelcast.core.HazelcastInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.text.ParseException;;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 
 @Service//Nu mai pot implementa interfata service pentru ca nu ma lasa Async-ul(Crapa)
@@ -74,6 +81,21 @@ public class TicketServiceImpl{
 
     public Ticket updateTicket(Long id, TicketDTO ticketDTO){
         Ticket ticket=ticketRepository.getOne(id);
+        Status status=ticketDTO.equals("free")?Status.FREE:(ticketDTO.getStatus().equals("booked")?Status.BOOKED:Status.PICKEDUP);
+        ticket.setStatus(status);
+        ticket.setUserId(ticketDTO.getUserId());
+        DateTimeFormatter formatter=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        if(StringUtils.isEmpty(ticketDTO.getBookDate())){
+            ticket.setBookDate(null);
+        }
+        else ticket.setBookDate(LocalDateTime.parse(ticketDTO.getBookDate(),formatter));
+
+        if(StringUtils.isEmpty(ticketDTO.getPickUpDate())){
+            ticket.setPickUpDate(null);
+        }
+        else ticket.setPickUpDate(LocalDateTime.parse(ticketDTO.getPickUpDate(),formatter));;
+
+        ticket.getPlay().setTicketList(null);
         return ticketRepository.saveAndFlush(ticket);
     }
 
@@ -81,7 +103,7 @@ public class TicketServiceImpl{
     public Ticket deleteTicket(Long ticketId) {
         Optional<Ticket> existingTicket = ticketRepository.findById(ticketId);
         if (existingTicket.isPresent()) {
-            ticketRepository.delete(existingTicket.get());
+            ticketRepository.deleteTicket(ticketId);
             return existingTicket.get();
         } else return null;
     }
@@ -97,45 +119,76 @@ public class TicketServiceImpl{
     }
 
    // @Override
-    public List<TicketDTO> findAllAvailableTicketsByPlayId(Long id) {
-
-       /* return ticketRepository.findAllAvailableByPlayId(id).stream()
-                                                            .map(ticketMapper::ticketToTicketDTO)
-
-                                                            .collect(Collectors.toList());*/
+    public List<TicketDTO> findAllAvailableTicketsByPlayIdUsingHazel(Long id) {
         Map<Long,List<Long>> map=hazelcastInstance.getMap("availableTickets");
-        //List<Long> tickets=map.get(id);
         List<TicketDTO> availableTickets=map.get(id).stream()
                                                 .map(ticketID->new TicketDTO(ticketID,null,id,Status.FREE.getValue(),null,null))
                                                 .collect(Collectors.toList());
        return availableTickets;
     }
+    public List<TicketDTO> findAllAvailableTicketsByPlayId(Long id) {
+        List<TicketDTO> availableTickets=ticketRepository.findAllAvailableByPlayId(id).stream()
+                .map(ticketMapper::ticketToTicketDTO)
+                .collect(Collectors.toList());
+        return availableTickets;
+    }
+
+    private boolean updateTicketForPickUp(Long playId,Long ticketId,Long userId){
+        String date=LocalDateTime.now().toString().replace("T"," ");
+        date=date.substring(0,date.indexOf('.'));
+        return updateTicket(ticketId,new TicketDTO(ticketId, userId, playId, Status.PICKEDUP.getValue(), null, date))!=null;
+    }
+
+    public boolean pickUpTicketByUserAndTicketId(Long ticketId,Long userId){
+        Ticket ticket;
+        ticket=ticketRepository.findOneById(ticketId);
+        if(ticket!=null){
+            Long playId=ticket.getPlayId();
+            boolean updateIsOk = updateTicketForPickUp(playId,ticket.getId(),userId);
+            return true;
+        }
+        return false;
+    }
 
     // NU MERGE
     //Decomentezi pe propria raspundere
-   /* @Async
+   @Async
     private void saveTicket(Long playId,Long ticketId,Long userId){
         updateTicket(ticketId,new TicketDTO(ticketId,userId,playId,Status.BOOKED.getValue(), LocalDateTime.now().toString(),null));
     }
-
-    public synchronized ResponseEntity<BookResponse> bookTicketAsync(Long playId,Long userId){
+    public ResponseEntity<BookResponse> bookTicketAsync(Long playId,Long userId){
 
         BookResponse bookResponse=new BookResponse();
 
-        Map<Long,List<Long>> map=hazelcastInstance.getMap("availableTickets");
-        List<Long> availableTickets = new ArrayList<>(map.get(playId));
+        Lock reserveTicketLock=hazelcastInstance.getLock("check-available-tickets");
+        reserveTicketLock.lock();
+        try{
+            Map<Long,List<Long>> map=hazelcastInstance.getMap("availableTickets");
+            List<Long> availableTickets = new ArrayList<>(map.get(playId));
 
-        if(availableTickets.size() > 0){
-            saveTicket(availableTickets.get(0),playId,userId);
-            availableTickets.remove(0);
-            map.put(playId,availableTickets);
-            bookResponse.setAllowedToBook(true);
-            return ResponseEntity.ok(bookResponse);
+            if(availableTickets.size() > 0){
+
+                saveTicket(playId,availableTickets.get(0),userId);
+
+                availableTickets.remove(0);
+                map.put(playId,availableTickets);
+
+                bookResponse.setAllowedToBook(true);
+                return ResponseEntity.ok(bookResponse);
+            }
+            else {
+                bookResponse.setAllowedToBook(false);
+                return ResponseEntity.badRequest().build();
+            }
         }
-        else {
-            bookResponse.setAllowedToBook(false);
-            return ResponseEntity.badRequest().build();
+        catch (Exception ex){
+            System.out.println("Failed to reserve tickets.Exception "+ Arrays.toString(ex.getStackTrace()));
+            return ResponseEntity.notFound().build();
         }
+        finally {
+            reserveTicketLock.unlock();
+        }
+
     }
 
     public ResponseEntity<BookResponse> tryBookTicketByPlayId(Long playId, String headers){
@@ -160,21 +213,22 @@ public class TicketServiceImpl{
             else return ResponseEntity.badRequest().build();
         }
         else return bookTicketAsync(playId,user.get().getId());
-    }*/
+    }
+    public ResponseEntity<BookResponse> tryBookTicketByPlayIdTest(Long playId, Long userId){
+
+        Optional<Ticket> ticket=ticketRepository.findAllByUserId(userId).stream()
+                .max((t1,t2)->t1.getBookDate().compareTo(t2.getBookDate()));
+
+        return bookTicketAsync(playId,userId);
+    }
+
     public Long countAllBookedTicketsByPlayId(Long playId){
 
         return ticketRepository.countAllBookedTicketsByPlayId(playId);
     }
-    //Nu are validare cu 30 de zile ridicata
-    //Userul momentan face rezervari cand/cat vrea
     //@Override
     public BookResponse bookTicket(Long playId, String userCredential){
         BookResponse bookResponse=new BookResponse();
-
-        //read All available Tickets from Hazel map
-        //Pick the ticket
-        //Update hazel Map
-        //check if available date is
         List<Ticket> availableTickets=ticketRepository.findAllAvailableByPlayId(playId);
         if(availableTickets==null || availableTickets.size()==0){
             Optional<Ticket> ticket= ticketRepository.findAllByPlayId(playId).stream()
@@ -187,18 +241,25 @@ public class TicketServiceImpl{
                 String userCredentialDecoded=new String(userDecoded);
                 String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
                 userEmail=userEmail.substring(1,userEmail.length()-1);
-                Optional<Ticket> freeTicket=availableTickets.stream().findFirst();
-                System.out.println(freeTicket.get()+": "+userCredential);
-                PlayDTO play =playMapper.convertPlayToPlayDTO(playRepository.getOne(playId));
 
-                bookResponse.setExpiredTime(null);
-                bookResponse.setAllowedToBook(true);
+                Long userId=userRepository.getUserIdByEmail(userEmail);
 
-                freeTicket.get().setStatus(Status.BOOKED);
-                freeTicket.get().setUserId(userRepository.getUserIdByEmail(userEmail));
-                freeTicket.get().setBookDate(LocalDateTime.now());
+                Optional<Ticket> lastBookedTicket=ticketRepository.findAllByUserId(userId).stream()
+                                                        .filter(ticket->ticket.getStatus().equals(Status.BOOKED))
+                                                        .max((t1,t2)->t1.getBookDate().compareTo(t2.getBookDate()));
 
-                updateTicket(freeTicket.get().getId(),ticketMapper.ticketToTicketDTO(freeTicket.get()));
+                if(lastBookedTicket.isPresent() &&
+                   lastBookedTicket.get().getBookDate().until(LocalDateTime.now(),ChronoUnit.DAYS)>30){
+                    bookResponse.setAllowedToBook(true);
+                    Ticket newTicket=availableTickets.get(0);
+                    saveTicket(playId,newTicket.getId(),userId);
+                }
+                else if(!lastBookedTicket.isPresent()){
+                    bookResponse.setAllowedToBook(true);
+                    Ticket newTicket=availableTickets.get(0);
+                    saveTicket(playId,newTicket.getId(),userId);
+                }
+                else bookResponse.setAllowedToBook(false);
         }
         return bookResponse;
     }

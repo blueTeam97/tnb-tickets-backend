@@ -2,6 +2,8 @@ package com.blue.tnb.controller;
 
 import com.blue.tnb.dto.BookResponse;
 import com.blue.tnb.dto.TicketDTO;
+import com.blue.tnb.exception.InvalidDateException;
+import com.blue.tnb.exception.TicketExceptions.InvalidTicketForUpdate;
 import com.blue.tnb.exception.TicketExceptions.TicketNotFoundException;
 import com.blue.tnb.exception.TicketExceptions.TicketWithoutUserException;
 import com.blue.tnb.model.Ticket;
@@ -46,6 +48,7 @@ public class TicketController {
     public List<TicketDTO> findAllTickets(){
         return ticketService.getAllTickets();
     }
+
     @GetMapping("/findByUserId/{userId}")
     public TicketDTO findTicketByUserId(@PathVariable Long userId) throws TicketWithoutUserException {
 
@@ -64,35 +67,38 @@ public class TicketController {
     }
 
     @PostMapping("/addTicket")
-    public ResponseEntity<Ticket> addTicket(@RequestBody TicketDTO ticketDTO) throws ParseException {
+    public Ticket addTicket(@RequestBody TicketDTO ticketDTO) throws ParseException, InvalidDateException {
         System.out.println(ticketDTO);
         if(ticketValidator.validateTicket(ticketDTO)){
-            return ResponseEntity.ok(ticketService.addTicket(ticketDTO));
+            return ticketService.addTicket(ticketDTO);
         }
-        else return ResponseEntity.badRequest() .build();
+        else throw new InvalidDateException();
     }
     @PutMapping("/updateTicket/{id}")
-    public ResponseEntity<Ticket> updateTicket(@RequestBody TicketDTO ticketDTO) throws ParseException {
-        System.out.println(ticketDTO);
+    public TicketDTO updateTicket(@PathVariable("id") Long id,
+                                               @RequestBody TicketDTO ticketDTO) throws ParseException, InvalidTicketForUpdate {
         if(ticketValidator.validateTicketForUpdate(ticketDTO)){
-            Ticket ticket =ticketService.addTicket(ticketDTO);
-            return ResponseEntity.ok(ticket);
+            TicketDTO ticket =new TicketDTO(ticketService.updateTicket(id,ticketDTO));
+            return ticket;
         }
-        else return ResponseEntity.badRequest().build();
+        else throw new InvalidTicketForUpdate();
     }
     @DeleteMapping("/deleteTicket/{id}")
-    public ResponseEntity<Ticket> deleteTicket(@PathVariable Long id){
+    public ResponseEntity<TicketDTO> deleteTicket(@PathVariable Long id) throws InvalidTicketForUpdate{
         if(ticketValidator.validateTicketIdForUpdate(id)){
-            return ResponseEntity.ok(ticketService.deleteTicket(id));
+            TicketDTO deletedTicket=new TicketDTO(ticketService.deleteTicket(id));
+            if(deletedTicket!=null){
+                return ResponseEntity.ok(deletedTicket);
+            }
+            else return ResponseEntity.badRequest().build();
         }
-        else return ResponseEntity.badRequest().build();
+        else throw new InvalidTicketForUpdate();
     }
     @GetMapping("/play/{id}/findAllAvailableTickets")
     public ResponseEntity<List<TicketDTO>> findAllAvailableTickets(@PathVariable("id") Long id){
         return ResponseEntity.ok(ticketService.findAllAvailableTicketsByPlayId(id));
     }
     @GetMapping("/play/{id}/availableTickets")
-    @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
     public ResponseEntity<Long> getAllAvailableTickets(@PathVariable Long id){
         return ResponseEntity.ok(ticketService.countAvailableTicketsByPlayId(id));
     }
@@ -106,6 +112,21 @@ public class TicketController {
                                                    @RequestHeader(value="authorization") String headers){
 
         return ResponseEntity.ok(ticketService.bookTicket(playId,headers));
+    }
+    @GetMapping("/play/{playId}/book/{userId}")
+    public ResponseEntity<BookResponse> bookTicketTest(@PathVariable(value = "playId") Long playId,
+                                                        @PathVariable("userId") Long userId){
+        return ticketService.tryBookTicketByPlayIdTest(playId,userId);
+    }
+
+    @GetMapping("/pickup/{ticketId}&{userId}")
+    public ResponseEntity pickUpTicket(@PathVariable(value = "ticketId") Long ticketId,
+                                       @PathVariable(value = "userId") Long userId){
+        boolean result=ticketService.pickUpTicketByUserAndTicketId(ticketId,userId);
+        if(result){
+            return ResponseEntity.ok().build();
+        }
+        else return ResponseEntity.badRequest().build();
     }
 
  // /play/{playId}/book/{userId} -> booking pentru un bilet
