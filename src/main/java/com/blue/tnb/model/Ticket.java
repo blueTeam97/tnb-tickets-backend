@@ -43,7 +43,14 @@ public class Ticket {
     @JoinColumn(referencedColumnName = "id",nullable = false,insertable = false,updatable = false)
     private Play play;
 
-    public Ticket(){}
+    public Ticket(Long id, Long userId, Long playId, Status status, LocalDateTime bookDate, LocalDateTime pickUpDate) {
+        this.id = id;
+        this.userId = userId;
+        this.playId = playId;
+        this.status = status;
+        this.bookDate = bookDate;
+        this.pickUpDate = pickUpDate;
+    }
 
     public Long getId() {
         return id;
@@ -101,6 +108,41 @@ public class Ticket {
         this.play = play;
     }
 
+    public Ticket(){
+
+    }
+    public Ticket(TicketDTO ticketDTO) throws ParseException {
+        this.id=ticketDTO.getId();
+        this.userId=ticketDTO.getUserId();
+        this.playId=ticketDTO.getPlayId();
+        if(!StringUtils.isEmpty(ticketDTO.getBookDate())){
+            this.bookDate=convertStringToLocalDateTime(ticketDTO.getBookDate());
+        }
+        else this.bookDate=null;
+        if(!StringUtils.isEmpty(ticketDTO.getPickUpDate())){
+            this.pickUpDate=convertStringToLocalDateTime(ticketDTO.getPickUpDate());
+        }
+        else this.pickUpDate=null;
+        switch(ticketDTO.getStatus().toLowerCase()){
+            case "free":
+                this.status=Status.FREE;
+                break;
+            case "booked":
+                this.status=Status.BOOKED;
+                break;
+            case "pickedup":
+                this.status=Status.PICKEDUP;
+                break;
+        }
+
+
+
+    }
+    public LocalDateTime convertStringToLocalDateTime(String dateAsString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(dateAsString, formatter);
+        return dateTime;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -117,7 +159,7 @@ public class Ticket {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userId, playId, status, bookDate, pickUpDate, play);
+        return Objects.hash(id, userId, playId, status, bookDate, pickUpDate);
     }
 
     @Override

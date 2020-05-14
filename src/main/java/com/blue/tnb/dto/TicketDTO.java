@@ -26,9 +26,7 @@ public class TicketDTO {
 
     private String pickUpDate;
 
-    private String name;
-    private String date;
-    private String link;
+    private PlayDTO playDTO;
 
    public TicketDTO() {}
 
@@ -37,11 +35,6 @@ public class TicketDTO {
         this.playId=ticket.getPlayId();
         this.userId=ticket.getUserId();
         this.status=ticket.getStatus().getValue();
-
-        this.setName(ticket.getPlay().getPlayName());
-        this.setDate(ticket.getPlay().getAvailableDate().toString().replace("T", " "));
-        this.setLink(ticket.getPlay().getLink());
-
         if(ticket.getBookDate()==null){
             this.bookDate="";
         }
@@ -50,43 +43,40 @@ public class TicketDTO {
             this.pickUpDate="";
         }
         else this.pickUpDate=ticket.getPickUpDate().toString().replace("T"," ");
+        playDTO=new PlayMapperImpl().convertPlayToPlayDTO(ticket.getPlay());
+        //playDTO=new PlayDTO(ticket.getPlay().getPlayName(),ticket.getPlay().getPlayDate().toString(),ticket.getPlay().getLink());
     }
 
-    public TicketDTO(Long userId, Long playId, String bookDate, String pickUpDate) {
+    public TicketDTO(@NotEmpty(message = "A ticket MUST have an ID associated") Long id,
+                     Long userId,
+                     @NotEmpty(message = "A ticket MUST have a play associated") Long playId,
+                     String status,
+                     String bookDate,
+                     String pickUpDate) {
+        this.id = id;
         this.userId = userId;
         this.playId = playId;
+        this.status = status;
         this.bookDate = bookDate;
         this.pickUpDate = pickUpDate;
-        this.status= Status.FREE.getValue();
     }
 
-    public String getName() {
-        return name;
+    public PlayDTO getPlayDTO() {
+        return playDTO;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getLink() {
-        return link;
-    }
-
-    public void setLink(String link) {
-        this.link = link;
+    public void setPlayDTO(PlayDTO playDTO) {
+        this.playDTO = playDTO;
     }
 
     public String getStatus() {
         return status;
     }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
 
     public Long getId() {
         return id;
@@ -133,41 +123,32 @@ public class TicketDTO {
     }
 
 
-   /* @Override
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof TicketDTO)) return false;
         TicketDTO ticketDTO = (TicketDTO) o;
-        return Objects.equals(playMapperImpl, ticketDTO.playMapperImpl) &&
-                Objects.equals(id, ticketDTO.id) &&
-                Objects.equals(userId, ticketDTO.userId) &&
-                Objects.equals(playId, ticketDTO.playId) &&
-                Objects.equals(status, ticketDTO.status) &&
+        return  Objects.equals(userId, ticketDTO.userId) &&
+                playId.equals(ticketDTO.playId) &&
+                status.equals(ticketDTO.status) &&
                 Objects.equals(bookDate, ticketDTO.bookDate) &&
-                Objects.equals(pickUpDate, ticketDTO.pickUpDate) &&
-                Objects.equals(name, ticketDTO.name) &&
-                Objects.equals(date, ticketDTO.date) &&
-                Objects.equals(link, ticketDTO.link);
-    }*/
-
-   /* @Override
-    public int hashCode() {
-        return Objects.hash(playMapperImpl, id, userId, playId, status, bookDate, pickUpDate, name, date, link);
-    }*/
+                Objects.equals(pickUpDate, ticketDTO.pickUpDate);
+    }
 
     @Override
     public String toString() {
         return "TicketDTO{" +
-                "playMapperImpl="  +
-                ", id=" + id +
+                "id=" + id +
                 ", userId=" + userId +
                 ", playId=" + playId +
                 ", status='" + status + '\'' +
-                ", bookDate='" + bookDate + '\'' +
-              //  ", pickUpDate='" + pickUpDate + '\'' +
-                ", name='" + name + '\'' +
-                ", date='" + date + '\'' +
-                ", link='" + link + '\'' +
+                ", bookDate=" + bookDate +
+                ", pickUpDate=" + pickUpDate +
                 '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, playId, status, bookDate, pickUpDate);
     }
 }

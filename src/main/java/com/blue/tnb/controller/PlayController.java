@@ -36,7 +36,6 @@ public class PlayController {
 
     @GetMapping({"/findAll"})
     public ResponseEntity<List<PlayDTO>> getAll() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return playService.getAllPlays() == null ?
                 ResponseEntity.noContent().build() : ResponseEntity.ok(this.playService.getAllPlays());
     }

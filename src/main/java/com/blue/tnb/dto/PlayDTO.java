@@ -39,7 +39,7 @@ public class PlayDTO {
     @JsonIgnore
     List<TicketDTO> ticketDTOList;
 
-    private int availableTicketsNumber= 0;
+    private Long availableTicketsNumber= 0L;
 
     public PlayDTO() {}
 
@@ -100,11 +100,11 @@ public class PlayDTO {
         this.ticketsNumber = ticketsNumber;
     }
 
-    public int getAvailableTicketsNumber() {
+    public Long getAvailableTicketsNumber() {
         return availableTicketsNumber;
     }
 
-    public void setAvailableTicketsNumber(int availableTicketsNumber) {
+    public void setAvailableTicketsNumber(Long availableTicketsNumber) {
         this.availableTicketsNumber = availableTicketsNumber;
     }
 

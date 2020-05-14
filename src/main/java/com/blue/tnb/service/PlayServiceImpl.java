@@ -14,6 +14,7 @@ import com.blue.tnb.mapper.TicketMapperImpl;
 import com.blue.tnb.model.Play;
 import com.blue.tnb.repository.PlayRepository;
 import com.blue.tnb.repository.TicketRepository;
+import com.blue.tnb.validator.PlayValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
