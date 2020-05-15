@@ -50,7 +50,7 @@ public class PlayServiceImpl implements PlayService {
                 .collect(Collectors.toList());
         for (PlayDTO playDTO : plays) {
             playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
-
+            playDTO.setBookedTicketsNumber(ticketRepository.countAllBookedTicketsByPlayId(playDTO.getId()));
         }
         return plays;
     }

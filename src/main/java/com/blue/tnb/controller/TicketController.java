@@ -32,6 +32,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/tasks")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class TicketController {
 
     @Autowired
@@ -57,7 +58,7 @@ public class TicketController {
             return ResponseEntity.ok(ticketService.getTicketById(id));
         else return ResponseEntity.notFound().build();
     }
-    @GetMapping("/findTicketByPlayId/{playId}")
+    @GetMapping("/findTicketsByPlayId/{playId}")
     public List<TicketDTO> getAllByPlayId(@PathVariable Long playId) throws TicketNotFoundException {
         return ticketService.getAllByPlayId(playId);
     }
