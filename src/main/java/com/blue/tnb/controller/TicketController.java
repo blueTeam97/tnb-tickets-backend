@@ -114,7 +114,8 @@ public class TicketController {
     @GetMapping("/play/{playId}/book/{userId}") //Just for the benchmarking
     public ResponseEntity<BookResponse> bookTicketTest(@PathVariable(value = "playId") Long playId,
                                                         @PathVariable("userId") Long userId){
-        return ticketService.tryBookTicketByPlayIdTest(playId,userId);
+        return ResponseEntity.ok(ticketService.bookTicketHardWay(playId,userId));
+        //return ticketService.tryBookTicketByPlayIdTest(playId,userId);
     }
 
     @GetMapping("/pickup/{ticketId}&{userId}")

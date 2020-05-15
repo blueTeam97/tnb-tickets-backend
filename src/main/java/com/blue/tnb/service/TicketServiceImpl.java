@@ -100,6 +100,7 @@ public class TicketServiceImpl{
             date=ticketDTO.getBookDate();
             date=date.indexOf('.')>=0?date.substring(0,date.indexOf('.')):date;
             ticket.setBookDate(DateUtils.convertStringToLocalDateTime(date));
+            ticket.setBookDate(LocalDateTime.parse(date.indexOf('.')>=0?date.substring(0,date.indexOf('.')):date,formatter));
         }
 
         if(StringUtils.isEmpty(ticketDTO.getPickUpDate())){
@@ -109,6 +110,7 @@ public class TicketServiceImpl{
             date =ticketDTO.getPickUpDate();
             date=date.indexOf('.')>=0?date.substring(0,date.indexOf('.')):date;
             ticket.setPickUpDate(DateUtils.convertStringToLocalDateTime(date));
+            ticket.setPickUpDate(LocalDateTime.parse(date.indexOf('.')>=0?date.substring(0,date.indexOf('.')):date,formatter));
         }
 
         ticket.getPlay().setTicketList(null);
@@ -255,6 +257,33 @@ public class TicketServiceImpl{
     public Long countAllBookedTicketsByPlayId(Long playId){
 
         return ticketRepository.countAllBookedTicketsByPlayId(playId);
+    }
+    public synchronized BookResponse bookTicketHardWay(Long playId,Long userId){
+        BookResponse bookResponse=new BookResponse();
+        List<Ticket> availableTickets=ticketRepository.findAllAvailableByPlayId(playId);
+        if(availableTickets==null || availableTickets.size()==0){
+            Optional<Ticket> ticket= ticketRepository.findAllByPlayId(playId).stream()
+                    .min((t1, t2) -> -t1.getBookDate().compareTo(t2.getBookDate()));
+            bookResponse.setExpiredTime(ticket.get().getBookDate().until(LocalDateTime.now(), ChronoUnit.MILLIS));
+        }
+        else{
+            Optional<Ticket> lastBookedTicket=ticketRepository.findAllByUserId(userId).stream()
+                    .filter(ticket->ticket.getStatus().equals(Status.BOOKED))
+                    .max((t1,t2)->t1.getBookDate().compareTo(t2.getBookDate()));
+            if(lastBookedTicket.isPresent() &&
+                    lastBookedTicket.get().getBookDate().until(LocalDateTime.now(),ChronoUnit.DAYS)>30){
+                bookResponse.setAllowedToBook(true);
+                Ticket newTicket=availableTickets.get(0);
+                saveTicket(playId,newTicket.getId(),userId);
+            }
+            else if(!lastBookedTicket.isPresent()){
+                bookResponse.setAllowedToBook(true);
+                Ticket newTicket=availableTickets.get(0);
+                saveTicket(playId,newTicket.getId(),userId);
+            }
+            else bookResponse.setAllowedToBook(false);
+        }
+        return bookResponse;
     }
     //@Override
     public synchronized BookResponse bookTicket(Long playId, String userCredential){
