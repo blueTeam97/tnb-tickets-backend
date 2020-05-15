@@ -1,6 +1,5 @@
 package com.blue.tnb.dto;
 
-import com.blue.tnb.model.Play;
 
 import java.util.List;
 
@@ -8,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import java.util.Objects;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -39,7 +37,8 @@ public class PlayDTO {
     @JsonIgnore
     List<TicketDTO> ticketDTOList;
 
-    private Long availableTicketsNumber= 0L;
+    private Long availableTicketsNumber = 0L;
+    private Long bookedTicketsNumber = 0L;
 
     private Long bookedTicketsNumber = 0L;
 
@@ -117,6 +116,13 @@ public class PlayDTO {
         this.availableTicketsNumber = availableTicketsNumber;
     }
 
+    public Long getBookedTicketsNumber() {
+        return bookedTicketsNumber;
+    }
+
+    public void setBookedTicketsNumber(Long bookedTicketsNumber) {
+        this.bookedTicketsNumber = bookedTicketsNumber;
+    }
 
     public List<TicketDTO> getTicketDTOList() {
         return this.ticketDTOList;

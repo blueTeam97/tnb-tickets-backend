@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Component
@@ -64,9 +66,26 @@ public class PlayValidator {
 
     }
 
-    public boolean validateDateTime(String localDateTimeAsString) {
-        System.out.println(localDateTimeAsString);
-        return GenericValidator.isDate(localDateTimeAsString, "yyyy-MM-dd HH:mm:ss", true);
+    public boolean validateDateTime(String playDateAsString, String availableDateAsString) {
+        if(GenericValidator.isDate(playDateAsString, "yyyy-MM-dd HH:mm:ss", true)
+                && GenericValidator.isDate(playDateAsString, "yyyy-MM-dd HH:mm:ss", true) ) {
+
+            LocalDateTime playDateAslocalDateTime = convertStringToLocalDateTime(playDateAsString);
+            LocalDateTime availableDateAsLocalDateTime = convertStringToLocalDateTime(availableDateAsString);
+
+            if(playDateAslocalDateTime.isAfter(availableDateAsLocalDateTime)) {
+                if(playDateAslocalDateTime.isAfter(LocalDateTime.now().minusMinutes(2))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public LocalDateTime convertStringToLocalDateTime(String dateAsString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(dateAsString, formatter);
+        return dateTime;
     }
 
 }

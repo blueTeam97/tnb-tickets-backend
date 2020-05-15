@@ -84,8 +84,7 @@ public class PlayServiceImpl implements PlayService {
     public PlayDTO updatePlay(PlayDTO playDTO, Long id) throws PlayUpdateException, InvalidDateException, TicketsNumberException {
         if (!playValidator.validateIdForUpdate(id)) {
             throw new PlayUpdateException();
-        } else if (!playValidator.validateDateTime(playDTO.getAvailableDate())
-                && !playValidator.validateDateTime(playDTO.getPlayDate())) {
+        } else if (! playValidator.validateDateTime(playDTO.getPlayDate(), playDTO.getAvailableDate())) {
             throw new InvalidDateException();
         } else {
             Play existingPlay = playRepository.getOne(id);
@@ -141,7 +140,7 @@ public class PlayServiceImpl implements PlayService {
     public boolean checkDateTimeFormat(PlayDTO playDTO) {
         playDTO.setPlayDate(playValidator.checkDateTimeFormat(playDTO.getPlayDate()));
         playDTO.setAvailableDate(playValidator.checkDateTimeFormat(playDTO.getAvailableDate()));
-        if (playValidator.validateDateTime(playDTO.getPlayDate()) && playValidator.validateDateTime(playDTO.getAvailableDate())) {
+        if (playValidator.validateDateTime(playDTO.getPlayDate(), playDTO.getAvailableDate())) {
             return true;
         } else {
             return false;
