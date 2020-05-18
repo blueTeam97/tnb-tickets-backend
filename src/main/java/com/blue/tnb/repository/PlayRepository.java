@@ -22,6 +22,8 @@ public interface PlayRepository extends JpaRepository<Play, Long> {
 
     @Query(value = "Select p.* from Play p Join Ticket t on p.id=t.play_id",nativeQuery = true)
     List<Play> findAllNoRestriction();
+    @Query(value = "SELECT * from play p where (SELECT Count(t.id) FROM Ticket t WHERE t.status='free' AND t.play_id= p.id)>0 and p.available_date>=current_timestamp()",nativeQuery = true)
+    List<Play> getAllAvailablePlays();
 
     Optional<Play> findAllByPlayName(String playName);
 

@@ -67,9 +67,12 @@ public class PlayValidator {
     }
 
     public boolean validateDateTime(String playDateAsString, String availableDateAsString) {
-        if(GenericValidator.isDate(playDateAsString, "yyyy-MM-dd HH:mm:ss", true)
-                && GenericValidator.isDate(playDateAsString, "yyyy-MM-dd HH:mm:ss", true) ) {
-
+        boolean ok=GenericValidator.isDate(playDateAsString, "yyyy-MM-dd HH:mm:ss", true)
+                && GenericValidator.isDate(playDateAsString, "yyyy-MM-dd HH:mm:ss", true);
+        if(!ok)
+            ok=GenericValidator.isDate(playDateAsString, "yyyy-MM-dd HH:mm", true)
+                    && GenericValidator.isDate(playDateAsString, "yyyy-MM-dd HH:mm", true);
+        if(ok) {
             LocalDateTime playDateAslocalDateTime = convertStringToLocalDateTime(playDateAsString);
             LocalDateTime availableDateAsLocalDateTime = convertStringToLocalDateTime(availableDateAsString);
 
@@ -84,7 +87,14 @@ public class PlayValidator {
 
     public LocalDateTime convertStringToLocalDateTime(String dateAsString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime dateTime = LocalDateTime.parse(dateAsString, formatter);
+        LocalDateTime dateTime=null;
+        try{
+             dateTime= LocalDateTime.parse(dateAsString, formatter);
+        }
+        catch (Exception ex){
+            DateTimeFormatter formatter2=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            dateTime=LocalDateTime.parse(dateAsString,formatter2);
+        }
         return dateTime;
     }
 
