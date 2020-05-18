@@ -9,6 +9,7 @@ import com.blue.tnb.exception.TicketExceptions.TicketsNumberException;
 import com.blue.tnb.model.Play;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PlayService {

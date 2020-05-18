@@ -31,5 +31,7 @@ public interface PlayRepository extends JpaRepository<Play, Long> {
 
     Optional<Play> findByPlayName(String playName);
 
+    @Query(value = "Select * from Play p where p.available_date > :localDateTime",nativeQuery = true)
+    List<Play> getNextAvailablePlays(@Param("localDateTime") LocalDateTime localDateTime);
 
 }
