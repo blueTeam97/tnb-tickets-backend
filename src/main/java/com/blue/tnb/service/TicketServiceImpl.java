@@ -239,7 +239,7 @@ public class TicketServiceImpl{
         return ticketRepository.countAllBookedTicketsByPlayId(playId);
     }
     //@Override
-    public BookResponse bookTicket(Long playId, String userCredential){
+    public synchronized BookResponse bookTicket(Long playId, String userCredential){
         BookResponse bookResponse=new BookResponse();
 
         //read All available Tickets from Hazel map

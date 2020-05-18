@@ -22,4 +22,5 @@ public interface PlayService {
     PlayDTO updatePlay(PlayDTO playDTO, Long id) throws PlayUpdateException, InvalidDateException, TicketsNumberException;
     PlayDTO deletePlay(Long id) throws PlayDeleteException;
 
+    List<PlayDTO> getAllPlaysForUser(String userCredential);
 }

@@ -10,6 +10,8 @@ import com.blue.tnb.model.Play;
 import com.blue.tnb.service.PlayService;
 import java.util.List;
 import javax.validation.constraints.NotNull;
+
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +35,15 @@ public class PlayController {
     private PlayService playService;
 
     public PlayController() {}
+
+    @GetMapping("/user/findPlays")
+    public ResponseEntity<List<PlayDTO>> getAllAvailablePlaysForLoggedUser(@RequestHeader("authorization") String header){
+        List<PlayDTO> availablePlays=playService.getAllPlaysForUser(header);
+        if(availablePlays!=null && availablePlays.size()>0){
+            return ResponseEntity.ok(availablePlays);
+        }
+        else return ResponseEntity.badRequest().build();
+    }
 
     @GetMapping({"/findAll"})
     public ResponseEntity<List<PlayDTO>> getAll() {
