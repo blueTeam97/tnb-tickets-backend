@@ -8,8 +8,10 @@ import com.blue.tnb.exception.TicketExceptions.TicketNotFoundException;
 import com.blue.tnb.exception.TicketExceptions.TicketWithoutUserException;
 import com.blue.tnb.model.Ticket;
 import com.blue.tnb.model.User;
+import com.blue.tnb.repository.UserRepository;
 import com.blue.tnb.service.TicketService;
 import com.blue.tnb.service.TicketServiceImpl;
+import com.blue.tnb.service.UserDetailsServiceImpl;
 import com.blue.tnb.validator.TicketValidator;
 import com.hazelcast.core.HazelcastInstance;
 import io.jsonwebtoken.Jwt;
@@ -40,6 +42,9 @@ public class TicketController {
 
     @Autowired
     private TicketValidator ticketValidator;
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
 
     @GetMapping("/findAll")
     public List<TicketDTO> findAllTickets() {
@@ -100,9 +105,13 @@ public class TicketController {
     public ResponseEntity<Long> getAllAvailableTickets(@PathVariable Long id){
         return ResponseEntity.ok(ticketService.countAvailableTicketsByPlayId(id));
     }
-    @GetMapping("/user/{id}/history")
-    public ResponseEntity<List<TicketDTO>> getAllTicketsByUserId(@PathVariable Long id){
-        return ResponseEntity.ok(ticketService.findAllTicketsByUserId(id));
+    @GetMapping("/user/history")
+    public ResponseEntity<List<TicketDTO>> getAllTicketsByUserId( @RequestHeader(value = "authorization") String header){
+        List<TicketDTO> userHistory=ticketService.findAllTicketsByCurrentUser(header);
+        if(userHistory!=null && userHistory.size()>0){
+            return ResponseEntity.notFound().build();
+        }
+        else return ResponseEntity.ok(userHistory);
     }
 
     @PostMapping("/play/{playId}/book")
@@ -121,6 +130,15 @@ public class TicketController {
                                        @PathVariable(value = "userId") Long userId){
         boolean result=ticketService.pickUpTicketByUserAndTicketId(ticketId,userId);
         if(result){
+            return ResponseEntity.ok().build();
+        }
+        else return ResponseEntity.badRequest().build();
+    }
+
+    @PutMapping("/user/changeSubscribe")
+    public ResponseEntity subscribe(@RequestHeader(value = "authorization") String header){
+        boolean ok=userDetailsService.updateSubscribeForUser(header);
+        if(ok){
             return ResponseEntity.ok().build();
         }
         else return ResponseEntity.badRequest().build();
