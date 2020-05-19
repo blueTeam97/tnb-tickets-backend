@@ -156,8 +156,8 @@ public class PlayServiceImpl implements PlayService {
         }
     }
 
-    public List<Play> getNextAvailablePlays(LocalDateTime localDateTime) {
-        return playRepository.getNextAvailablePlays(localDateTime);
+    public List<Play> getNextAvailablePlays(LocalDateTime localDateTimeFrom, LocalDateTime localDateTimeTo) {
+        return playRepository.getNextAvailablePlays(localDateTimeFrom, localDateTimeTo);
     }
 
     public void populateTicketsListPlay(Play play) {
@@ -191,4 +191,6 @@ public class PlayServiceImpl implements PlayService {
             return false;
         }
     }
+
+
 }

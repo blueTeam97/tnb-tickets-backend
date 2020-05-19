@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,6 +17,7 @@ import java.util.concurrent.Executors;
 @ComponentScan({"com.blue.tnb.*"})
 @EnableJpaRepositories("com.blue.tnb.repository")
 @EnableAsync
+@EnableScheduling
 public class TnbApplication {
 
 	public static void main(String[] args) {
