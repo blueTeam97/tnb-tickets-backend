@@ -288,4 +288,8 @@ public class TicketServiceImpl{
         }
         return bookResponse;
     }
+
+    public List<String> findEmailsForTicketStatusBooked(){
+        return ticketRepository.findEmailsForTicketStatusBooked();
+    }
 }

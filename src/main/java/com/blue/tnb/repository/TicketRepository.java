@@ -40,4 +40,7 @@ public interface TicketRepository extends JpaRepository<Ticket,Long> {
 
     @Query(value = "SELECT Count(t.id) FROM Ticket t WHERE t.status='booked' AND t.play_id= :playId",nativeQuery = true)
     Long countAllBookedTicketsByPlayId(Long playId);
+
+    @Query(value="SELECT DISTINCT CONCAT(u.email, \"||\", p.name, \"||\", p.play_date) FROM user u LEFT JOIN ticket t ON u.id = t.user_id  LEFT JOIN play p ON t.play_id = p.id WHERE t.status = 'booked'",nativeQuery = true)
+    List<String> findEmailsForTicketStatusBooked();
 }
