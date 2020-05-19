@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -30,5 +31,20 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public List<String> getAllSubscribersThatCanBookTickets(){
         return userRepository.getAllSubscribersThatCanBookTickets();
+    }
+    public boolean updateSubscribeForUser(String userCredential){
+        try{
+            String[] headerSplitted=userCredential.substring("Bearer".length()).trim().split("\\.");
+            byte[] userDecoded= Base64.getDecoder().decode(headerSplitted[1]);
+            String userCredentialDecoded=new String(userDecoded);
+            String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
+            userEmail=userEmail.substring(1,userEmail.length()-1);
+            Long userId=userRepository.getUserIdByEmail(userEmail);
+            userRepository.updateSubscribeForUser(userId);
+            return true;
+        }
+        catch(Exception ex){
+            return false;
+        }
     }
 }

@@ -124,7 +124,16 @@ public class TicketServiceImpl{
     public Long countAvailableTicketsByPlayId(Long playId) {
         return ticketRepository.countAllAvailableByPlayId(playId);
     }
+    public List<TicketDTO> findAllTicketsByCurrentUser(String header){
+        String[] headerSplitted=header.substring("Bearer".length()).trim().split("\\.");
+        byte[] userDecoded= Base64.getDecoder().decode(headerSplitted[1]);
+        String userCredentialDecoded=new String(userDecoded);
+        String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
+        userEmail=userEmail.substring(1,userEmail.length()-1);
 
+        Optional<User> user=userRepository.findByEmail(userEmail);
+        return user.isPresent()?findAllTicketsByUserId(user.get().getId()):null;
+    }
   //  @Override
     public List<TicketDTO> findAllTicketsByUserId(Long id) {
         return ticketMapper.convertTicketToTicketDTOList(ticketRepository.findAllByUserId(id));
