@@ -20,6 +20,7 @@ import com.blue.tnb.validator.PlayValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.LocalDateTime;
@@ -156,8 +157,8 @@ public class PlayServiceImpl implements PlayService {
         }
     }
 
-    public List<Play> getNextAvailablePlays(LocalDateTime localDateTimeFrom, LocalDateTime localDateTimeTo) {
-        return playRepository.getNextAvailablePlays(localDateTimeFrom, localDateTimeTo);
+    public List<Play> getNextAvailablePlays(LocalDate localDateFrom, LocalDate localDateTo) {
+        return playRepository.getNextAvailablePlays(localDateFrom, localDateTo);
     }
 
     public void populateTicketsListPlay(Play play) {
