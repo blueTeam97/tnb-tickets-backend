@@ -105,9 +105,13 @@ public class TicketController {
     public ResponseEntity<Long> getAllAvailableTickets(@PathVariable Long id){
         return ResponseEntity.ok(ticketService.countAvailableTicketsByPlayId(id));
     }
-    @GetMapping("/user/{id}/history")
-    public ResponseEntity<List<TicketDTO>> getAllTicketsByUserId(@PathVariable Long id){
-        return ResponseEntity.ok(ticketService.findAllTicketsByUserId(id));
+    @GetMapping("/user/history")
+    public ResponseEntity<List<TicketDTO>> getAllTicketsByUserId( @RequestHeader(value = "authorization") String header){
+        List<TicketDTO> userHistory=ticketService.findAllTicketsByCurrentUser(header);
+        if(userHistory!=null && userHistory.size()>0){
+            return ResponseEntity.notFound().build();
+        }
+        else return ResponseEntity.ok(userHistory);
     }
 
     @PostMapping("/play/{playId}/book")
