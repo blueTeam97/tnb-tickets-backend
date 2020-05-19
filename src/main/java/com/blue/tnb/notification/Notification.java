@@ -47,7 +47,7 @@ public class Notification {
     //EndpointReminder - send notificari pt bilete noi
 
     //0 0 12 * * * || 0/10 * * * * *
-    @Scheduled(cron = "0/10 * * * * *")
+    @Scheduled(cron = "0 0 12 * * *")
     public void OneDayAheadBookReminder(){
         List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
         List<Play> plays = playService.getNextAvailablePlays(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2));
@@ -57,7 +57,7 @@ public class Notification {
     }
 
     //0 0 13 * * * || 0/10 * * * * *
-    @Scheduled(cron = "0/10 * * * * *")
+    @Scheduled(cron = "0 0 13 * * *")
     public void OneHourAheadBookReminder(){
         List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
         List<Play> plays = playService.getNextAvailablePlays(LocalDate.now(), LocalDate.now().plusDays(1));
@@ -67,7 +67,7 @@ public class Notification {
     }
 
     //0 0 16 * * THU  every thursday 0/10 * * * * *
-    @Scheduled(cron = "0/10 * * * * *")
+    @Scheduled(cron = "0 0 16 * * THU")
     public void pickupReminder(){
         List<String> concatEmailsAndPlaysList = ticketService.findEmailsForTicketStatusBooked();
         List<String[]> splitEmailsAndPlaysList = new ArrayList<>();
