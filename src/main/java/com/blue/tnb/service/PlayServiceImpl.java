@@ -71,20 +71,20 @@ public class PlayServiceImpl implements PlayService {
                 .map(playMapperImpl::convertPlayToPlayDTO)
                 .collect(Collectors.toList());
         List<PlayDTO> availablePlays=new ArrayList<>();
+        String[] headerSplitted=userCredential.substring("Bearer".length()).trim().split("\\.");
+        byte[] userDecoded= Base64.getDecoder().decode(headerSplitted[1]);
+        String userCredentialDecoded=new String(userDecoded);
+        String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
+        userEmail=userEmail.substring(1,userEmail.length()-1);
+
+        Long userId=userRepository.getUserIdByEmail(userEmail);
+
+        Optional<Ticket> lastBookedTicket=ticketRepository.findAllByUserId(userId).stream()
+                .filter(ticket->ticket.getStatus().equals(Status.BOOKED))
+                .max((t1,t2)->t1.getBookDate().compareTo(t2.getBookDate()));
         for (PlayDTO playDTO : plays) {
-            String[] headerSplitted=userCredential.substring("Bearer".length()).trim().split("\\.");
-            byte[] userDecoded= Base64.getDecoder().decode(headerSplitted[1]);
-            String userCredentialDecoded=new String(userDecoded);
-            String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
-            userEmail=userEmail.substring(1,userEmail.length()-1);
-
-            Long userId=userRepository.getUserIdByEmail(userEmail);
-
-            Optional<Ticket> lastBookedTicket=ticketRepository.findAllByUserId(userId).stream()
-                    .filter(ticket->ticket.getStatus().equals(Status.BOOKED))
-                    .max((t1,t2)->t1.getBookDate().compareTo(t2.getBookDate()));
             if(lastBookedTicket.isPresent() && lastBookedTicket.get().getBookDate()
-                    .until(playValidator.convertStringToLocalDateTime(playDTO.getAvailableDate()),ChronoUnit.DAYS)>30){
+                    .until(playValidator.convertStringToLocalDateTime(playDTO.getPlayDate()),ChronoUnit.DAYS)>=30){
                 playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
                 playDTO.setBookedTicketsNumber(ticketRepository.countAllBookedTicketsByPlayId(playDTO.getId()));
                 availablePlays.add(playDTO);

@@ -87,7 +87,7 @@ public class Notification {
         email.setSubject(subject);
         email.setText(message);
         email.setFrom(Objects.requireNonNull(env.getProperty("support.email")));
-        mailSender.send(email);
+    //    mailSender.send(email);
     }
 
     private void constructAndSendEmail(List<String> emails, List<Play> plays,String subject,StringBuilder message) {
