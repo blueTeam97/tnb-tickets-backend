@@ -4,9 +4,11 @@ import com.blue.tnb.constants.Status;
 import com.blue.tnb.mapper.PlayMapperImpl;
 import com.blue.tnb.model.Play;
 import com.blue.tnb.model.Ticket;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.NotEmpty;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class TicketDTO {
@@ -28,6 +30,8 @@ public class TicketDTO {
 
     private PlayDTO playDTO;
 
+    private String userEmail;
+
    public TicketDTO() {}
 
     public TicketDTO(Ticket ticket) {
@@ -44,7 +48,7 @@ public class TicketDTO {
         }
         else this.pickUpDate=ticket.getPickUpDate().toString().replace("T"," ");
         playDTO=new PlayMapperImpl().convertPlayToPlayDTO(ticket.getPlay());
-        //playDTO=new PlayDTO(ticket.getPlay().getPlayName(),ticket.getPlay().getPlayDate().toString(),ticket.getPlay().getLink());
+
     }
 
     public TicketDTO(@NotEmpty(message = "A ticket MUST have an ID associated") Long id,
@@ -61,20 +65,33 @@ public class TicketDTO {
         this.pickUpDate = pickUpDate;
     }
 
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public TicketDTO setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+        return this;
+    }
+
     public PlayDTO getPlayDTO() {
         return playDTO;
     }
 
-    public void setPlayDTO(PlayDTO playDTO) {
-        this.playDTO = playDTO;
+    public TicketDTO setPlayDTO(PlayDTO playDTO) {
+
+       this.playDTO = playDTO;
+        return this;
     }
 
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public TicketDTO setStatus(String status) {
+
+       this.status = status;
+        return this;
     }
 
 
@@ -82,44 +99,61 @@ public class TicketDTO {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public TicketDTO setId(Long id) {
+
+       this.id = id;
+        return this;
     }
 
     public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public TicketDTO setUserId(Long userId) {
+
+       this.userId = userId;
+        return this;
     }
 
     public Long getPlayId() {
         return playId;
     }
 
-    public void setPlayId(Long playId) {
-        this.playId = playId;
+    public TicketDTO setPlayId(Long playId) {
+
+       this.playId = playId;
+        return this;
     }
 
-    public void setStatus(Status status) {
+    public TicketDTO setStatus(Status status) {
         this.status = status.getValue();
+        return this;
     }
 
     public String getBookDate() {
         return bookDate;
     }
 
-    public void setBookDate(String bookDate) {
-        this.bookDate = bookDate;
+    public TicketDTO setBookDate(LocalDateTime bookDate) {
+        if(bookDate==null){
+            this.bookDate="";
+        }
+        else this.bookDate=bookDate.toString().replace("T"," ");
+
+        return this;
     }
 
     public String getPickUpDate() {
         return pickUpDate;
     }
 
-    public void setPickUpDate(String pickUpDate) {
-        this.pickUpDate = pickUpDate;
+    public TicketDTO setPickUpDate(LocalDateTime pickUpDate) {
+        if(pickUpDate==null){
+            this.pickUpDate="";
+        }
+        else this.pickUpDate = pickUpDate.toString().replace("T"," ");
+
+        return this;
     }
 
 

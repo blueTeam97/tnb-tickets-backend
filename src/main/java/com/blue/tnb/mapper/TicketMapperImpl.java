@@ -3,15 +3,23 @@ package com.blue.tnb.mapper;
 import com.blue.tnb.constants.Status;
 import com.blue.tnb.dto.TicketDTO;
 import com.blue.tnb.model.Ticket;
+import com.blue.tnb.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class TicketMapperImpl implements TicketMapper {
+
+    @Autowired
+    private UserRepository userRepository;
+
+
     @Override
     public List<Ticket> convertTicketDTOToTicketList(List<TicketDTO> tickets) {
         if(tickets == null){
@@ -91,7 +99,19 @@ public class TicketMapperImpl implements TicketMapper {
 
     @Override
     public TicketDTO ticketToTicketDTO(Ticket ticket) {
-        return ticket==null?null:new TicketDTO(ticket);
+
+        Optional<String> email = userRepository.getEmailByUserId(ticket.getUserId());
+
+        TicketDTO ticketDTO = new TicketDTO();
+        ticketDTO.setId(ticket.getId())
+                .setUserId(ticket.getUserId())
+                .setPlayId(ticket.getPlayId())
+                .setBookDate(ticket.getBookDate())
+                .setPickUpDate(ticket.getPickUpDate())
+                .setStatus(ticket.getStatus())
+                .setPlayDTO(new PlayMapperImpl().convertPlayToPlayDTO(ticket.getPlay()))
+                .setUserEmail(email.orElse(null));
+        return ticket==null?null:ticketDTO;
     }
 
 

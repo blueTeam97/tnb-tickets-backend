@@ -40,17 +40,9 @@ public class PlayDTO {
     private Long availableTicketsNumber = 0L;
     private Long bookedTicketsNumber = 0L;
 
-    private Long bookedTicketsNumber = 0L;
 
     public PlayDTO() {}
 
-    public Long getBookedTicketsNumber() {
-        return bookedTicketsNumber;
-    }
-
-    public void setBookedTicketsNumber(Long bookedTicketsNumber) {
-        this.bookedTicketsNumber = bookedTicketsNumber;
-    }
 
     public Long getId() {
         return id;
