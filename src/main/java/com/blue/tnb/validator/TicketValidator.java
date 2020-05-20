@@ -32,7 +32,12 @@ public class TicketValidator {
     public boolean validateTicketDate(String ticketDateTimeAsString,boolean isForUpdate){
         if(StringUtils.isEmpty(ticketDateTimeAsString) || ticketDateTimeAsString.equals(" "))
             return !isForUpdate;
-        return GenericValidator.isDate(ticketDateTimeAsString, "yyyy-MM-dd HH:mm:ss", true);
+        else{
+            if(GenericValidator.isDate(ticketDateTimeAsString, "yyyy-MM-dd HH:mm:ss", true)){
+                return true;
+            }
+            else return GenericValidator.isDate(ticketDateTimeAsString, "yyyy-MM-dd HH:mm", true);
+        }
     }
     public boolean validateTicketId(Long ticketId){
 

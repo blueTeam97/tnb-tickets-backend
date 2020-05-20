@@ -37,6 +37,8 @@ public class User implements Serializable {
     @Size(min=6, max = 100)
     private String password;
 
+    private Boolean subscriber;
+
     @ManyToOne
     @JoinColumn(name="role_id", nullable=false)
     private Role role;
@@ -93,5 +95,14 @@ public class User implements Serializable {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+
+    public Boolean getSubscriber() {
+        return subscriber;
+    }
+
+    public void setSubscriber(Boolean subscriber) {
+        this.subscriber = subscriber;
     }
 }

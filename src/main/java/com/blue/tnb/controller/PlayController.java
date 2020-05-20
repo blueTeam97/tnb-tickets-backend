@@ -39,10 +39,11 @@ public class PlayController {
     @GetMapping("/user/findPlays")
     public ResponseEntity<List<PlayDTO>> getAllAvailablePlaysForLoggedUser(@RequestHeader("authorization") String header){
         List<PlayDTO> availablePlays=playService.getAllPlaysForUser(header);
-        if(availablePlays!=null && availablePlays.size()>0){
-            return ResponseEntity.ok(availablePlays);
-        }
-        else return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(availablePlays);
+//        if(availablePlays!=null && availablePlays.size()>0){
+//            return ResponseEntity.ok(availablePlays);
+//        }
+//        else return ResponseEntity.badRequest().build();
     }
 
     @GetMapping({"/findAll"})

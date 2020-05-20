@@ -136,10 +136,10 @@ public class TicketController {
     }
 
     @PutMapping("/user/changeSubscribe")
-    public ResponseEntity subscribe(@RequestHeader(value = "authorization") String header){
-        boolean ok=userDetailsService.updateSubscribeForUser(header);
-        if(ok){
-            return ResponseEntity.ok().build();
+    public ResponseEntity<Integer> subscribe(@RequestHeader(value = "authorization") String header){
+        Integer ok=userDetailsService.updateSubscribeForUser(header);
+        if(ok>=0){
+            return ResponseEntity.ok(ok);
         }
         else return ResponseEntity.badRequest().build();
     }

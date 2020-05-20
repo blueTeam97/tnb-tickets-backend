@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -32,19 +33,23 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public List<String> getAllSubscribersThatCanBookTickets(){
         return userRepository.getAllSubscribersThatCanBookTickets();
     }
-    public boolean updateSubscribeForUser(String userCredential){
+    public Integer updateSubscribeForUser(String userCredential){
         try{
             String[] headerSplitted=userCredential.substring("Bearer".length()).trim().split("\\.");
             byte[] userDecoded= Base64.getDecoder().decode(headerSplitted[1]);
             String userCredentialDecoded=new String(userDecoded);
             String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
             userEmail=userEmail.substring(1,userEmail.length()-1);
-            Long userId=userRepository.getUserIdByEmail(userEmail);
-            userRepository.updateSubscribeForUser(userId);
-            return true;
+//            Long userId=userRepository.getUserIdByEmail(userEmail);
+            Optional<User> user=userRepository.findByEmail(userEmail);
+            if(user.isPresent()){
+                userRepository.updateSubscribeForUser(user.get().getId());
+                return user.get().getSubscriber() ?1:0;
+            }
+            else return -1;
         }
         catch(Exception ex){
-            return false;
+            return -1;
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.blue.tnb.service;
 
+import com.blue.tnb.constants.DateUtils;
 import com.blue.tnb.constants.Status;
 import com.blue.tnb.dto.BookResponse;
 import com.blue.tnb.dto.TicketDTO;
@@ -88,14 +89,14 @@ public class TicketServiceImpl{
         ticket.setStatus(status);
         ticket.setUserId(ticketDTO.getUserId());
         String date;
-        DateTimeFormatter formatter=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
         if(StringUtils.isEmpty(ticketDTO.getBookDate())){
             ticket.setBookDate(null);
         }
         else {
             date=ticketDTO.getBookDate();
             date=date.indexOf('.')>=0?date.substring(0,date.indexOf('.')):date;
-            ticket.setBookDate(LocalDateTime.parse(date,formatter));
+            ticket.setBookDate(DateUtils.convertStringToLocalDateTime(date));
         }
 
         if(StringUtils.isEmpty(ticketDTO.getPickUpDate())){
@@ -104,7 +105,7 @@ public class TicketServiceImpl{
         else {
             date =ticketDTO.getPickUpDate();
             date=date.indexOf('.')>=0?date.substring(0,date.indexOf('.')):date;
-            ticket.setPickUpDate(LocalDateTime.parse(date,formatter));
+            ticket.setPickUpDate(DateUtils.convertStringToLocalDateTime(date));
         }
 
         ticket.getPlay().setTicketList(null);
@@ -251,10 +252,6 @@ public class TicketServiceImpl{
     public synchronized BookResponse bookTicket(Long playId, String userCredential){
         BookResponse bookResponse=new BookResponse();
 
-        //read All available Tickets from Hazel map
-        //Pick the ticket
-        //Update hazel Map
-        //check if available date is
         List<Ticket> availableTickets=ticketRepository.findAllAvailableByPlayId(playId);
         if(availableTickets==null || availableTickets.size()==0){
             Optional<Ticket> ticket= ticketRepository.findAllByPlayId(playId).stream()
