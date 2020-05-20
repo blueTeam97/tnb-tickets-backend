@@ -18,12 +18,14 @@ import java.util.Optional;
 @ComponentScan
 public interface PlayRepository extends JpaRepository<Play, Long> {
 
-    @Query("Select p FROM Play p WHERE p.playDate > current_timestamp") // - for user
+    @Query("Select p FROM Play p WHERE p.playDate > current_timestamp")
+        // - for user
     List<Play> findAll();
 
-    @Query(value = "Select p.* from Play p Join Ticket t on p.id=t.play_id",nativeQuery = true)
+    @Query(value = "Select p.* from Play p Join Ticket t on p.id=t.play_id", nativeQuery = true)
     List<Play> findAllNoRestriction();
-    @Query(value = "SELECT * from play p where (SELECT Count(t.id) FROM Ticket t WHERE t.status='free' AND t.play_id= p.id)>0",nativeQuery = true)
+
+    @Query(value = "SELECT * from play p where (SELECT Count(t.id) FROM Ticket t WHERE t.status='free' AND t.play_id= p.id)>0", nativeQuery = true)
     List<Play> getAllAvailablePlays();
 
     Optional<Play> findAllByPlayName(String playName);
@@ -35,12 +37,17 @@ public interface PlayRepository extends JpaRepository<Play, Long> {
     Optional<Play> findByPlayName(String playName);
 
     @Query(value = "Select * from Play p where p.available_date >= :localDateFrom \n" +
-            "  AND p.available_date < :localDateTo ;",nativeQuery = true)
+            "  AND p.available_date < :localDateTo ;", nativeQuery = true)
     List<Play> getNextAvailablePlays(@Param("localDateFrom") LocalDate localDateFrom,
-                                     @Param("localDateTo")LocalDate localDateTo);
-    @Query(value="Select p.* from play p"+
-            " Join ticket t on p.id=t.play_id"+
-            " Join user u on t.user_id=u.id"+
-            " where u.id= :userId and p.play_date>=current_timestamp and t.status='booked' ",nativeQuery = true)
+                                     @Param("localDateTo") LocalDate localDateTo);
+
+    @Query(value = "SELECT p.id, p.name, p.available_date, p.play_date, p.registered_date, p.link, p.nr_tickets FROM (SELECT play_id from ticket WHERE status = 'booked' AND id <> 0) t \n" +
+            "INNER JOIN play p ON t.play_id = p.id ;", nativeQuery = true)
+    List<Play> getPlaysWhereTicketsStatusFromBookToFree();
+
+    @Query(value = "Select p.* from play p" +
+            " Join ticket t on p.id=t.play_id" +
+            " Join user u on t.user_id=u.id" +
+            " where u.id= :userId and p.play_date>=current_timestamp and t.status='booked' ", nativeQuery = true)
     List<Play> getAllAvailablePlaysUserBooked(@Param("userId") Long userId);
 }

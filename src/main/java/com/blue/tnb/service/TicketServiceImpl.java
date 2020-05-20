@@ -316,6 +316,10 @@ public class TicketServiceImpl{
         return ticketRepository.findEmailsForTicketStatusBooked();
     }
 
+    public void changeTicketStatusToFree(){
+        ticketRepository.changeTicketStatusToFree();
+    }
+
     public List<TicketDTO> findAllBookedTicketsByPlayId(Long id) {
         List<TicketDTO> bookedTickets = ticketRepository.findAllBookedTicketsByPlayId(id).stream()
                 .map(ticketMapper::ticketToTicketDTO)

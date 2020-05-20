@@ -1,5 +1,7 @@
 package com.blue.tnb.notification;
 
+import com.blue.tnb.constants.DayOfWeek;
+import com.blue.tnb.exception.WrongDayOfTheWeekException;
 import com.blue.tnb.model.Play;
 import com.blue.tnb.service.PlayServiceImpl;
 import com.blue.tnb.service.TicketServiceImpl;
@@ -48,48 +50,83 @@ public class Notification {
 
     //0 0 12 * * * || 0/10 * * * * *
     @Scheduled(cron = "0 0 12 * * *")
-    public void oneDayAheadBookReminder(){
+    public void oneDayAheadBookReminder() {
         List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
-        List<Play> plays = playService.getNextAvailablePlays(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2));
-        String subject = "TNB tickets available tomorrow";
-        //StringBuilder message = new StringBuilder("Tomorrow the following tickets will become available to be booked: \n\n");
-        String typeOfEmail = "One day before";
-        constructAndSendEmail(emails, plays,subject,typeOfEmail);
+        if (emails.size() > 0) {
+            List<Play> plays = playService.getNextAvailablePlays(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2));
+            if (plays.size() > 0) {
+                String subject = "TNB tickets available tomorrow";
+                String typeOfEmail = "One day before";
+                constructAndSendEmail(emails, plays, subject, typeOfEmail);
+            }
+        }
+
     }
 
     //0 0 13 * * * || 0/10 * * * * *
     @Scheduled(cron = "0 0 13 * * *")
-    public void oneHourAheadBookReminder(){
+    public void oneHourAheadBookReminder() {
         List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
-        List<Play> plays = playService.getNextAvailablePlays(LocalDate.now(), LocalDate.now().plusDays(1));
-        String subject = "TNB tickets available today";
-        //StringBuilder message = new StringBuilder("There is one hour left until the tickets become available: \n\n");
-        String typeOfEmail = "One hour before";
-        constructAndSendEmail(emails, plays,subject,typeOfEmail);
+        if (emails.size() > 0) {
+            List<Play> plays = playService.getNextAvailablePlays(LocalDate.now(), LocalDate.now().plusDays(1));
+            if (plays.size() > 0) {
+                String subject = "TNB tickets available today";
+                String typeOfEmail = "One hour before";
+                constructAndSendEmail(emails, plays, subject, typeOfEmail);
+            }
+        }
     }
 
-    //0 0 16 * * THU  every thursday 0/10 * * * * *
-    @Scheduled(cron = "0 0 16 * * THU")
-    public void pickupReminder(){
+    //0 0 13 * * THU  every thursday 0/10 * * * * *
+    @Scheduled(cron = "0 0 13 * * THU"  )
+    public void thursdayPickupReminder() throws WrongDayOfTheWeekException {
+        pickupReminder();
+    }
+
+    //0 0 13 * * FRI  every friday 0/10 * * * * *
+    @Scheduled(cron = "0 0 13 * * FRI")
+    public void fridayPickupReminder() throws WrongDayOfTheWeekException {
+        pickupReminder();
+    }
+
+    //0 0 15 * * FRI  every friday 0/10 * * * * *
+    @Scheduled(cron = "0 0 15 * * FRI")
+    public void fridayChangeStatus() {
+        List<Play> plays = playService.getPlaysWhereTicketsStatusFromBookToFree();
+        if(plays.size()>0){
+            List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
+            ticketService.changeTicketStatusToFree();
+            if(emails.size()>0) {
+                String subject = "TNB tickets available now";
+                StringBuilder message = new StringBuilder("Tickets for the following plays are available now: \n\n");
+                constructAndSendEmail(emails, plays, subject, message);
+            }
+        }
+    }
+
+
+    private void pickupReminder() throws WrongDayOfTheWeekException {
         List<String> concatEmailsAndPlaysList = ticketService.findEmailsForTicketStatusBooked();
-        List<String[]> splitEmailsAndPlaysList = new ArrayList<>();
+        if (concatEmailsAndPlaysList.size() > 0) {
+            List<String[]> splitEmailsAndPlaysList = new ArrayList<>();
 
-        for(String row : concatEmailsAndPlaysList){
-            splitEmailsAndPlaysList.add(row.split("\\|\\|"));
-        }
-        //splitEmailsAndPlaysList.forEach(element -> System.out.println(Arrays.toString(element)));
-        for(String[] row : splitEmailsAndPlaysList){
-            constructAndSendEmail(row[0],row[1],row[2]);
+            for (String row : concatEmailsAndPlaysList) {
+                splitEmailsAndPlaysList.add(row.split("\\|\\|"));
+            }
+            //splitEmailsAndPlaysList.forEach(element -> System.out.println(Arrays.toString(element)));
+            for (String[] row : splitEmailsAndPlaysList) {
+                constructAndSendEmail(row[0], row[1], row[2]);
+            }
         }
     }
 
-    private final void constructEmailMessage(String emailAddress,String subject,String message) {
+    private final void constructEmailMessage(String emailAddress, String subject, String message) {
         final SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(emailAddress);
         email.setSubject(subject);
         email.setText(message);
         email.setFrom(Objects.requireNonNull(env.getProperty("support.email")));
-    //    mailSender.send(email);
+//        mailSender.send(email);
     }
 
     private void constructAndSendEmail(List<String> emails, List<Play> plays,String subject,String typeOfEmail) {
@@ -103,20 +140,30 @@ public class Notification {
                 message.append("There is one hour left until the tickets become available: \n\n");
             }
             for(Play play : plays){
-                message.append(play.getPlayName()).append(" on ").append(play.getPlayDate().toString().replace("T", " ")).append('\n');
+                String date = play.getPlayDate().toString();
+                String dateWithoutSeconds = date.substring(0, date.lastIndexOf(":"));
+                message.append(play.getPlayName()).append(" on ").append(dateWithoutSeconds.replace("T", " ")).append('\n');
             }
             // System.out.println("===================================================================================================================");
-             constructEmailMessage(email,subject,message.toString());
-            // System.out.println("********************************************************************************************************************");
+            constructEmailMessage(email, subject, message.toString());
+            //  System.out.println("********************************************************************************************************************");
         }
     }
 
-    private void constructAndSendEmail(String email, String playName,String date) {
-            String subject = "TNB tickets to pick-up";
-            StringBuilder message = new StringBuilder("You should pick-up your tickets for: \n\n");
-                message.append(playName).append(" on ").append(date.replace("T", " ")).append('\n');
-            // System.out.println("===================================================================================================================");
-            constructEmailMessage(email,subject,message.toString());
-            //  System.out.println("********************************************************************************************************************");
+    private void constructAndSendEmail(String email, String playName, String date) throws WrongDayOfTheWeekException {
+        String subject = "TNB tickets to pick-up";
+        String dateWithoutSeconds = date.substring(0, date.lastIndexOf(":"));
+        StringBuilder message = new StringBuilder();
+        if(LocalDate.now().getDayOfWeek().getValue()== DayOfWeek.THURSDAY.getValue()) {
+            message = new StringBuilder("You should pick-up your tickets for: \n\n");
+        } else if (LocalDate.now().getDayOfWeek().getValue()== DayOfWeek.FRIDAY.getValue()) {
+            message = new StringBuilder("Hurry up! You have one hour left to pick-up your tickets for: \n\n");
+        } else {
+            throw new WrongDayOfTheWeekException("Wrong day of the week to pick-up tickets!");
+        }
+        message.append(playName).append(" on ").append(dateWithoutSeconds.replace("T", " ")).append('\n');
+        // System.out.println("===================================================================================================================");
+        constructEmailMessage(email, subject, message.toString());
+        //  System.out.println("********************************************************************************************************************");
     }
 }
