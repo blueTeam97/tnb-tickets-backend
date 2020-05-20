@@ -1,5 +1,6 @@
 package com.blue.tnb.repository;
 
+import com.blue.tnb.dto.TicketDTO;
 import com.blue.tnb.model.Ticket;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -32,6 +33,10 @@ public interface TicketRepository extends JpaRepository<Ticket,Long> {
 
     @Query(value ="Select * from Ticket t where t.play_id= :playId AND t.status='free'",nativeQuery = true)
     List<Ticket> findAllAvailableByPlayId(@Param("playId") Long playId);
+
+    @Query(value = "SELECT t.* FROM Ticket t WHERE t.status='booked' AND t.play_id= :playId",nativeQuery = true)
+     List<Ticket> findAllBookedTicketsByPlayId(Long playId);
+
 
     @Modifying
     @Transactional

@@ -13,24 +13,13 @@ import com.blue.tnb.service.TicketService;
 import com.blue.tnb.service.TicketServiceImpl;
 import com.blue.tnb.service.UserDetailsServiceImpl;
 import com.blue.tnb.validator.TicketValidator;
-import com.hazelcast.core.HazelcastInstance;
-import io.jsonwebtoken.Jwt;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.http.HttpProperties;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
-import org.springframework.data.jpa.repository.Lock;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.LockModeType;
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.Base64;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/tasks")
@@ -142,6 +131,21 @@ public class TicketController {
             return ResponseEntity.ok(ok);
         }
         else return ResponseEntity.badRequest().build();
+    }
+
+   /* @GetMapping("/play/{id}/findAllBookedTickets")
+    public List<TicketForAdminDTO> getBookedTickets(@PathVariable(value = "id") Long id) {
+        return ticketService.findAllBookedTicketsByPlayId(id);
+    }*/
+
+    @GetMapping("user/{id}/findEmailByUserId")
+    public Optional<String> getEmailByUserId(@PathVariable(value = "id") Long id){
+        return ticketService.findEmailByUserId(id);
+    }
+
+    @GetMapping("/findAllBookedTicketsByPlayId/{id}")
+    public List<TicketDTO> getAllBookedTickets(@PathVariable(value = "id") Long id) {
+        return ticketService.findAllBookedTicketsByPlayId(id);
     }
 
 }

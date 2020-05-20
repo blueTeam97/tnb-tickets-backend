@@ -13,6 +13,7 @@ import com.blue.tnb.model.User;
 import com.blue.tnb.repository.PlayRepository;
 import com.blue.tnb.repository.TicketRepository;
 import com.blue.tnb.repository.UserRepository;
+import com.blue.tnb.validator.PlayValidator;
 import com.hazelcast.core.HazelcastInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.text.ParseException;;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -52,6 +50,9 @@ public class TicketServiceImpl{
 
     @Autowired
     private HazelcastInstance hazelcastInstance;
+
+    @Autowired
+    private PlayValidator playValidator;
 
     //@Override
     public List<TicketDTO> getAllTickets() {
@@ -175,7 +176,7 @@ public class TicketServiceImpl{
     // NU MERGE
     //Decomentezi pe propria raspundere
    @Async
-    private void saveTicket(Long playId,Long ticketId,Long userId){
+   void saveTicket(Long playId, Long ticketId, Long userId){
         updateTicket(ticketId,new TicketDTO(ticketId,userId,playId,Status.BOOKED.getValue(), LocalDateTime.now().toString().replace("T"," "),null));
     }
     public ResponseEntity<BookResponse> bookTicketAsync(Long playId,Long userId){
@@ -288,5 +289,16 @@ public class TicketServiceImpl{
 
     public List<String> findEmailsForTicketStatusBooked(){
         return ticketRepository.findEmailsForTicketStatusBooked();
+    }
+
+    public List<TicketDTO> findAllBookedTicketsByPlayId(Long id) {
+        List<TicketDTO> bookedTickets = ticketRepository.findAllBookedTicketsByPlayId(id).stream()
+                .map(ticketMapper::ticketToTicketDTO)
+                .collect(Collectors.toList());
+        return bookedTickets;
+    }
+
+    public Optional<String> findEmailByUserId(Long id) {
+        return userRepository.getEmailByUserId(id);
     }
 }

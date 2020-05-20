@@ -1,5 +1,9 @@
 package com.blue.tnb.controller;
 
+import com.blue.tnb.dto.TicketDTO;
+import com.blue.tnb.service.TicketServiceImpl;
+import org.hibernate.annotations.GeneratorType;
+import org.springframework.beans.factory.annotation.Autowired;
 import com.blue.tnb.model.User;
 import com.blue.tnb.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
