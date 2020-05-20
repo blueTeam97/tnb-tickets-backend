@@ -4,6 +4,9 @@ import com.blue.tnb.dto.TicketDTO;
 import com.blue.tnb.service.TicketServiceImpl;
 import org.hibernate.annotations.GeneratorType;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.blue.tnb.model.User;
+import com.blue.tnb.service.UserDetailsServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -20,11 +23,11 @@ import java.util.List;
 public class TestController {
 
     @Autowired
-    private TicketServiceImpl ticketService;
+    private UserDetailsServiceImpl userDetailsService;
 
     @GetMapping("/all")
-    public String getAll() {
-       return "HELLO";
+    public List<String> getAllSubscribers() {
+       return userDetailsService.getAllSubscribersThatCanBookTickets();
     }
 
 }

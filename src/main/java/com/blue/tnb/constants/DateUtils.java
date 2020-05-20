@@ -1,8 +1,10 @@
 package com.blue.tnb.constants;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class DateUtils {
@@ -20,5 +22,23 @@ public class DateUtils {
         return dateToConvert.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
+    }
+    public static LocalDateTime convertStringToLocalDateTime(String stringDate){
+        DateTimeFormatter formatter=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter2=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime convertedDate=null;
+        try{
+            convertedDate=LocalDateTime.parse(stringDate,formatter);
+        }
+        catch (Exception ex){
+            try{
+                convertedDate=LocalDateTime.parse(stringDate,formatter2);
+                return convertedDate;
+            }
+            catch (Exception ex2){
+                return null;
+            }
+        }
+        return null;
     }
 }

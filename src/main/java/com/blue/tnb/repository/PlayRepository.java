@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,8 @@ public interface PlayRepository extends JpaRepository<Play, Long> {
 
     @Query(value = "Select p.* from Play p Join Ticket t on p.id=t.play_id",nativeQuery = true)
     List<Play> findAllNoRestriction();
+    @Query(value = "SELECT * from play p where (SELECT Count(t.id) FROM Ticket t WHERE t.status='free' AND t.play_id= p.id)>0",nativeQuery = true)
+    List<Play> getAllAvailablePlays();
 
     Optional<Play> findAllByPlayName(String playName);
 
@@ -31,5 +34,9 @@ public interface PlayRepository extends JpaRepository<Play, Long> {
 
     Optional<Play> findByPlayName(String playName);
 
+    @Query(value = "Select * from Play p where p.available_date >= :localDateFrom \n" +
+            "  AND p.available_date < :localDateTo ;",nativeQuery = true)
+    List<Play> getNextAvailablePlays(@Param("localDateFrom") LocalDate localDateFrom,
+                                     @Param("localDateTo")LocalDate localDateTo);
 
 }

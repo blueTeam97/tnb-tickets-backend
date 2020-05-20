@@ -9,6 +9,7 @@ import com.blue.tnb.exception.TicketExceptions.TicketsNumberException;
 import com.blue.tnb.model.Play;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PlayService {
@@ -21,4 +22,5 @@ public interface PlayService {
     PlayDTO updatePlay(PlayDTO playDTO, Long id) throws PlayUpdateException, InvalidDateException, TicketsNumberException;
     PlayDTO deletePlay(Long id) throws PlayDeleteException;
 
+    List<PlayDTO> getAllPlaysForUser(String userCredential);
 }

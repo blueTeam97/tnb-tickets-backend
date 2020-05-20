@@ -12,14 +12,22 @@ import com.blue.tnb.exception.TicketExceptions.TicketsNumberException;
 import com.blue.tnb.mapper.PlayMapperImpl;
 import com.blue.tnb.mapper.TicketMapperImpl;
 import com.blue.tnb.model.Play;
+import com.blue.tnb.model.Ticket;
 import com.blue.tnb.repository.PlayRepository;
 import com.blue.tnb.repository.TicketRepository;
+import com.blue.tnb.repository.UserRepository;
 import com.blue.tnb.validator.PlayValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.blue.tnb.validator.PlayValidator;
@@ -43,6 +51,9 @@ public class PlayServiceImpl implements PlayService {
     @Autowired
     private TicketMapperImpl ticketMapperImpl;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Override
     public List<PlayDTO> getAllPlays() {
         List<PlayDTO> plays = playRepository.findAll().stream()
@@ -55,6 +66,37 @@ public class PlayServiceImpl implements PlayService {
         return plays;
     }
 
+    public List<PlayDTO> getAllPlaysForUser(String userCredential) {
+        List<PlayDTO> plays = playRepository.getAllAvailablePlays().stream()
+                .map(playMapperImpl::convertPlayToPlayDTO)
+                .collect(Collectors.toList());
+        List<PlayDTO> availablePlays=new ArrayList<>();
+        String[] headerSplitted=userCredential.substring("Bearer".length()).trim().split("\\.");
+        byte[] userDecoded= Base64.getDecoder().decode(headerSplitted[1]);
+        String userCredentialDecoded=new String(userDecoded);
+        String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
+        userEmail=userEmail.substring(1,userEmail.length()-1);
+
+        Long userId=userRepository.getUserIdByEmail(userEmail);
+
+        Optional<Ticket> lastBookedTicket=ticketRepository.findAllByUserId(userId).stream()
+                .filter(ticket->ticket.getStatus().equals(Status.BOOKED))
+                .max((t1,t2)->t1.getBookDate().compareTo(t2.getBookDate()));
+        for (PlayDTO playDTO : plays) {
+            if(lastBookedTicket.isPresent() && lastBookedTicket.get().getBookDate()
+                    .until(playValidator.convertStringToLocalDateTime(playDTO.getPlayDate()),ChronoUnit.DAYS)>=30){
+                playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
+                playDTO.setBookedTicketsNumber(ticketRepository.countAllBookedTicketsByPlayId(playDTO.getId()));
+                availablePlays.add(playDTO);
+            }
+            else if(!lastBookedTicket.isPresent()){
+                playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
+                playDTO.setBookedTicketsNumber(ticketRepository.countAllBookedTicketsByPlayId(playDTO.getId()));
+                availablePlays.add(playDTO);
+            }
+        }
+        return availablePlays;
+    }
     public PlayDTO getPlayById(Long id) throws PlayNotFoundException {
         PlayDTO playDTO = playRepository.findById(id)
                 .map(playMapperImpl::convertPlayToPlayDTO)
@@ -115,6 +157,10 @@ public class PlayServiceImpl implements PlayService {
         }
     }
 
+    public List<Play> getNextAvailablePlays(LocalDate localDateFrom, LocalDate localDateTo) {
+        return playRepository.getNextAvailablePlays(localDateFrom, localDateTo);
+    }
+
     public void populateTicketsListPlay(Play play) {
 
         TicketDTO ticketDTO;
@@ -146,4 +192,6 @@ public class PlayServiceImpl implements PlayService {
             return false;
         }
     }
+
+
 }
