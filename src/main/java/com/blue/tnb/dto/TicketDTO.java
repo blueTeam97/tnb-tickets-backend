@@ -4,6 +4,7 @@ import com.blue.tnb.constants.Status;
 import com.blue.tnb.mapper.PlayMapperImpl;
 import com.blue.tnb.model.Play;
 import com.blue.tnb.model.Ticket;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -132,6 +133,14 @@ public class TicketDTO {
 
     public String getBookDate() {
         return bookDate;
+    }
+
+    public void setBookDate(String bookDate) {
+       this.bookDate = bookDate;
+    }
+
+    public void setPickUpDate(String pickUpDate) {
+       this.pickUpDate = pickUpDate;
     }
 
     public TicketDTO setBookDate(LocalDateTime bookDate) {

@@ -26,6 +26,7 @@ public class PlayMapperImpl implements PlayMapper {
             play.setPlayDate(convertStringToLocalDateTime(playDTO.getPlayDate()));
             play.setLink(playDTO.getLink());
             play.setTicketsNumber(playDTO.getTicketsNumber());
+            play.setImageUrl(playDTO.getImageUrl());
             return play;
         }
     }
@@ -43,6 +44,7 @@ public class PlayMapperImpl implements PlayMapper {
             playDTO.setRegisteredDate(play.getRegisteredDate().toString().replace("T", " "));
             playDTO.setLink(play.getLink());
             playDTO.setTicketsNumber(play.getTicketsNumber());
+            playDTO.setImageUrl(play.getImageUrl());
             return playDTO;
         }
     }

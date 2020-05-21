@@ -68,7 +68,7 @@ public class PlayValidator {
 
     public boolean validateDateTime(String playDateAsString, String availableDateAsString) {
         boolean ok=GenericValidator.isDate(playDateAsString, "yyyy-MM-dd HH:mm:ss", true)
-                && GenericValidator.isDate(playDateAsString, "yyyy-MM-dd HH:mm:ss", true);
+                && GenericValidator.isDate(availableDateAsString, "yyyy-MM-dd HH:mm:ss", true);
         if(!ok)
             ok=GenericValidator.isDate(playDateAsString, "yyyy-MM-dd HH:mm", true)
                     && GenericValidator.isDate(playDateAsString, "yyyy-MM-dd HH:mm", true);

@@ -34,7 +34,7 @@ public interface TicketRepository extends JpaRepository<Ticket,Long> {
     @Query(value ="Select * from Ticket t where t.play_id= :playId AND t.status='free'",nativeQuery = true)
     List<Ticket> findAllAvailableByPlayId(@Param("playId") Long playId);
 
-    @Query(value = "SELECT t.* FROM Ticket t WHERE t.status='booked' AND t.play_id= :playId",nativeQuery = true)
+    @Query(value = "SELECT t.* FROM Ticket t WHERE (t.status='booked' OR t.status='pickedup') AND t.play_id= :playId",nativeQuery = true)
      List<Ticket> findAllBookedTicketsByPlayId(Long playId);
 
 
