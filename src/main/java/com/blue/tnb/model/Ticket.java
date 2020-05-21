@@ -2,6 +2,7 @@ package com.blue.tnb.model;
 
 import com.blue.tnb.constants.Status;
 import com.blue.tnb.dto.TicketDTO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -34,9 +35,11 @@ public class Ticket {
     private Status status;
 
     @Column(name = "book_date")
+    @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
     private LocalDateTime bookDate;
 
     @Column(name="pickup_date")
+    @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
     private LocalDateTime pickUpDate;
 
     @ManyToOne(fetch = FetchType.EAGER)

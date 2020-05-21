@@ -66,6 +66,7 @@ public class TicketController {
         }
         else throw new InvalidDateException();
     }
+
     @PutMapping("/updateTicket/{id}")
     public TicketDTO updateTicket(@PathVariable("id") Long id,
                                                @RequestBody TicketDTO ticketDTO) throws ParseException, InvalidTicketForUpdate {
@@ -75,6 +76,7 @@ public class TicketController {
         }
         else throw new InvalidTicketForUpdate();
     }
+
     @DeleteMapping("/deleteTicket/{id}")
     public ResponseEntity<TicketDTO> deleteTicket(@PathVariable Long id) throws InvalidTicketForUpdate{
         if(ticketValidator.validateTicketIdForUpdate(id)){

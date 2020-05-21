@@ -23,22 +23,16 @@ public class DateUtils {
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
     }
-    public static LocalDateTime convertStringToLocalDateTime(String stringDate){
-        DateTimeFormatter formatter=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        DateTimeFormatter formatter2=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime convertedDate=null;
-        try{
-            convertedDate=LocalDateTime.parse(stringDate,formatter);
-        }
-        catch (Exception ex){
-            try{
-                convertedDate=LocalDateTime.parse(stringDate,formatter2);
-                return convertedDate;
-            }
-            catch (Exception ex2){
-                return null;
-            }
+
+    public static LocalDateTime convertStringToLocalDateTime(String stringDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        try {
+            return LocalDateTime.parse(stringDate, formatter);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
         return null;
     }
+
 }
