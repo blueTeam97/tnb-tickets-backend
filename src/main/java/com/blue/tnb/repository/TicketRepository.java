@@ -59,6 +59,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Query(value = "UPDATE ticket SET user_id = NULL , status = 'free', book_date = NULL WHERE status = 'booked' AND id <> 0;", nativeQuery = true)
     void changeTicketStatusToFree();
 
+    @Query(value = "UPDATE ticket AS t INNER JOIN play AS p ON t.play_id = p.id SET t.user_id = NULL, t.status = 'free', t.book_date = NULL WHERE t.status = 'booked' AND p.play_date < current_timestamp();", nativeQuery = true)
+    void freeBookedTicketsOncePlayDateInThePast();
 
     @Query(value = "Select subscriber from user where email= :userEmail", nativeQuery = true)
     Boolean getSubscribeStateForUser(@Param("userEmail") String userEmail);

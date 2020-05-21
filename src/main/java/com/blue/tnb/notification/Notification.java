@@ -31,12 +31,12 @@ public class Notification {
     private TicketServiceImpl ticketService;
 
     @Autowired
-    private  Environment env;
+    private Environment env;
 
     @Autowired
-    private  JavaMailSender mailSender;
+    private JavaMailSender mailSender;
 
-    Notification(){
+    Notification() {
     }
 
     //Luni - 12:00 notificare toate biletele de book pentru maine ora 14:00
@@ -49,7 +49,7 @@ public class Notification {
     //EndpointReminder - send notificari pt bilete noi
 
     //0 0 12 * * * || 0/10 * * * * *
-    @Scheduled(cron = "0 0 12 * * *")
+    @Scheduled(cron = "${tnb.app.notification.oneDayAheadBookReminder}")
     public void oneDayAheadBookReminder() {
         List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
         if (emails.size() > 0) {
@@ -60,11 +60,10 @@ public class Notification {
                 constructAndSendEmail(emails, plays, subject, typeOfEmail);
             }
         }
-
     }
 
     //0 0 13 * * * || 0/10 * * * * *
-    @Scheduled(cron = "0 0 13 * * *")
+    @Scheduled(cron = "${tnb.app.notification.oneHourAheadBookReminder}")
     public void oneHourAheadBookReminder() {
         List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
         if (emails.size() > 0) {
@@ -78,34 +77,13 @@ public class Notification {
     }
 
     //0 0 13 * * THU  every thursday 0/10 * * * * *
-    @Scheduled(cron = "0 0 13 * * THU"  )
-    public void thursdayPickupReminder() throws WrongDayOfTheWeekException {
-        pickupReminder();
-    }
+    @Scheduled(cron = "${tnb.app.notification.thursdayAndFridayPickupReminder}")
+    public void thursdayAndFridayPickupReminder() throws WrongDayOfTheWeekException {
 
-    //0 0 13 * * FRI  every friday 0/10 * * * * *
-    @Scheduled(cron = "0 0 13 * * FRI")
-    public void fridayPickupReminder() throws WrongDayOfTheWeekException {
-        pickupReminder();
-    }
-
-    //0 0 15 * * FRI  every friday 0/10 * * * * *
-    @Scheduled(cron = "0 0 15 * * FRI")
-    public void fridayChangeStatus() {
-        List<Play> plays = playService.getPlaysWhereTicketsStatusFromBookToFree();
-        if(plays.size()>0){
-            List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
-            ticketService.changeTicketStatusToFree();
-            if(emails.size()>0) {
-                String subject = "TNB tickets available now";
-                StringBuilder message = new StringBuilder("Tickets for the following plays are available now: \n\n");
-                constructAndSendEmail(emails, plays, subject, message);
-            }
+        if (LocalDate.now().getDayOfWeek().getValue() == DayOfWeek.THURSDAY.getValue()) {
+            ticketService.freeBookedTicketsOncePlayDateInThePast();
         }
-    }
 
-
-    private void pickupReminder() throws WrongDayOfTheWeekException {
         List<String> concatEmailsAndPlaysList = ticketService.findEmailsForTicketStatusBooked();
         if (concatEmailsAndPlaysList.size() > 0) {
             List<String[]> splitEmailsAndPlaysList = new ArrayList<>();
@@ -120,6 +98,23 @@ public class Notification {
         }
     }
 
+    //0 0 15 * * FRI  every friday 0/10 * * * * *
+    @Scheduled(cron = "${tnb.app.notification.fridayChangeStatus}")
+    public void fridayChangeStatus() {
+
+        List<Play> plays = playService.getPlaysWhereTicketsStatusFromBookToFree();
+        if (plays.size() > 0) {
+            List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
+            ticketService.updateTicketStatusToFree();
+            if (emails.size() > 0) {
+                String subject = "TNB tickets available now";
+                String message = "Friday available tickets";
+                constructAndSendEmail(emails, plays, subject, message);
+            }
+        }
+    }
+
+
     private final void constructEmailMessage(String emailAddress, String subject, String message) {
         final SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(emailAddress);
@@ -129,17 +124,20 @@ public class Notification {
 //        mailSender.send(email);
     }
 
-    private void constructAndSendEmail(List<String> emails, List<Play> plays,String subject,String typeOfEmail) {
+    private void constructAndSendEmail(List<String> emails, List<Play> plays, String subject, String typeOfEmail) {
         StringBuilder message = new StringBuilder();
-        for(String email : emails){
-            if(typeOfEmail.equals("One day before")){
+        for (String email : emails) {
+            if (typeOfEmail.equals("One day before")) {
                 message = new StringBuilder();
                 message.append("Tomorrow the following tickets will become available to be booked: \n\n");
-            }else if(typeOfEmail.equals("One hour before")){
+            } else if (typeOfEmail.equals("One hour before")) {
+                message = new StringBuilder();
+                message.append("There is one hour left until the tickets become available: \n\n");
+            } else if (typeOfEmail.equals("Friday available tickets")) {
                 message = new StringBuilder();
                 message.append("There is one hour left until the tickets become available: \n\n");
             }
-            for(Play play : plays){
+            for (Play play : plays) {
                 String date = play.getPlayDate().toString();
                 String dateWithoutSeconds = date.substring(0, date.lastIndexOf(":"));
                 message.append(play.getPlayName()).append(" on ").append(dateWithoutSeconds.replace("T", " ")).append('\n');
@@ -154,9 +152,10 @@ public class Notification {
         String subject = "TNB tickets to pick-up";
         String dateWithoutSeconds = date.substring(0, date.lastIndexOf(":"));
         StringBuilder message = new StringBuilder();
-        if(LocalDate.now().getDayOfWeek().getValue()== DayOfWeek.THURSDAY.getValue()) {
+        if (LocalDate.now().getDayOfWeek().getValue() == DayOfWeek.THURSDAY.getValue()) {
             message = new StringBuilder("You should pick-up your tickets for: \n\n");
-        } else if (LocalDate.now().getDayOfWeek().getValue()== DayOfWeek.FRIDAY.getValue()) {
+
+        } else if (LocalDate.now().getDayOfWeek().getValue() == DayOfWeek.FRIDAY.getValue()) {
             message = new StringBuilder("Hurry up! You have one hour left to pick-up your tickets for: \n\n");
         } else {
             throw new WrongDayOfTheWeekException("Wrong day of the week to pick-up tickets!");

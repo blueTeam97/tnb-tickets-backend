@@ -316,8 +316,8 @@ public class TicketServiceImpl{
         return ticketRepository.findEmailsForTicketStatusBooked();
     }
 
-    public void changeTicketStatusToFree(){
-        ticketRepository.changeTicketStatusToFree();
+    public void updateTicketStatusToFree(){
+        ticketRepository.updateTicketStatusToFree();
     }
 
     public List<TicketDTO> findAllBookedTicketsByPlayId(Long id) {
@@ -325,6 +325,10 @@ public class TicketServiceImpl{
                 .map(ticketMapper::ticketToTicketDTO)
                 .collect(Collectors.toList());
         return bookedTickets;
+    }
+
+    public void freeBookedTicketsOncePlayDateInThePast(){
+        ticketRepository.freeBookedTicketsOncePlayDateInThePast();
     }
 
     public Optional<String> findEmailByUserId(Long id) {
