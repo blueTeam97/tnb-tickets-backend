@@ -266,13 +266,15 @@ public class TicketServiceImpl{
                 String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
                 userEmail=userEmail.substring(1,userEmail.length()-1);
 
+                //Refactoring--nu mai e nevoie de el
                 Long userId=userRepository.getUserIdByEmail(userEmail);
 
+                //La fel si asta
                 Optional<Ticket> lastBookedTicket=ticketRepository.findAllByUserId(userId).stream()
                                                         .filter(ticket->ticket.getStatus().equals(Status.BOOKED))
                                                         .max((t1,t2)->t1.getBookDate().compareTo(t2.getBookDate()));
                 if(lastBookedTicket.isPresent() &&
-                   lastBookedTicket.get().getBookDate().until(LocalDateTime.now(),ChronoUnit.DAYS)>30){
+                   lastBookedTicket.get().getBookDate().until(LocalDateTime.now(),ChronoUnit.DAYS)>=30){
                     bookResponse.setAllowedToBook(true);
                     Ticket newTicket=availableTickets.get(0);
                     saveTicket(playId,newTicket.getId(),userId);
@@ -286,7 +288,14 @@ public class TicketServiceImpl{
         }
         return bookResponse;
     }
-
+    public Boolean getStatusForLoggedUser(String userCredential){
+        String[] headerSplitted=userCredential.substring("Bearer".length()).trim().split("\\.");
+        byte[] userDecoded= Base64.getDecoder().decode(headerSplitted[1]);
+        String userCredentialDecoded=new String(userDecoded);
+        String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
+        userEmail=userEmail.substring(1,userEmail.length()-1);
+        return ticketRepository.getSubscribeStateForUser(userEmail);
+    }
     public List<String> findEmailsForTicketStatusBooked(){
         return ticketRepository.findEmailsForTicketStatusBooked();
     }

@@ -48,22 +48,24 @@ public class Notification {
 
     //0 0 12 * * * || 0/10 * * * * *
     @Scheduled(cron = "0 0 12 * * *")
-    public void OneDayAheadBookReminder(){
+    public void oneDayAheadBookReminder(){
         List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
         List<Play> plays = playService.getNextAvailablePlays(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2));
         String subject = "TNB tickets available tomorrow";
-        StringBuilder message = new StringBuilder("Tomorrow the following tickets will become available to be booked: \n\n");
-        constructAndSendEmail(emails, plays,subject,message);
+        //StringBuilder message = new StringBuilder("Tomorrow the following tickets will become available to be booked: \n\n");
+        String typeOfEmail = "One day before";
+        constructAndSendEmail(emails, plays,subject,typeOfEmail);
     }
 
     //0 0 13 * * * || 0/10 * * * * *
     @Scheduled(cron = "0 0 13 * * *")
-    public void OneHourAheadBookReminder(){
+    public void oneHourAheadBookReminder(){
         List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
         List<Play> plays = playService.getNextAvailablePlays(LocalDate.now(), LocalDate.now().plusDays(1));
         String subject = "TNB tickets available today";
-        StringBuilder message = new StringBuilder("There is one hour left until the tickets become available: \n\n");
-        constructAndSendEmail(emails, plays,subject,message);
+        //StringBuilder message = new StringBuilder("There is one hour left until the tickets become available: \n\n");
+        String typeOfEmail = "One hour before";
+        constructAndSendEmail(emails, plays,subject,typeOfEmail);
     }
 
     //0 0 16 * * THU  every thursday 0/10 * * * * *
@@ -90,14 +92,22 @@ public class Notification {
     //    mailSender.send(email);
     }
 
-    private void constructAndSendEmail(List<String> emails, List<Play> plays,String subject,StringBuilder message) {
+    private void constructAndSendEmail(List<String> emails, List<Play> plays,String subject,String typeOfEmail) {
+        StringBuilder message = new StringBuilder();
         for(String email : emails){
+            if(typeOfEmail.equals("One day before")){
+                message = new StringBuilder();
+                message.append("Tomorrow the following tickets will become available to be booked: \n\n");
+            }else if(typeOfEmail.equals("One hour before")){
+                message = new StringBuilder();
+                message.append("There is one hour left until the tickets become available: \n\n");
+            }
             for(Play play : plays){
                 message.append(play.getPlayName()).append(" on ").append(play.getPlayDate().toString().replace("T", " ")).append('\n');
             }
             // System.out.println("===================================================================================================================");
-            constructEmailMessage(email,subject,message.toString());
-            //  System.out.println("********************************************************************************************************************");
+             constructEmailMessage(email,subject,message.toString());
+            // System.out.println("********************************************************************************************************************");
         }
     }
 
