@@ -56,9 +56,12 @@ public class Play {
     private String link;
 
     @Column(name = "nr_tickets")
-    @Min(value = 2)
+    @Min(value = 1)
     @NotNull
     private int ticketsNumber;
+
+    @Column(name = "image_url")
+    private String imageUrl;
 
     @OneToMany(mappedBy = "play", fetch = FetchType.EAGER,  cascade = CascadeType.ALL)
     private List<Ticket> ticketList;
@@ -129,26 +132,33 @@ public class Play {
         this.ticketList = ticketList;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
 
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, playName, availableDate, playDate, registeredDate, link, ticketsNumber, ticketList);
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Play)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         Play play = (Play) o;
         return ticketsNumber == play.ticketsNumber &&
-                id.equals(play.id) &&
-                playName.equals(play.playName) &&
-                availableDate.equals(play.availableDate) &&
-                playDate.equals(play.playDate) &&
-                registeredDate.equals(play.registeredDate) &&
-                link.equals(play.link) &&
+                Objects.equals(id, play.id) &&
+                Objects.equals(playName, play.playName) &&
+                Objects.equals(availableDate, play.availableDate) &&
+                Objects.equals(playDate, play.playDate) &&
+                Objects.equals(registeredDate, play.registeredDate) &&
+                Objects.equals(link, play.link) &&
+                Objects.equals(imageUrl, play.imageUrl) &&
                 Objects.equals(ticketList, play.ticketList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, playName, availableDate, playDate, registeredDate, link, ticketsNumber, imageUrl, ticketList);
     }
 
     @Override
@@ -161,6 +171,8 @@ public class Play {
                 ", registeredDate=" + registeredDate +
                 ", link='" + link + '\'' +
                 ", ticketsNumber=" + ticketsNumber +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", ticketList=" + ticketList +
                 '}';
     }
 }

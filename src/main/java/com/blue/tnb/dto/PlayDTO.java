@@ -34,6 +34,8 @@ public class PlayDTO {
     @Min(value = 2)
     private int ticketsNumber;
 
+    private String imageUrl;
+
     @JsonIgnore
     List<TicketDTO> ticketDTOList;
 
@@ -124,6 +126,14 @@ public class PlayDTO {
         this.ticketDTOList = ticketDTOList;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -136,13 +146,15 @@ public class PlayDTO {
                 Objects.equals(playDate, playDTO.playDate) &&
                 Objects.equals(registeredDate, playDTO.registeredDate) &&
                 Objects.equals(link, playDTO.link) &&
+                Objects.equals(imageUrl, playDTO.imageUrl) &&
                 Objects.equals(ticketDTOList, playDTO.ticketDTOList) &&
-                Objects.equals(availableTicketsNumber, playDTO.availableTicketsNumber);
+                Objects.equals(availableTicketsNumber, playDTO.availableTicketsNumber) &&
+                Objects.equals(bookedTicketsNumber, playDTO.bookedTicketsNumber);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, playName, availableDate, playDate, registeredDate, link, ticketsNumber, ticketDTOList, availableTicketsNumber);
+        return Objects.hash(id, playName, availableDate, playDate, registeredDate, link, ticketsNumber, imageUrl, ticketDTOList, availableTicketsNumber, bookedTicketsNumber);
     }
 
     @Override
@@ -155,8 +167,10 @@ public class PlayDTO {
                 ", registeredDate='" + registeredDate + '\'' +
                 ", link='" + link + '\'' +
                 ", ticketsNumber=" + ticketsNumber +
+                ", imageUrl='" + imageUrl + '\'' +
                 ", ticketDTOList=" + ticketDTOList +
                 ", availableTicketsNumber=" + availableTicketsNumber +
+                ", bookedTicketsNumber=" + bookedTicketsNumber +
                 '}';
     }
 }

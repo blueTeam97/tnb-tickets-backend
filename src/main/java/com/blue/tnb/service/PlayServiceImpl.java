@@ -135,6 +135,7 @@ public class PlayServiceImpl implements PlayService {
             existingPlay.setPlayDate(updatedPlay.getPlayDate());
             existingPlay.setAvailableDate(updatedPlay.getAvailableDate());
             existingPlay.setLink(updatedPlay.getLink());
+            existingPlay.setImageUrl(updatedPlay.getImageUrl());
             if (existingPlay.getTicketsNumber() > updatedPlay.getTicketsNumber()) {
                 throw new TicketsNumberException();
             } else if (existingPlay.getTicketsNumber() < updatedPlay.getTicketsNumber()) {

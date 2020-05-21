@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS `play` (
   `play_date` timestamp NULL,
   `registered_date` timestamp DEFAULT CURRENT_TIMESTAMP(),
   `link` varchar(255),
-  `nr_tickets` int DEFAULT 0
+  `nr_tickets` int DEFAULT 0,
+  `image_url` varchar(255)
 );
 
 CREATE TABLE IF NOT EXISTS `ticket` (
