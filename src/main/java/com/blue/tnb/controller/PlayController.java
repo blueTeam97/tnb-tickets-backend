@@ -1,6 +1,7 @@
 package com.blue.tnb.controller;
 
 import com.blue.tnb.dto.PlayDTO;
+import com.blue.tnb.dto.UserPlaysPopulator;
 import com.blue.tnb.exception.PlayExceptions.InvalidDateException;
 import com.blue.tnb.exception.PlayExceptions.PlayDeleteException;
 import com.blue.tnb.exception.PlayExceptions.PlayNotFoundException;
@@ -37,13 +38,9 @@ public class PlayController {
     public PlayController() {}
 
     @GetMapping("/user/findPlays")
-    public ResponseEntity<List<PlayDTO>> getAllAvailablePlaysForLoggedUser(@RequestHeader("authorization") String header){
-        List<PlayDTO> availablePlays=playService.getAllPlaysForUser(header);
+    public ResponseEntity<UserPlaysPopulator> getAllAvailablePlaysForLoggedUser(@RequestHeader("authorization") String header){
+        UserPlaysPopulator availablePlays=playService.populateUserWithPlays(header);
         return ResponseEntity.ok(availablePlays);
-//        if(availablePlays!=null && availablePlays.size()>0){
-//            return ResponseEntity.ok(availablePlays);
-//        }
-//        else return ResponseEntity.badRequest().build();
     }
 
     @GetMapping({"/findAll"})

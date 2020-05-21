@@ -1,6 +1,7 @@
 package com.blue.tnb.service;
 
 import com.blue.tnb.dto.PlayDTO;
+import com.blue.tnb.dto.UserPlaysPopulator;
 import com.blue.tnb.exception.PlayExceptions.InvalidDateException;
 import com.blue.tnb.exception.PlayExceptions.PlayDeleteException;
 import com.blue.tnb.exception.PlayExceptions.PlayNotFoundException;
@@ -23,4 +24,6 @@ public interface PlayService {
     PlayDTO deletePlay(Long id) throws PlayDeleteException;
 
     List<PlayDTO> getAllPlaysForUser(String userCredential);
+
+    UserPlaysPopulator populateUserWithPlays(String userCredential);
 }

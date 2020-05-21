@@ -97,7 +97,7 @@ public class TicketController {
     @GetMapping("/user/history")
     public ResponseEntity<List<TicketDTO>> getAllTicketsByUserId( @RequestHeader(value = "authorization") String header){
         List<TicketDTO> userHistory=ticketService.findAllTicketsByCurrentUser(header);
-        if(userHistory!=null && userHistory.size()>0){
+        if(userHistory==null && userHistory.size()<=0){
             return ResponseEntity.notFound().build();
         }
         else return ResponseEntity.ok(userHistory);
@@ -108,7 +108,7 @@ public class TicketController {
                                                    @RequestHeader(value = "authorization") String header){
         return ResponseEntity.ok(ticketService.bookTicket(playId,header));
     }
-    @GetMapping("/play/{playId}/book/{userId}")
+    @GetMapping("/play/{playId}/book/{userId}") //Just for the benchmarking
     public ResponseEntity<BookResponse> bookTicketTest(@PathVariable(value = "playId") Long playId,
                                                         @PathVariable("userId") Long userId){
         return ticketService.tryBookTicketByPlayIdTest(playId,userId);

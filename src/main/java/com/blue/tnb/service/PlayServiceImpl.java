@@ -1,9 +1,11 @@
 
 package com.blue.tnb.service;
 
+import com.blue.tnb.constants.DateUtils;
 import com.blue.tnb.constants.Status;
 import com.blue.tnb.dto.PlayDTO;
 import com.blue.tnb.dto.TicketDTO;
+import com.blue.tnb.dto.UserPlaysPopulator;
 import com.blue.tnb.exception.PlayExceptions.InvalidDateException;
 import com.blue.tnb.exception.PlayExceptions.PlayDeleteException;
 import com.blue.tnb.exception.PlayExceptions.PlayNotFoundException;
@@ -23,11 +25,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.blue.tnb.validator.PlayValidator;
@@ -66,6 +64,44 @@ public class PlayServiceImpl implements PlayService {
         return plays;
     }
 
+    public UserPlaysPopulator populateUserWithPlays(String userCredential) {
+        UserPlaysPopulator userPlaysPopulator=new UserPlaysPopulator();
+        List<PlayDTO> plays = playRepository.getAllAvailablePlays().stream()
+                .map(playMapperImpl::convertPlayToPlayDTO)
+                .collect(Collectors.toList());
+        List<PlayDTO> availablePlays=new ArrayList<>();
+        String[] headerSplitted=userCredential.substring("Bearer".length()).trim().split("\\.");
+        byte[] userDecoded= Base64.getDecoder().decode(headerSplitted[1]);
+        String userCredentialDecoded=new String(userDecoded);
+        String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
+        userEmail=userEmail.substring(1,userEmail.length()-1);
+
+        Long userId=userRepository.getUserIdByEmail(userEmail);
+
+        Optional<Ticket> lastBookedTicket=ticketRepository.findAllByUserId(userId).stream()
+                .filter(ticket->ticket.getStatus().equals(Status.BOOKED))
+                .max((t1,t2)->t1.getBookDate().compareTo(t2.getBookDate()));
+        for (PlayDTO playDTO : plays) {
+
+            LocalDateTime currentPlayDate = DateUtils.convertStringToLocalDateTime(playDTO.getPlayDate());
+            LocalDateTime currentAvailableDate = DateUtils.convertStringToLocalDateTime(playDTO.getAvailableDate());
+            if((currentPlayDate.isAfter(LocalDateTime.now()) || currentPlayDate.equals(LocalDateTime.now()))){
+                if(lastBookedTicket.isPresent()){
+                    userPlaysPopulator.setUserLastBookedTicket(ticketMapperImpl.ticketToTicketDTO(lastBookedTicket.get()));
+                    if(lastBookedTicket.get().getBookDate().until(currentAvailableDate,ChronoUnit.DAYS)>=30){
+                        playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
+                        userPlaysPopulator.addPlayDTO(playDTO);
+                    }
+                }
+                else {
+                    playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
+                    userPlaysPopulator.addPlayDTO(playDTO);
+                }
+            }
+        }
+        return userPlaysPopulator;
+    }
+
     public List<PlayDTO> getAllPlaysForUser(String userCredential) {
         List<PlayDTO> plays = playRepository.getAllAvailablePlays().stream()
                 .map(playMapperImpl::convertPlayToPlayDTO)
@@ -83,16 +119,20 @@ public class PlayServiceImpl implements PlayService {
                 .filter(ticket->ticket.getStatus().equals(Status.BOOKED))
                 .max((t1,t2)->t1.getBookDate().compareTo(t2.getBookDate()));
         for (PlayDTO playDTO : plays) {
-            if(lastBookedTicket.isPresent() && lastBookedTicket.get().getBookDate()
-                    .until(playValidator.convertStringToLocalDateTime(playDTO.getPlayDate()),ChronoUnit.DAYS)>=30){
-                playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
-                playDTO.setBookedTicketsNumber(ticketRepository.countAllBookedTicketsByPlayId(playDTO.getId()));
-                availablePlays.add(playDTO);
-            }
-            else if(!lastBookedTicket.isPresent()){
-                playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
-                playDTO.setBookedTicketsNumber(ticketRepository.countAllBookedTicketsByPlayId(playDTO.getId()));
-                availablePlays.add(playDTO);
+
+            LocalDateTime currentPlayDate = DateUtils.convertStringToLocalDateTime(playDTO.getPlayDate());
+            if(currentPlayDate.isAfter(LocalDateTime.now()) || currentPlayDate.equals(LocalDateTime.now())){
+                if(lastBookedTicket.isPresent() && lastBookedTicket.get().getBookDate()
+                        .until(playValidator.convertStringToLocalDateTime(playDTO.getAvailableDate()),ChronoUnit.DAYS)>=30){
+                    playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
+                    playDTO.setBookedTicketsNumber(ticketRepository.countAllBookedTicketsByPlayId(playDTO.getId()));
+                    availablePlays.add(playDTO);
+                }
+                else if(!lastBookedTicket.isPresent()){
+                    playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
+                    playDTO.setBookedTicketsNumber(ticketRepository.countAllBookedTicketsByPlayId(playDTO.getId()));
+                    availablePlays.add(playDTO);
+                }
             }
         }
         return availablePlays;

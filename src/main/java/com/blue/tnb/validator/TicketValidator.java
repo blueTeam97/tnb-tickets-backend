@@ -74,10 +74,10 @@ public class TicketValidator {
         else{
             boolean ok=validateTicketPlayId(ticketDTO.getPlayId());
             System.out.println(ok);
-            if(validateTicketDate(ticketDTO.getBookDate(),false)){
+            if(validateTicketDate(ticketDTO.getBookDate(),true)){
                 ticketDTO.getBookDate().replace("T"," ");
             }
-            if(validateTicketDate(ticketDTO.getPickUpDate(),false)){
+            if(validateTicketDate(ticketDTO.getPickUpDate(),true)){
                 ticketDTO.getPickUpDate().replace("T"," ");
             }
             return validateTicketPlayId(ticketDTO.getPlayId()) && validateTicketStatus(ticketDTO.getStatus());
