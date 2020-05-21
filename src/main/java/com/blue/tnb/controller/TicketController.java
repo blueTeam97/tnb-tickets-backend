@@ -149,5 +149,9 @@ public class TicketController {
     public List<TicketDTO> getAllBookedTickets(@PathVariable(value = "id") Long id) {
         return ticketService.findAllBookedTicketsByPlayId(id);
     }
-
+    @GetMapping("/user/getSubscribeStatus")
+    public ResponseEntity<Boolean> getSubscribeStatus(@RequestHeader(value="authorization") String header){
+        Boolean status=ticketService.getStatusForLoggedUser(header);
+        return ResponseEntity.ok(status);
+    }
 }
