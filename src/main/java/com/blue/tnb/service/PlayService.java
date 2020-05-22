@@ -2,10 +2,7 @@ package com.blue.tnb.service;
 
 import com.blue.tnb.dto.PlayDTO;
 import com.blue.tnb.dto.UserPlaysPopulator;
-import com.blue.tnb.exception.PlayExceptions.InvalidDateException;
-import com.blue.tnb.exception.PlayExceptions.PlayDeleteException;
-import com.blue.tnb.exception.PlayExceptions.PlayNotFoundException;
-import com.blue.tnb.exception.PlayExceptions.PlayUpdateException;
+import com.blue.tnb.exception.PlayExceptions.*;
 import com.blue.tnb.exception.TicketExceptions.TicketsNumberException;
 import com.blue.tnb.model.Play;
 import org.springframework.data.jpa.repository.Query;
@@ -19,8 +16,8 @@ public interface PlayService {
     PlayDTO getPlayByName(String playName) throws PlayNotFoundException;
     PlayDTO getPlayById(Long id) throws PlayNotFoundException;
 
-    PlayDTO addPlay(PlayDTO playDTO) throws InvalidDateException;
-    PlayDTO updatePlay(PlayDTO playDTO, Long id) throws PlayUpdateException, InvalidDateException, TicketsNumberException;
+    PlayDTO addPlay(PlayDTO playDTO) throws InvalidDateException, InvalidImageUrlException;
+    PlayDTO updatePlay(PlayDTO playDTO, Long id) throws PlayUpdateException, InvalidDateException, TicketsNumberException, InvalidImageUrlException;
     PlayDTO deletePlay(Long id) throws PlayDeleteException;
 
     List<PlayDTO> getAllPlaysForUser(String userCredential);

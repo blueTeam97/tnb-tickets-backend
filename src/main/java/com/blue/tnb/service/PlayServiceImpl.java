@@ -6,10 +6,7 @@ import com.blue.tnb.constants.Status;
 import com.blue.tnb.dto.PlayDTO;
 import com.blue.tnb.dto.TicketDTO;
 import com.blue.tnb.dto.UserPlaysPopulator;
-import com.blue.tnb.exception.PlayExceptions.InvalidDateException;
-import com.blue.tnb.exception.PlayExceptions.PlayDeleteException;
-import com.blue.tnb.exception.PlayExceptions.PlayNotFoundException;
-import com.blue.tnb.exception.PlayExceptions.PlayUpdateException;
+import com.blue.tnb.exception.PlayExceptions.*;
 import com.blue.tnb.exception.TicketExceptions.TicketsNumberException;
 import com.blue.tnb.mapper.PlayMapperImpl;
 import com.blue.tnb.mapper.TicketMapperImpl;
@@ -151,41 +148,48 @@ public class PlayServiceImpl implements PlayService {
                 .orElseThrow(PlayNotFoundException::new);
     }
 
-    public PlayDTO addPlay(PlayDTO playDTO) throws InvalidDateException {
+    public PlayDTO addPlay(PlayDTO playDTO) throws InvalidDateException, InvalidImageUrlException {
 
         if (!checkDateTimeFormat(playDTO)) {
             throw new InvalidDateException();
         }
-        else {
-            Play play = playRepository.save(this.playMapperImpl.convertPlayDTOToPlay(playDTO));
-            populateTicketsListPlay(play);
-            return playMapperImpl.convertPlayToPlayDTO(playRepository.save(play));
+        else if(!playValidator.validateImageUrl(playDTO.getImageUrl())) {
+            throw new InvalidImageUrlException();
         }
+            else {
+                Play play = playRepository.save(this.playMapperImpl.convertPlayDTOToPlay(playDTO));
+                populateTicketsListPlay(play);
+                return playMapperImpl.convertPlayToPlayDTO(playRepository.save(play));
+            }
     }
 
-    public PlayDTO updatePlay(PlayDTO playDTO, Long id) throws PlayUpdateException, InvalidDateException, TicketsNumberException {
+    public PlayDTO updatePlay(PlayDTO playDTO, Long id) throws PlayUpdateException, InvalidDateException, TicketsNumberException, InvalidImageUrlException {
         if (!playValidator.validateIdForUpdate(id)) {
             throw new PlayUpdateException();
-        } else if (! checkDateTimeFormat(playDTO)) {
+        } else if (!checkDateTimeFormat(playDTO)) {
             throw new InvalidDateException();
-        } else {
-            Play existingPlay = playRepository.getOne(id);
-            Play updatedPlay = this.playMapperImpl.convertPlayDTOToPlay(playDTO);
-            existingPlay.setPlayName(updatedPlay.getPlayName());
-            existingPlay.setPlayDate(updatedPlay.getPlayDate());
-            existingPlay.setAvailableDate(updatedPlay.getAvailableDate());
-            existingPlay.setLink(updatedPlay.getLink());
-            existingPlay.setImageUrl(updatedPlay.getImageUrl());
-            if (existingPlay.getTicketsNumber() > updatedPlay.getTicketsNumber()) {
-                throw new TicketsNumberException();
-            } else if (existingPlay.getTicketsNumber() < updatedPlay.getTicketsNumber()) {
-                updateTicketsListPlay(existingPlay, updatedPlay.getTicketsNumber());
-            }
-
-            existingPlay.setTicketsNumber(updatedPlay.getTicketsNumber());
-
-            return playMapperImpl.convertPlayToPlayDTO(playRepository.saveAndFlush(existingPlay));
         }
+                else if(!playValidator.validateImageUrl(playDTO.getImageUrl())) {
+                    throw new InvalidImageUrlException();
+                }
+                    else {
+                        Play existingPlay = playRepository.getOne(id);
+                        Play updatedPlay = this.playMapperImpl.convertPlayDTOToPlay(playDTO);
+                        existingPlay.setPlayName(updatedPlay.getPlayName());
+                        existingPlay.setPlayDate(updatedPlay.getPlayDate());
+                        existingPlay.setAvailableDate(updatedPlay.getAvailableDate());
+                        existingPlay.setLink(updatedPlay.getLink());
+                        existingPlay.setImageUrl(updatedPlay.getImageUrl());
+                        if (existingPlay.getTicketsNumber() > updatedPlay.getTicketsNumber()) {
+                            throw new TicketsNumberException();
+                        } else if (existingPlay.getTicketsNumber() < updatedPlay.getTicketsNumber()) {
+                            updateTicketsListPlay(existingPlay, updatedPlay.getTicketsNumber());
+                        }
+
+                        existingPlay.setTicketsNumber(updatedPlay.getTicketsNumber());
+
+                        return playMapperImpl.convertPlayToPlayDTO(playRepository.saveAndFlush(existingPlay));
+                    }
     }
 
     public PlayDTO deletePlay(Long id) throws PlayDeleteException {
@@ -233,6 +237,5 @@ public class PlayServiceImpl implements PlayService {
             return false;
         }
     }
-
 
 }

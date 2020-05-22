@@ -12,6 +12,7 @@ import org.apache.commons.validator.GenericValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -96,6 +97,11 @@ public class PlayValidator {
             dateTime=LocalDateTime.parse(dateAsString,formatter2);
         }
         return dateTime;
+    }
+
+
+    public boolean validateImageUrl(String imageUrl) {
+        return new UrlValidator().isValid(imageUrl);
     }
 
 }

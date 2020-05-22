@@ -2,10 +2,7 @@ package com.blue.tnb.controller;
 
 import com.blue.tnb.dto.PlayDTO;
 import com.blue.tnb.dto.UserPlaysPopulator;
-import com.blue.tnb.exception.PlayExceptions.InvalidDateException;
-import com.blue.tnb.exception.PlayExceptions.PlayDeleteException;
-import com.blue.tnb.exception.PlayExceptions.PlayNotFoundException;
-import com.blue.tnb.exception.PlayExceptions.PlayUpdateException;
+import com.blue.tnb.exception.PlayExceptions.*;
 import com.blue.tnb.exception.TicketExceptions.TicketsNumberException;
 import com.blue.tnb.model.Play;
 import com.blue.tnb.service.PlayService;
@@ -60,12 +57,12 @@ public class PlayController {
     }
 
     @PostMapping({"/add"})
-    public ResponseEntity<PlayDTO> addPlay(@RequestBody PlayDTO playDTO) throws InvalidDateException {
+    public ResponseEntity<PlayDTO> addPlay(@RequestBody PlayDTO playDTO) throws InvalidDateException, InvalidImageUrlException {
         return ResponseEntity.ok(playService.addPlay(playDTO));
     }
 
     @PutMapping({"/play/{id}"})
-    public ResponseEntity<PlayDTO> updatePlay(@PathVariable @NotNull Long id, @RequestBody PlayDTO playDTO) throws PlayUpdateException, InvalidDateException, TicketsNumberException {
+    public ResponseEntity<PlayDTO> updatePlay(@PathVariable @NotNull Long id, @RequestBody PlayDTO playDTO) throws PlayUpdateException, InvalidDateException, TicketsNumberException, InvalidImageUrlException {
         return ResponseEntity.ok(playService.updatePlay(playDTO, id));
     }
 

@@ -246,7 +246,6 @@ public class TicketServiceImpl{
     }
 
     public Long countAllBookedTicketsByPlayId(Long playId){
-
         return ticketRepository.countAllBookedTicketsByPlayId(playId);
     }
     //@Override
