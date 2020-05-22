@@ -61,6 +61,7 @@ public class Play {
     private int ticketsNumber;
 
     @Column(name = "image_url")
+    @Size(max = 255)
     private String imageUrl;
 
     @OneToMany(mappedBy = "play", fetch = FetchType.EAGER,  cascade = CascadeType.ALL)
