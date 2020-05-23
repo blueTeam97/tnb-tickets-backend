@@ -316,11 +316,19 @@ public class TicketServiceImpl{
         return ticketRepository.findEmailsForTicketStatusBooked();
     }
 
+    public void updateTicketStatusToFree(){
+        ticketRepository.updateTicketStatusToFree();
+    }
+
     public List<TicketDTO> findAllBookedTicketsByPlayId(Long id) {
         List<TicketDTO> bookedTickets = ticketRepository.findAllBookedTicketsByPlayId(id).stream()
                 .map(ticketMapper::ticketToTicketDTO)
                 .collect(Collectors.toList());
         return bookedTickets;
+    }
+
+    public void freeBookedTicketsOncePlayDateInThePast(){
+        ticketRepository.freeBookedTicketsOncePlayDateInThePast();
     }
 
     public Optional<String> findEmailByUserId(Long id) {

@@ -1,4 +1,3 @@
-
 package com.blue.tnb.service;
 
 import com.blue.tnb.constants.DateUtils;
@@ -70,33 +69,32 @@ public class PlayServiceImpl implements PlayService {
     }
 
     public UserPlaysPopulator populateUserWithPlays(String userCredential) {
-        UserPlaysPopulator userPlaysPopulator=new UserPlaysPopulator();
+        UserPlaysPopulator userPlaysPopulator = new UserPlaysPopulator();
         List<PlayDTO> plays = playRepository.getAllAvailablePlays().stream()
                 .map(playMapperImpl::convertPlayToPlayDTO)
                 .collect(Collectors.toList());
-        List<PlayDTO> availablePlays=new ArrayList<>();
-        String[] headerSplitted=userCredential.substring("Bearer".length()).trim().split("\\.");
-        byte[] userDecoded= Base64.getDecoder().decode(headerSplitted[1]);
-        String userCredentialDecoded=new String(userDecoded);
-        String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
-        userEmail=userEmail.substring(1,userEmail.length()-1);
+        List<PlayDTO> availablePlays = new ArrayList<>();
+        String[] headerSplitted = userCredential.substring("Bearer".length()).trim().split("\\.");
+        byte[] userDecoded = Base64.getDecoder().decode(headerSplitted[1]);
+        String userCredentialDecoded = new String(userDecoded);
+        String userEmail = userCredentialDecoded.split(",")[0].split(":")[1];
+        userEmail = userEmail.substring(1, userEmail.length() - 1);
 
-        Optional<User> user=userRepository.findByEmail(userEmail);
+        Optional<User> user = userRepository.findByEmail(userEmail);
 
-        if(user.isPresent()){
+        if (user.isPresent()) {
             for (PlayDTO playDTO : plays) {
 
                 LocalDateTime currentPlayDate = DateUtils.convertStringToLocalDateTime(playDTO.getPlayDate());
                 LocalDateTime currentAvailableDate = DateUtils.convertStringToLocalDateTime(playDTO.getAvailableDate());
-                if((currentPlayDate.isAfter(LocalDateTime.now()) || currentPlayDate.equals(LocalDateTime.now()))){
-                    if(user.get().getLastBook()!=null){
-                        userPlaysPopulator.setUserLastBookedTicket(new TicketDTO(0L,user.get().getId(),0L,Status.BOOKED.getValue(),user.get().getLastBook().toString(),null));
-                        if(user.get().getLastBook().until(currentAvailableDate,ChronoUnit.DAYS)>=30){
+                if ((currentPlayDate.isAfter(LocalDateTime.now()) || currentPlayDate.equals(LocalDateTime.now()))) {
+                    if (user.get().getLastBook() != null) {
+                        userPlaysPopulator.setUserLastBookedTicket(new TicketDTO(0L, user.get().getId(), 0L, Status.BOOKED.getValue(), user.get().getLastBook().toString(), null));
+                        if (user.get().getLastBook().until(currentAvailableDate, ChronoUnit.DAYS) >= 30) {
                             playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
                             userPlaysPopulator.addPlayDTO(playDTO);
                         }
-                    }
-                    else {
+                    } else {
                         playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
                         userPlaysPopulator.addPlayDTO(playDTO);
                     }
@@ -111,16 +109,16 @@ public class PlayServiceImpl implements PlayService {
         List<PlayDTO> plays = playRepository.getAllAvailablePlays().stream()
                 .map(playMapperImpl::convertPlayToPlayDTO)
                 .collect(Collectors.toList());
-        List<PlayDTO> availablePlays=new ArrayList<>();
-        String[] headerSplitted=userCredential.substring("Bearer".length()).trim().split("\\.");
-        byte[] userDecoded= Base64.getDecoder().decode(headerSplitted[1]);
-        String userCredentialDecoded=new String(userDecoded);
-        String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
-        userEmail=userEmail.substring(1,userEmail.length()-1);
+        List<PlayDTO> availablePlays = new ArrayList<>();
+        String[] headerSplitted = userCredential.substring("Bearer".length()).trim().split("\\.");
+        byte[] userDecoded = Base64.getDecoder().decode(headerSplitted[1]);
+        String userCredentialDecoded = new String(userDecoded);
+        String userEmail = userCredentialDecoded.split(",")[0].split(":")[1];
+        userEmail = userEmail.substring(1, userEmail.length() - 1);
 
-        Optional<User> user=userRepository.findByEmail(userEmail);
+        Optional<User> user = userRepository.findByEmail(userEmail);
 
-        if(user.isPresent()) {
+        if (user.isPresent()) {
             for (PlayDTO playDTO : plays) {
 
                 LocalDateTime currentPlayDate = DateUtils.convertStringToLocalDateTime(playDTO.getPlayDate());
@@ -140,6 +138,7 @@ public class PlayServiceImpl implements PlayService {
         }
         return availablePlays;
     }
+
     public PlayDTO getPlayById(Long id) throws PlayNotFoundException {
         PlayDTO playDTO = playRepository.findById(id)
                 .map(playMapperImpl::convertPlayToPlayDTO)
@@ -158,8 +157,7 @@ public class PlayServiceImpl implements PlayService {
 
         if (!checkDateTimeFormat(playDTO)) {
             throw new InvalidDateException();
-        }
-        else {
+        } else {
             Play play = playRepository.save(this.playMapperImpl.convertPlayDTOToPlay(playDTO));
             populateTicketsListPlay(play);
             return playMapperImpl.convertPlayToPlayDTO(playRepository.save(play));
@@ -169,7 +167,7 @@ public class PlayServiceImpl implements PlayService {
     public PlayDTO updatePlay(PlayDTO playDTO, Long id) throws PlayUpdateException, InvalidDateException, TicketsNumberException {
         if (!playValidator.validateIdForUpdate(id)) {
             throw new PlayUpdateException();
-        } else if (! checkDateTimeFormat(playDTO)) {
+        } else if (!checkDateTimeFormat(playDTO)) {
             throw new InvalidDateException();
         } else {
             Play existingPlay = playRepository.getOne(id);
@@ -237,20 +235,25 @@ public class PlayServiceImpl implements PlayService {
         }
     }
 
-    public List<PlayDTO> getAllBookedPlaysForLoggedUser(Long userId){
+    public List<Play> getPlaysWhereTicketsStatusFromBookToFree() {
+        return playRepository.getPlaysWhereTicketsStatusFromBookToFree();
+    }
+
+    public List<PlayDTO> getAllBookedPlaysForLoggedUser(Long userId) {
         return playRepository.getAllAvailablePlaysUserBooked(userId).stream()
                 .map(playMapperImpl::convertPlayToPlayDTO)
                 .collect(Collectors.toList());
     }
-    public List<PlayDTO> getAllBookedPlaysForLoggedUser(String userCredential){
 
-        String[] headerSplitted=userCredential.substring("Bearer".length()).trim().split("\\.");
-        byte[] userDecoded= Base64.getDecoder().decode(headerSplitted[1]);
-        String userCredentialDecoded=new String(userDecoded);
-        String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
-        userEmail=userEmail.substring(1,userEmail.length()-1);
+    public List<PlayDTO> getAllBookedPlaysForLoggedUser(String userCredential) {
 
-        Long userId=userRepository.getUserIdByEmail(userEmail);
+        String[] headerSplitted = userCredential.substring("Bearer".length()).trim().split("\\.");
+        byte[] userDecoded = Base64.getDecoder().decode(headerSplitted[1]);
+        String userCredentialDecoded = new String(userDecoded);
+        String userEmail = userCredentialDecoded.split(",")[0].split(":")[1];
+        userEmail = userEmail.substring(1, userEmail.length() - 1);
+
+        Long userId = userRepository.getUserIdByEmail(userEmail);
         return playRepository.getAllAvailablePlaysUserBooked(userId).stream()
                 .map(playMapperImpl::convertPlayToPlayDTO)
                 .collect(Collectors.toList());
