@@ -41,7 +41,8 @@ public interface PlayRepository extends JpaRepository<Play, Long> {
     List<Play> getNextAvailablePlays(@Param("localDateFrom") LocalDate localDateFrom,
                                      @Param("localDateTo") LocalDate localDateTo);
 
-    @Query(value = "SELECT p.id, p.name, p.available_date, p.play_date, p.registered_date, p.link, p.nr_tickets FROM (SELECT play_id from ticket WHERE status = 'booked' AND id <> 0) t \n" +
+    @Query(value = "SELECT DISTINCT p.id, p.name, p.available_date, p.play_date, p.registered_date, p.link, p.nr_tickets \n" +
+            "FROM (SELECT play_id from ticket WHERE status = 'booked' AND id <> 0) t\n" +
             "INNER JOIN play p ON t.play_id = p.id ;", nativeQuery = true)
     List<Play> getPlaysWhereTicketsStatusFromBookToFree();
 

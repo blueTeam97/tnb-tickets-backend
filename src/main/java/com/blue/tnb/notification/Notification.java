@@ -12,9 +12,11 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -48,13 +50,13 @@ public class Notification {
     //PickupReminder - verificare bilete fara pickup cron = 0 16 * * THU
     //EndpointReminder - send notificari pt bilete noi
 
-    //0 0 12 * * * || 0/10 * * * * *
+    //oneDayAheadBookReminder || tenSecondsSchendulerTEST
     @Scheduled(cron = "${tnb.app.notification.oneDayAheadBookReminder}")
     public void oneDayAheadBookReminder() {
         List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
-        if (emails.size() > 0) {
+        if (emails != null && emails.size() > 0) {
             List<Play> plays = playService.getNextAvailablePlays(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2));
-            if (plays.size() > 0) {
+            if (plays != null && plays.size() > 0) {
                 String subject = "TNB tickets available tomorrow";
                 String typeOfEmail = "One day before";
                 constructAndSendEmail(emails, plays, subject, typeOfEmail);
@@ -62,13 +64,13 @@ public class Notification {
         }
     }
 
-    //0 0 13 * * * || 0/10 * * * * *
+    //oneHourAheadBookReminder || tenSecondsSchendulerTEST
     @Scheduled(cron = "${tnb.app.notification.oneHourAheadBookReminder}")
     public void oneHourAheadBookReminder() {
         List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
-        if (emails.size() > 0) {
+        if (emails != null && emails.size() > 0) {
             List<Play> plays = playService.getNextAvailablePlays(LocalDate.now(), LocalDate.now().plusDays(1));
-            if (plays.size() > 0) {
+            if (plays != null && plays.size() > 0) {
                 String subject = "TNB tickets available today";
                 String typeOfEmail = "One hour before";
                 constructAndSendEmail(emails, plays, subject, typeOfEmail);
@@ -76,7 +78,7 @@ public class Notification {
         }
     }
 
-    //0 0 13 * * THU  every thursday 0/10 * * * * *
+    //thursdayAndFridayPickupReminder || tenSecondsSchendulerTEST
     @Scheduled(cron = "${tnb.app.notification.thursdayAndFridayPickupReminder}")
     public void thursdayAndFridayPickupReminder() throws WrongDayOfTheWeekException {
 
@@ -85,7 +87,7 @@ public class Notification {
         }
 
         List<String> concatEmailsAndPlaysList = ticketService.findEmailsForTicketStatusBooked();
-        if (concatEmailsAndPlaysList.size() > 0) {
+        if (concatEmailsAndPlaysList != null) {
             List<String[]> splitEmailsAndPlaysList = new ArrayList<>();
 
             for (String row : concatEmailsAndPlaysList) {
@@ -98,15 +100,15 @@ public class Notification {
         }
     }
 
-    //0 0 15 * * FRI  every friday 0/10 * * * * *
+    //fridayChangeStatus || tenSecondsSchendulerTEST
     @Scheduled(cron = "${tnb.app.notification.fridayChangeStatus}")
     public void fridayChangeStatus() {
 
         List<Play> plays = playService.getPlaysWhereTicketsStatusFromBookToFree();
-        if (plays.size() > 0) {
+        if (plays != null) {
             List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
             ticketService.updateTicketStatusToFree();
-            if (emails.size() > 0) {
+            if (emails != null) {
                 String subject = "TNB tickets available now";
                 String message = "Friday available tickets";
                 constructAndSendEmail(emails, plays, subject, message);
@@ -114,14 +116,14 @@ public class Notification {
         }
     }
 
-
     private final void constructEmailMessage(String emailAddress, String subject, String message) {
         final SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(emailAddress);
         email.setSubject(subject);
         email.setText(message);
-        email.setFrom(Objects.requireNonNull(env.getProperty("support.email")));
-//        mailSender.send(email);
+//        email.setFrom(Objects.requireNonNull(env.getProperty("support.email")));
+        email.setFrom("TNBTickets");
+        mailSender.send(email);
     }
 
     private void constructAndSendEmail(List<String> emails, List<Play> plays, String subject, String typeOfEmail) {
@@ -135,23 +137,40 @@ public class Notification {
                 message.append("There is one hour left until the tickets become available: \n\n");
             } else if (typeOfEmail.equals("Friday available tickets")) {
                 message = new StringBuilder();
-                message.append("There is one hour left until the tickets become available: \n\n");
+                message.append("There are new tickets available for the following plays: \n\n");
             }
             for (Play play : plays) {
-                String date = play.getPlayDate().toString();
-                String dateWithoutSeconds = date.substring(0, date.lastIndexOf(":"));
-                message.append(play.getPlayName()).append(" on ").append(dateWithoutSeconds.replace("T", " ")).append('\n');
+                String date = removeSecondsFromDate(play.getPlayDate().toString());
+                message.append(play.getPlayName()).append(" on ").append(date).append('\n');
             }
-            // System.out.println("===================================================================================================================");
+            System.out.println("===================================================================================================================");
+            System.out.println(email);
             constructEmailMessage(email, subject, message.toString());
-            //  System.out.println("********************************************************************************************************************");
+            System.out.println("********************************************************************************************************************");
         }
+    }
+
+    private String removeSecondsFromDate(String _date) {
+        String date = _date.replace("T", " ");
+        int count = StringUtils.countOccurrencesOf(date, ":");
+        String dateWithoutSeconds;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("EEEE, MMM dd yyyy 'at' HH:mm");
+        LocalDateTime formatDateTime;
+
+        if (count == 2) {
+            dateWithoutSeconds = date.substring(0, date.lastIndexOf(":"));
+            formatDateTime = LocalDateTime.parse(dateWithoutSeconds, formatter);
+            return formatDateTime.format(outputFormat);
+        }
+        formatDateTime = LocalDateTime.parse(date, formatter);
+        return formatDateTime.format(outputFormat);
     }
 
     private void constructAndSendEmail(String email, String playName, String date) throws WrongDayOfTheWeekException {
         String subject = "TNB tickets to pick-up";
-        String dateWithoutSeconds = date.substring(0, date.lastIndexOf(":"));
-        StringBuilder message = new StringBuilder();
+
+        StringBuilder message;
         if (LocalDate.now().getDayOfWeek().getValue() == DayOfWeek.THURSDAY.getValue()) {
             message = new StringBuilder("You should pick-up your tickets for: \n\n");
 
@@ -160,9 +179,9 @@ public class Notification {
         } else {
             throw new WrongDayOfTheWeekException("Wrong day of the week to pick-up tickets!");
         }
-        message.append(playName).append(" on ").append(dateWithoutSeconds.replace("T", " ")).append('\n');
-        // System.out.println("===================================================================================================================");
+        message.append(playName).append(" on ").append(removeSecondsFromDate(date)).append('\n');
+        System.out.println("===================================================================================================================");
         constructEmailMessage(email, subject, message.toString());
-        //  System.out.println("********************************************************************************************************************");
+        System.out.println("********************************************************************************************************************");
     }
 }

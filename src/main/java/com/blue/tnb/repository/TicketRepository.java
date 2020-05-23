@@ -53,12 +53,17 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Query(value = "SELECT Count(t.id) FROM Ticket t WHERE t.status='booked' AND t.play_id= :playId", nativeQuery = true)
     Long countAllBookedTicketsByPlayId(Long playId);
 
-    @Query(value = "SELECT DISTINCT CONCAT(u.email, \"||\", p.name, \"||\", p.play_date) FROM user u LEFT JOIN ticket t ON u.id = t.user_id  LEFT JOIN play p ON t.play_id = p.id WHERE t.status = 'booked'", nativeQuery = true)
+    @Query(value = "SELECT DISTINCT CONCAT(u.email, \"||\", p.name, \"||\", p.play_date) FROM user u LEFT JOIN ticket t ON u.id = t.user_id  \n" +
+            "LEFT JOIN play p ON t.play_id = p.id WHERE t.status = 'booked' AND u.subscriber=1", nativeQuery = true)
     List<String> findEmailsForTicketStatusBooked();
 
+    @Modifying
+    @Transactional
     @Query(value = "UPDATE ticket SET user_id = NULL , status = 'free', book_date = NULL WHERE status = 'booked' AND id <> 0;", nativeQuery = true)
-    void changeTicketStatusToFree();
+    void updateTicketStatusToFree();
 
+    @Modifying
+    @Transactional
     @Query(value = "UPDATE ticket AS t INNER JOIN play AS p ON t.play_id = p.id SET t.user_id = NULL, t.status = 'free', t.book_date = NULL WHERE t.status = 'booked' AND p.play_date < current_timestamp();", nativeQuery = true)
     void freeBookedTicketsOncePlayDateInThePast();
 
