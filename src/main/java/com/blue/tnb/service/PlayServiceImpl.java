@@ -15,6 +15,7 @@ import com.blue.tnb.mapper.PlayMapperImpl;
 import com.blue.tnb.mapper.TicketMapperImpl;
 import com.blue.tnb.model.Play;
 import com.blue.tnb.model.Ticket;
+import com.blue.tnb.model.User;
 import com.blue.tnb.repository.PlayRepository;
 import com.blue.tnb.repository.TicketRepository;
 import com.blue.tnb.repository.UserRepository;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,6 +54,9 @@ public class PlayServiceImpl implements PlayService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PlayService playService;
+
     @Override
     public List<PlayDTO> getAllPlays() {
         List<PlayDTO> plays = playRepository.findAll().stream()
@@ -76,29 +81,29 @@ public class PlayServiceImpl implements PlayService {
         String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
         userEmail=userEmail.substring(1,userEmail.length()-1);
 
-        Long userId=userRepository.getUserIdByEmail(userEmail);
+        Optional<User> user=userRepository.findByEmail(userEmail);
 
-        Optional<Ticket> lastBookedTicket=ticketRepository.findAllByUserId(userId).stream()
-                .filter(ticket->ticket.getStatus().equals(Status.BOOKED))
-                .max((t1,t2)->t1.getBookDate().compareTo(t2.getBookDate()));
-        for (PlayDTO playDTO : plays) {
+        if(user.isPresent()){
+            for (PlayDTO playDTO : plays) {
 
-            LocalDateTime currentPlayDate = DateUtils.convertStringToLocalDateTime(playDTO.getPlayDate());
-            LocalDateTime currentAvailableDate = DateUtils.convertStringToLocalDateTime(playDTO.getAvailableDate());
-            if((currentPlayDate.isAfter(LocalDateTime.now()) || currentPlayDate.equals(LocalDateTime.now()))){
-                if(lastBookedTicket.isPresent()){
-                    userPlaysPopulator.setUserLastBookedTicket(ticketMapperImpl.ticketToTicketDTO(lastBookedTicket.get()));
-                    if(lastBookedTicket.get().getBookDate().until(currentAvailableDate,ChronoUnit.DAYS)>=30){
+                LocalDateTime currentPlayDate = DateUtils.convertStringToLocalDateTime(playDTO.getPlayDate());
+                LocalDateTime currentAvailableDate = DateUtils.convertStringToLocalDateTime(playDTO.getAvailableDate());
+                if((currentPlayDate.isAfter(LocalDateTime.now()) || currentPlayDate.equals(LocalDateTime.now()))){
+                    if(user.get().getLastBook()!=null){
+                        userPlaysPopulator.setUserLastBookedTicket(new TicketDTO(0L,user.get().getId(),0L,Status.BOOKED.getValue(),user.get().getLastBook().toString(),null));
+                        if(user.get().getLastBook().until(currentAvailableDate,ChronoUnit.DAYS)>=30){
+                            playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
+                            userPlaysPopulator.addPlayDTO(playDTO);
+                        }
+                    }
+                    else {
                         playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
                         userPlaysPopulator.addPlayDTO(playDTO);
                     }
                 }
-                else {
-                    playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
-                    userPlaysPopulator.addPlayDTO(playDTO);
-                }
             }
         }
+        playService.getAllBookedPlaysForLoggedUser(userCredential).stream().forEach(userPlaysPopulator::addBookedAvailablePlayDTO);
         return userPlaysPopulator;
     }
 
@@ -113,25 +118,23 @@ public class PlayServiceImpl implements PlayService {
         String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
         userEmail=userEmail.substring(1,userEmail.length()-1);
 
-        Long userId=userRepository.getUserIdByEmail(userEmail);
+        Optional<User> user=userRepository.findByEmail(userEmail);
 
-        Optional<Ticket> lastBookedTicket=ticketRepository.findAllByUserId(userId).stream()
-                .filter(ticket->ticket.getStatus().equals(Status.BOOKED))
-                .max((t1,t2)->t1.getBookDate().compareTo(t2.getBookDate()));
-        for (PlayDTO playDTO : plays) {
+        if(user.isPresent()) {
+            for (PlayDTO playDTO : plays) {
 
-            LocalDateTime currentPlayDate = DateUtils.convertStringToLocalDateTime(playDTO.getPlayDate());
-            if(currentPlayDate.isAfter(LocalDateTime.now()) || currentPlayDate.equals(LocalDateTime.now())){
-                if(lastBookedTicket.isPresent() && lastBookedTicket.get().getBookDate()
-                        .until(playValidator.convertStringToLocalDateTime(playDTO.getAvailableDate()),ChronoUnit.DAYS)>=30){
-                    playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
-                    playDTO.setBookedTicketsNumber(ticketRepository.countAllBookedTicketsByPlayId(playDTO.getId()));
-                    availablePlays.add(playDTO);
-                }
-                else if(!lastBookedTicket.isPresent()){
-                    playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
-                    playDTO.setBookedTicketsNumber(ticketRepository.countAllBookedTicketsByPlayId(playDTO.getId()));
-                    availablePlays.add(playDTO);
+                LocalDateTime currentPlayDate = DateUtils.convertStringToLocalDateTime(playDTO.getPlayDate());
+                if (currentPlayDate.isAfter(LocalDateTime.now()) || currentPlayDate.equals(LocalDateTime.now())) {
+                    if (user.get().getLastBook() != null &&
+                            user.get().getLastBook().until(playValidator.convertStringToLocalDateTime(playDTO.getAvailableDate()), ChronoUnit.DAYS) >= 30) {
+                        playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
+                        playDTO.setBookedTicketsNumber(ticketRepository.countAllBookedTicketsByPlayId(playDTO.getId()));
+                        availablePlays.add(playDTO);
+                    } else if (user.get().getLastBook() != null) {
+                        playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
+                        playDTO.setBookedTicketsNumber(ticketRepository.countAllBookedTicketsByPlayId(playDTO.getId()));
+                        availablePlays.add(playDTO);
+                    }
                 }
             }
         }
@@ -234,5 +237,22 @@ public class PlayServiceImpl implements PlayService {
         }
     }
 
+    public List<PlayDTO> getAllBookedPlaysForLoggedUser(Long userId){
+        return playRepository.getAllAvailablePlaysUserBooked(userId).stream()
+                .map(playMapperImpl::convertPlayToPlayDTO)
+                .collect(Collectors.toList());
+    }
+    public List<PlayDTO> getAllBookedPlaysForLoggedUser(String userCredential){
 
+        String[] headerSplitted=userCredential.substring("Bearer".length()).trim().split("\\.");
+        byte[] userDecoded= Base64.getDecoder().decode(headerSplitted[1]);
+        String userCredentialDecoded=new String(userDecoded);
+        String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
+        userEmail=userEmail.substring(1,userEmail.length()-1);
+
+        Long userId=userRepository.getUserIdByEmail(userEmail);
+        return playRepository.getAllAvailablePlaysUserBooked(userId).stream()
+                .map(playMapperImpl::convertPlayToPlayDTO)
+                .collect(Collectors.toList());
+    }
 }

@@ -3,6 +3,7 @@ package com.blue.tnb.service;
 import com.blue.tnb.constants.DateUtils;
 import com.blue.tnb.constants.Status;
 import com.blue.tnb.dto.BookResponse;
+import com.blue.tnb.dto.PlayDTO;
 import com.blue.tnb.dto.TicketDTO;
 import com.blue.tnb.exception.TicketExceptions.TicketNotFoundException;
 import com.blue.tnb.exception.TicketExceptions.TicketWithoutUserException;
@@ -21,6 +22,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.swing.text.html.Option;
 import java.text.ParseException;;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -161,6 +163,11 @@ public class TicketServiceImpl{
         date=date.substring(0,date.indexOf('.'));
         return updateTicket(ticketId,new TicketDTO(ticketId, userId, playId, Status.PICKEDUP.getValue(), null, date))!=null;
     }
+   /* private boolean updateTicketForPickUpV2(Long playId,Ticket ticket,Long userId){
+        String date=LocalDateTime.now().toString().replace("T"," ");
+        date=date.substring(0,date.indexOf('.'));
+        return updateTicket(ticket.getId(),new TicketDTO(ticket.getId(), userId, playId, Status.PICKEDUP.getValue(), ticket.getBookDate().toString().replace("T"," "), date))!=null;
+    }*/
 
     public boolean pickUpTicketByUserAndTicketId(Long ticketId,Long userId){
         Ticket ticket;
@@ -266,25 +273,34 @@ public class TicketServiceImpl{
                 String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
                 userEmail=userEmail.substring(1,userEmail.length()-1);
 
-                //Refactoring--nu mai e nevoie de el
-                Long userId=userRepository.getUserIdByEmail(userEmail);
+                Optional<User> user=userRepository.findByEmail(userEmail);
 
-                //La fel si asta
-                Optional<Ticket> lastBookedTicket=ticketRepository.findAllByUserId(userId).stream()
-                                                        .filter(ticket->ticket.getStatus().equals(Status.BOOKED))
-                                                        .max((t1,t2)->t1.getBookDate().compareTo(t2.getBookDate()));
-                if(lastBookedTicket.isPresent() &&
-                   lastBookedTicket.get().getBookDate().until(LocalDateTime.now(),ChronoUnit.DAYS)>=30){
-                    bookResponse.setAllowedToBook(true);
-                    Ticket newTicket=availableTickets.get(0);
-                    saveTicket(playId,newTicket.getId(),userId);
+                if(user.isPresent()){
+                    if(user.get().getLastBook()!=null &&
+                            user.get().getLastBook().until(LocalDateTime.now(),ChronoUnit.DAYS)>=30){
+                        bookResponse.setAllowedToBook(true);
+                        Ticket newTicket=availableTickets.get(0);
+                        try{
+                            userRepository.updateLastBookForUser(user.get().getId());
+                        }
+                        catch(Exception ex){
+                            return null;
+                        }
+                        saveTicket(playId,newTicket.getId(),user.get().getId());
+                    }
+                    else if(user.get().getLastBook()==null){
+                        bookResponse.setAllowedToBook(true);
+                        Ticket newTicket=availableTickets.get(0);
+                        try{
+                            userRepository.updateLastBookForUser(user.get().getId());
+                        }
+                        catch(Exception ex){
+                            return null;
+                        }
+                        saveTicket(playId,newTicket.getId(),user.get().getId());
+                    }
+                    else bookResponse.setAllowedToBook(false);
                 }
-                else if(!lastBookedTicket.isPresent()){
-                    bookResponse.setAllowedToBook(true);
-                    Ticket newTicket=availableTickets.get(0);
-                    saveTicket(playId,newTicket.getId(),userId);
-                }
-                else bookResponse.setAllowedToBook(false);
         }
         return bookResponse;
     }
@@ -309,5 +325,23 @@ public class TicketServiceImpl{
 
     public Optional<String> findEmailByUserId(Long id) {
         return userRepository.getEmailByUserId(id);
+    }
+
+    public Boolean unbookTicketforLoggedUser(String userCredential,Long playId){
+        String[] headerSplitted=userCredential.substring("Bearer".length()).trim().split("\\.");
+        byte[] userDecoded= Base64.getDecoder().decode(headerSplitted[1]);
+        String userCredentialDecoded=new String(userDecoded);
+        String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
+        userEmail=userEmail.substring(1,userEmail.length()-1);
+
+        Long userId=userRepository.getUserIdByEmail(userEmail);
+
+        try{
+            ticketRepository.unbookTicket(userId,playId);
+            return true;
+        }
+        catch(Exception ex){
+            return false;
+        }
     }
 }

@@ -38,5 +38,9 @@ public interface PlayRepository extends JpaRepository<Play, Long> {
             "  AND p.available_date < :localDateTo ;",nativeQuery = true)
     List<Play> getNextAvailablePlays(@Param("localDateFrom") LocalDate localDateFrom,
                                      @Param("localDateTo")LocalDate localDateTo);
-
+    @Query(value="Select p.* from play p"+
+            " Join ticket t on p.id=t.play_id"+
+            " Join user u on t.user_id=u.id"+
+            " where u.id= :userId and p.play_date>=current_timestamp and t.status='booked' ",nativeQuery = true)
+    List<Play> getAllAvailablePlaysUserBooked(@Param("userId") Long userId);
 }

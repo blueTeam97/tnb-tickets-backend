@@ -1,12 +1,17 @@
 package com.blue.tnb.repository;
 
-import com.blue.tnb.dto.TicketDTO;
 import com.blue.tnb.model.Ticket;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +42,8 @@ public interface TicketRepository extends JpaRepository<Ticket,Long> {
     @Query(value = "SELECT t.* FROM Ticket t WHERE (t.status='booked' OR t.status='pickedup') AND t.play_id= :playId",nativeQuery = true)
      List<Ticket> findAllBookedTicketsByPlayId(Long playId);
 
+    @Query(value="Select * from ticket t where t.user_id= :userId and t.book_date= :bookDate",nativeQuery = true)
+    Optional<Ticket> findTicketByUserIdAndBookDate(@Param("userId") Long userId,@Param("bookDate") String bookDate);
 
     @Modifying
     @Transactional
@@ -51,4 +58,12 @@ public interface TicketRepository extends JpaRepository<Ticket,Long> {
 
     @Query(value = "Select subscriber from user where email= :userEmail", nativeQuery = true)
     Boolean getSubscribeStateForUser(@Param("userEmail") String userEmail);
+
+    @Modifying
+    @Transactional
+    @Query(value="Update ticket set status='free', book_date=null, user_id=null where user_id= :userId and play_id= :playId and status!='pickedup'",nativeQuery = true)
+    void unbookTicket(@Param("userId") Long userId,@Param("playId") Long playId);
+
+    /*@Query(value="Select t.* from ticket t join user u on t.user_id = u.id where u.id= :userId order by t.book_date desc limit 4",nativeQuery = true)
+    List<Ticket> getUserHistoryByPage(@Param("userId") Long userId)*/
 }

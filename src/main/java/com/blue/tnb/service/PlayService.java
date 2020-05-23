@@ -26,4 +26,5 @@ public interface PlayService {
     List<PlayDTO> getAllPlaysForUser(String userCredential);
 
     UserPlaysPopulator populateUserWithPlays(String userCredential);
+    List<PlayDTO> getAllBookedPlaysForLoggedUser(String userCredential);
 }

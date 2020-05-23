@@ -73,4 +73,9 @@ public class PlayController {
     public ResponseEntity<PlayDTO> removePlay(@PathVariable("id") @NotNull Long id) throws PlayDeleteException {
         return ResponseEntity.ok(this.playService.deletePlay(id));
     }
+    @GetMapping("/user/testBookedPlays")
+    public ResponseEntity<List<PlayDTO>> getAllBookedPlays(@RequestHeader(value = "authorization") String header){
+
+        return ResponseEntity.ok(playService.getAllBookedPlaysForLoggedUser(header));
+    }
 }
