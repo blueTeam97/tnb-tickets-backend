@@ -8,14 +8,19 @@ public class UserPlaysPopulator {
 
     List<PlayDTO> userEdiblePlays;
     TicketDTO userLastBookedTicket;
+    List<PlayDTO> bookedAvailablePlays;
 
     public UserPlaysPopulator(){
         userEdiblePlays=new ArrayList<>();
+        bookedAvailablePlays=new ArrayList<>();
     }
+
+    public void addBookedAvailablePlayDTO(PlayDTO playDTO){bookedAvailablePlays.add(playDTO);}
 
     public void addPlayDTO(PlayDTO playDTO){
         userEdiblePlays.add(playDTO);
     }
+
     public List<PlayDTO> getUserEdiblePlays() {
         return userEdiblePlays;
     }
@@ -30,6 +35,14 @@ public class UserPlaysPopulator {
 
     public void setUserLastBookedTicket(TicketDTO userLastBookedTicket) {
         this.userLastBookedTicket = userLastBookedTicket;
+    }
+
+    public List<PlayDTO> getBookedAvailablePlays() {
+        return bookedAvailablePlays;
+    }
+
+    public void setBookedAvailablePlays(List<PlayDTO> bookedAvailablePlays) {
+        this.bookedAvailablePlays = bookedAvailablePlays;
     }
 
     @Override

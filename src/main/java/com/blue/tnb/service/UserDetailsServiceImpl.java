@@ -44,7 +44,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             Optional<User> user=userRepository.findByEmail(userEmail);
             if(user.isPresent()){
                 userRepository.updateSubscribeForUser(user.get().getId());
-                return user.get().getSubscriber() ?1:0;
+                return user.get().getSubscriber() ?0:1;
             }
             else return -1;
         }

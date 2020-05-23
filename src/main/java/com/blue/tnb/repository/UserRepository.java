@@ -35,4 +35,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional
     @Query(value = "Update user set subscriber = 1-(Select subscriber from user where id= :userId) where id= :userId",nativeQuery = true)
     void updateSubscribeForUser(@Param("userId") Long id);
+
+    @Modifying
+    @Transactional
+    @Query(value="Update user set last_book=current_timestamp where id= :userId",nativeQuery = true)
+    void updateLastBookForUser(@Param("userId") Long userId);
 }

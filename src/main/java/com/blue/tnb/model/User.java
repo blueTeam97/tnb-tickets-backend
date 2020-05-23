@@ -1,5 +1,6 @@
 package com.blue.tnb.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
@@ -7,6 +8,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Entity(name = "user")
 @Table(name = "user", uniqueConstraints = {
@@ -39,9 +41,13 @@ public class User implements Serializable {
 
     private Boolean subscriber;
 
+    @Column(name="last_book")
+    private LocalDateTime lastBook;
+
     @ManyToOne
     @JoinColumn(name="role_id", nullable=false)
     private Role role;
+
 
     public User() {}
 
@@ -51,6 +57,18 @@ public class User implements Serializable {
         this.email = email;
         this.password = password;
         this.role = role;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public LocalDateTime getLastBook() {
+        return lastBook;
+    }
+
+    public void setLastBook(LocalDateTime lastBook) {
+        this.lastBook = lastBook;
     }
 
     public Long getId() {

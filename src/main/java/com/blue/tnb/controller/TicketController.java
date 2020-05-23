@@ -1,6 +1,7 @@
 package com.blue.tnb.controller;
 
 import com.blue.tnb.dto.BookResponse;
+import com.blue.tnb.dto.PlayDTO;
 import com.blue.tnb.dto.TicketDTO;
 import com.blue.tnb.exception.InvalidDateException;
 import com.blue.tnb.exception.TicketExceptions.InvalidTicketForUpdate;
@@ -148,6 +149,18 @@ public class TicketController {
     @GetMapping("/findAllBookedTicketsByPlayId/{id}")
     public List<TicketDTO> getAllBookedTickets(@PathVariable(value = "id") Long id) {
         return ticketService.findAllBookedTicketsByPlayId(id);
+    }
+    @GetMapping("/user/getSubscribeStatus")
+    public ResponseEntity<Boolean> getSubscribeStatus(@RequestHeader(value="authorization") String header){
+        Boolean status=ticketService.getStatusForLoggedUser(header);
+        return ResponseEntity.ok(status);
+    }
+
+    @PutMapping("/user/ticket/{playId}/unbook")
+    public ResponseEntity<Boolean> unbookTicket(@RequestHeader(value="authorization") String header,
+                                                @PathVariable(value="playId") Long playId){
+        Boolean ok = ticketService.unbookTicketforLoggedUser(header,playId);
+        return ok?ResponseEntity.ok(true):ResponseEntity.badRequest().build();
     }
 
 }
