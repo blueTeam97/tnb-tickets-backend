@@ -43,6 +43,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Modifying
     @Transactional
-    @Query(value="Update user set last_book=null where id=5 and (Select Count(id) from ticket where user_id= :userId and play_id= :playId and status='pickedup') = 0",nativeQuery = true)
+    @Query(value="Update user set last_book=(last_book-INTERVAL 29 DAY-INTERVAL 23 HOUR-INTERVAL 59 MINUTE) where id= :userId and (Select Count(id) from ticket where user_id= :userId and play_id= :playId and status='pickedup') = 0",nativeQuery = true)
     void clearUserLastBookedDate(@Param("userId") Long userId,@Param("playId") Long playId);
+//    (last_book-INTERVAL 29 DAY-INTERVAL 23 HOUR-INTERVAL 55 MINUTE)
 }

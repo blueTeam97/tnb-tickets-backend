@@ -277,7 +277,7 @@ public class TicketServiceImpl{
 
                 if(user.isPresent()){
                     if(user.get().getLastBook()!=null &&
-                            user.get().getLastBook().until(LocalDateTime.now(),ChronoUnit.DAYS)>=30){
+                            user.get().getLastBook().until(LocalDateTime.now(),ChronoUnit.SECONDS)>=30*24*3600){
                         bookResponse.setAllowedToBook(true);
                         Ticket newTicket=availableTickets.get(0);
                         try{

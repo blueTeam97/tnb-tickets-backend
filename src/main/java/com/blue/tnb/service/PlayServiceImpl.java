@@ -90,7 +90,7 @@ public class PlayServiceImpl implements PlayService {
                 if ((currentPlayDate.isAfter(LocalDateTime.now()) || currentPlayDate.equals(LocalDateTime.now()))) {
                     if (user.get().getLastBook() != null) {
                         userPlaysPopulator.setUserLastBookedTicket(new TicketDTO(0L, user.get().getId(), 0L, Status.BOOKED.getValue(), user.get().getLastBook().toString(), null));
-                        if (user.get().getLastBook().until(currentAvailableDate, ChronoUnit.DAYS) >= 30) {
+                        if ((user.get().getLastBook().until(LocalDateTime.now(), ChronoUnit.SECONDS) >= 30*24*3600)  || currentAvailableDate.isAfter(LocalDateTime.now())) {
                             playDTO.setAvailableTicketsNumber(ticketRepository.countAllAvailableByPlayId(playDTO.getId()));
                             userPlaysPopulator.addPlayDTO(playDTO);
                         }
