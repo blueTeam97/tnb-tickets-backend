@@ -42,7 +42,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             userEmail=userEmail.substring(1,userEmail.length()-1);
             Optional<User> user=userRepository.findByEmail(userEmail);
             if(user.isPresent()){
-                userRepository.clearUserLastBookedDate(user.get().getId());
                 userRepository.updateSubscribeForUser(user.get().getId(),user.get().getId());
                 return user.get().getSubscriber() ?0:1;
             }
