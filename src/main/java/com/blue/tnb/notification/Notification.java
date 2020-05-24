@@ -123,7 +123,7 @@ public class Notification {
         email.setText(message);
 //        email.setFrom(Objects.requireNonNull(env.getProperty("support.email")));
         email.setFrom("TNBTickets");
-        mailSender.send(email);
+       // mailSender.send(email);
     }
 
     private void constructAndSendEmail(List<String> emails, List<Play> plays, String subject, String typeOfEmail) {

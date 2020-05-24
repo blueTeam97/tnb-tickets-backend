@@ -345,6 +345,7 @@ public class TicketServiceImpl{
         Long userId=userRepository.getUserIdByEmail(userEmail);
 
         try{
+            userRepository.clearUserLastBookedDate(userId,playId);
             ticketRepository.unbookTicket(userId,playId);
             return true;
         }
