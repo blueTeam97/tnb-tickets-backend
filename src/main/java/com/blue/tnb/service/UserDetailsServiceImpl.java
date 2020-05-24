@@ -40,10 +40,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             String userCredentialDecoded=new String(userDecoded);
             String userEmail=userCredentialDecoded.split(",")[0].split(":")[1];
             userEmail=userEmail.substring(1,userEmail.length()-1);
-//            Long userId=userRepository.getUserIdByEmail(userEmail);
             Optional<User> user=userRepository.findByEmail(userEmail);
             if(user.isPresent()){
-                userRepository.updateSubscribeForUser(user.get().getId());
+                userRepository.clearUserLastBookedDate(user.get().getId());
+                userRepository.updateSubscribeForUser(user.get().getId(),user.get().getId());
                 return user.get().getSubscriber() ?0:1;
             }
             else return -1;
