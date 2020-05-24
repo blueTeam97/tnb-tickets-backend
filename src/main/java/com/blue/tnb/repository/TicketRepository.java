@@ -75,6 +75,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Query(value = "Update ticket set status='free', book_date=null, user_id=null where user_id= :userId and play_id= :playId and status!='pickedup'", nativeQuery = true)
     void unbookTicket(@Param("userId") Long userId, @Param("playId") Long playId);
 
+
+
     /*@Query(value="Select t.* from ticket t join user u on t.user_id = u.id where u.id= :userId order by t.book_date desc limit 4",nativeQuery = true)
     List<Ticket> getUserHistoryByPage(@Param("userId") Long userId)*/
 }
