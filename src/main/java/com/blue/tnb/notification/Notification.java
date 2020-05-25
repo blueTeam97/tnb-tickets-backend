@@ -50,7 +50,7 @@ public class Notification {
     //PickupReminder - verificare bilete fara pickup cron = 0 16 * * THU
     //EndpointReminder - send notificari pt bilete noi
 
-    //oneDayAheadBookReminder || tenSecondsSchendulerTEST
+    //oneDayAheadBookReminder || tenSecondsSchedulerTEST
     @Scheduled(cron = "${tnb.app.notification.oneDayAheadBookReminder}")
     public void oneDayAheadBookReminder() {
         List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
@@ -64,7 +64,7 @@ public class Notification {
         }
     }
 
-    //oneHourAheadBookReminder || tenSecondsSchendulerTEST
+    //oneHourAheadBookReminder || tenSecondsSchedulerTEST
     @Scheduled(cron = "${tnb.app.notification.oneHourAheadBookReminder}")
     public void oneHourAheadBookReminder() {
         List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
@@ -78,7 +78,7 @@ public class Notification {
         }
     }
 
-    //thursdayAndFridayPickupReminder || tenSecondsSchendulerTEST
+    //thursdayAndFridayPickupReminder || tenSecondsSchedulerTEST
     @Scheduled(cron = "${tnb.app.notification.thursdayAndFridayPickupReminder}")
     public void thursdayAndFridayPickupReminder() throws WrongDayOfTheWeekException {
 
@@ -100,7 +100,7 @@ public class Notification {
         }
     }
 
-    //fridayChangeStatus || tenSecondsSchendulerTEST
+    //fridayChangeStatus || tenSecondsSchedulerTEST
     @Scheduled(cron = "${tnb.app.notification.fridayChangeStatus}")
     public void fridayChangeStatus() {
 
@@ -121,9 +121,9 @@ public class Notification {
         email.setTo(emailAddress);
         email.setSubject(subject);
         email.setText(message);
-//        email.setFrom(Objects.requireNonNull(env.getProperty("support.email")));
-        email.setFrom("TNBTickets");
-       // mailSender.send(email);
+        email.setFrom(Objects.requireNonNull(env.getProperty("support.email")));
+//        email.setFrom("TNBTickets");
+        mailSender.send(email);
     }
 
     private void constructAndSendEmail(List<String> emails, List<Play> plays, String subject, String typeOfEmail) {
