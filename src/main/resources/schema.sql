@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `role_id` int,
   `subscriber` boolean DEFAULT 0
 );
-
+Create Index play_available_date_index On play(available_date Desc);
 CREATE TABLE IF NOT EXISTS `role` (
   `role_id` int PRIMARY KEY AUTO_INCREMENT,
   `role_name` varchar(55) DEFAULT "user"
