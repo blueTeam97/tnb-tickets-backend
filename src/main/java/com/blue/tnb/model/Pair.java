@@ -5,8 +5,8 @@ import java.util.Objects;
 
 public class Pair<A, B> implements Serializable {
 
-    public final A fst;
-    public final B snd;
+    public A fst;
+    public B snd;
 
     public Pair(A fst, B snd) {
         this.fst = fst;
@@ -19,9 +19,9 @@ public class Pair<A, B> implements Serializable {
 
     public boolean equals(Object other) {
         return
-                other instanceof com.sun.tools.javac.util.Pair<?,?> &&
-                        Objects.equals(fst, ((com.sun.tools.javac.util.Pair<?,?>)other).fst) &&
-                        Objects.equals(snd, ((com.sun.tools.javac.util.Pair<?,?>)other).snd);
+                other instanceof Pair<?,?> &&
+                        Objects.equals(fst, ((Pair<?,?>)other).fst) &&
+                        Objects.equals(snd, ((Pair<?,?>)other).snd);
     }
 
     public int hashCode() {
@@ -30,7 +30,7 @@ public class Pair<A, B> implements Serializable {
         else return fst.hashCode() * 17 + snd.hashCode();
     }
 
-    public static <A,B> com.sun.tools.javac.util.Pair<A,B> of(A a, B b) {
-        return new com.sun.tools.javac.util.Pair<>(a,b);
+    public static <A,B> Pair<A,B> of(A a, B b) {
+        return new Pair<>(a,b);
     }
 }

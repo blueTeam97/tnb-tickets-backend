@@ -23,15 +23,15 @@ public class ReserveTicketsMainTest {
         }
         LocalDateTime currentTime=LocalDateTime.now();
         userIds.stream().filter(id->Integer.parseInt(id)<18).forEach(u->{
-            Future<String> result =  executor.submit(new TicketBookingTest(u,"http://localhost:8081/tasks/play/25/book/{id}"));
+            Future<String> result =  executor.submit(new TicketBookingTest(u,"http://localhost:9081/tasks/play/25/book/"+ u));
             results.add(result);
         });
         userIds.stream().filter(id->Integer.parseInt(id)>=18 && Integer.parseInt(id)<30).forEach(u->{
-            Future<String> result =  executor.submit(new TicketBookingTest(u,"http://localhost:8081/tasks/play/22/book/{id}"));
+            Future<String> result =  executor.submit(new TicketBookingTest(u,"http://localhost:9081/tasks/play/22/book/"+ u));
             results.add(result);
         });
         userIds.stream().filter(id->Integer.parseInt(id)>=30).forEach(u->{
-            Future<String> result =  executor.submit(new TicketBookingTest(u,"http://localhost:8081/tasks/play/1/book/{id}"));
+            Future<String> result =  executor.submit(new TicketBookingTest(u,"http://localhost:9081/tasks/play/1/book/"+ u));
             results.add(result);
         });
 

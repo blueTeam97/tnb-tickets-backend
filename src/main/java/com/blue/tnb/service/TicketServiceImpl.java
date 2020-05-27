@@ -3,7 +3,6 @@ package com.blue.tnb.service;
 import com.blue.tnb.constants.DateUtils;
 import com.blue.tnb.constants.Status;
 import com.blue.tnb.dto.BookResponse;
-import com.blue.tnb.dto.PlayDTO;
 import com.blue.tnb.dto.TicketDTO;
 import com.blue.tnb.exception.TicketExceptions.TicketNotFoundException;
 import com.blue.tnb.exception.TicketExceptions.TicketWithoutUserException;
@@ -21,13 +20,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import javax.swing.text.html.Option;
 import java.text.ParseException;;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
@@ -100,7 +96,6 @@ public class TicketServiceImpl{
             date=ticketDTO.getBookDate();
             date=date.indexOf('.')>=0?date.substring(0,date.indexOf('.')):date;
             ticket.setBookDate(DateUtils.convertStringToLocalDateTime(date));
-            ticket.setBookDate(LocalDateTime.parse(date.indexOf('.')>=0?date.substring(0,date.indexOf('.')):date,formatter));
         }
 
         if(StringUtils.isEmpty(ticketDTO.getPickUpDate())){
@@ -110,7 +105,6 @@ public class TicketServiceImpl{
             date =ticketDTO.getPickUpDate();
             date=date.indexOf('.')>=0?date.substring(0,date.indexOf('.')):date;
             ticket.setPickUpDate(DateUtils.convertStringToLocalDateTime(date));
-            ticket.setPickUpDate(LocalDateTime.parse(date.indexOf('.')>=0?date.substring(0,date.indexOf('.')):date,formatter));
         }
 
         ticket.getPlay().setTicketList(null);
@@ -267,21 +261,23 @@ public class TicketServiceImpl{
             bookResponse.setExpiredTime(ticket.get().getBookDate().until(LocalDateTime.now(), ChronoUnit.MILLIS));
         }
         else{
-            Optional<Ticket> lastBookedTicket=ticketRepository.findAllByUserId(userId).stream()
-                    .filter(ticket->ticket.getStatus().equals(Status.BOOKED))
-                    .max((t1,t2)->t1.getBookDate().compareTo(t2.getBookDate()));
-            if(lastBookedTicket.isPresent() &&
-                    lastBookedTicket.get().getBookDate().until(LocalDateTime.now(),ChronoUnit.DAYS)>30){
-                bookResponse.setAllowedToBook(true);
-                Ticket newTicket=availableTickets.get(0);
-                saveTicket(playId,newTicket.getId(),userId);
+            Optional<User> user=userRepository.findById(userId);
+            if(user.isPresent()){
+                if(user.get().getLastBook()!=null &&
+                        user.get().getLastBook().until(LocalDateTime.now(),ChronoUnit.DAYS)>30){
+                    bookResponse.setAllowedToBook(true);
+                    Ticket newTicket=availableTickets.get(0);
+                    saveTicket(playId,newTicket.getId(),userId);
+                }
+                else if(user.get().getLastBook()==null){
+                    bookResponse.setAllowedToBook(true);
+                    Ticket newTicket=availableTickets.get(0);
+                    saveTicket(playId,newTicket.getId(),userId);
+                }
+                else{
+                    bookResponse.setAllowedToBook(false);
+                }
             }
-            else if(!lastBookedTicket.isPresent()){
-                bookResponse.setAllowedToBook(true);
-                Ticket newTicket=availableTickets.get(0);
-                saveTicket(playId,newTicket.getId(),userId);
-            }
-            else bookResponse.setAllowedToBook(false);
         }
         return bookResponse;
     }

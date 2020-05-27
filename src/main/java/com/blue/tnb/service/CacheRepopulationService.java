@@ -10,15 +10,12 @@ import com.blue.tnb.repository.TicketRepository;
 import com.blue.tnb.repository.UserRepository;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
-import jdk.vm.ci.meta.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,7 +38,7 @@ public class CacheRepopulationService {
 
         //IMap<Long,IMap<Map<Long,List<Long>>, Map<Pair<Long,String>,Long>>> map=hazelcastInstance.getMap("availableTickets");
         IMap<Long,List<Long>> map=hazelcastInstance.getMap("availableTickets");
-        IMap<Long,List<Pair<Long,LocalDateTime>>> userMap=hazelcastInstance.getMap("userTickets");
+        IMap<Long,LocalDateTime> userMap=hazelcastInstance.getMap("userTickets");
         List<Play> plays=playRepository.findAllNoRestriction();
         plays.stream().forEach(play->{
             map.put(play.getId(),play.getTicketList().stream()
@@ -51,9 +48,7 @@ public class CacheRepopulationService {
         });
         List<User> users=userRepository.findAll();
         users.stream().forEach(user->{
-            userMap.put(user.getId(),ticketRepository.findAllByUserId(user.getId()).stream()
-                                                        .map(ticket -> new Pair<Long, LocalDateTime>(ticket.getId(),ticket.getBookDate()))
-                                                        .collect(Collectors.toList()));
+            userMap.put(user.getId(),user.getLastBook()==null?LocalDateTime.now().minusDays(32):user.getLastBook());
         });
     }
 }

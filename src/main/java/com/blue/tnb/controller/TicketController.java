@@ -12,6 +12,7 @@ import com.blue.tnb.model.User;
 import com.blue.tnb.repository.UserRepository;
 import com.blue.tnb.service.TicketService;
 import com.blue.tnb.service.TicketServiceImpl;
+import com.blue.tnb.service.TicketServiceImplementingHazel;
 import com.blue.tnb.service.UserDetailsServiceImpl;
 import com.blue.tnb.validator.TicketValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,9 @@ public class TicketController {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    private TicketServiceImplementingHazel ticketServiceImplementingHazel;
 
     @GetMapping("/findAll")
     public List<TicketDTO> findAllTickets() {
@@ -63,7 +67,7 @@ public class TicketController {
     public Ticket addTicket(@RequestBody TicketDTO ticketDTO) throws ParseException, InvalidDateException {
         System.out.println(ticketDTO);
         if(ticketValidator.validateTicket(ticketDTO)){
-            return ticketService.addTicket(ticketDTO);
+            return ticketServiceImplementingHazel.addTicket(ticketDTO);
         }
         else throw new InvalidDateException();
     }
@@ -72,7 +76,7 @@ public class TicketController {
     public TicketDTO updateTicket(@PathVariable("id") Long id,
                                                @RequestBody TicketDTO ticketDTO) throws ParseException, InvalidTicketForUpdate {
         if(ticketValidator.validateTicketForUpdate(ticketDTO)){
-            TicketDTO ticket =new TicketDTO(ticketService.updateTicket(id,ticketDTO));
+            TicketDTO ticket =new TicketDTO(ticketServiceImplementingHazel.updateTicket(id,ticketDTO));
             return ticket;
         }
         else throw new InvalidTicketForUpdate();
@@ -81,7 +85,7 @@ public class TicketController {
     @DeleteMapping("/deleteTicket/{id}")
     public ResponseEntity<TicketDTO> deleteTicket(@PathVariable Long id) throws InvalidTicketForUpdate{
         if(ticketValidator.validateTicketIdForUpdate(id)){
-            TicketDTO deletedTicket=new TicketDTO(ticketService.deleteTicket(id));
+            TicketDTO deletedTicket=new TicketDTO(ticketServiceImplementingHazel.deleteTicket(id));
             if(deletedTicket!=null){
                 return ResponseEntity.ok(deletedTicket);
             }
@@ -91,11 +95,11 @@ public class TicketController {
     }
     @GetMapping("/play/{id}/findAllAvailableTickets")
     public ResponseEntity<List<TicketDTO>> findAllAvailableTickets(@PathVariable("id") Long id){
-        return ResponseEntity.ok(ticketService.findAllAvailableTicketsByPlayId(id));
+        return ResponseEntity.ok(ticketServiceImplementingHazel.findAllAvailableTicketsByPlayId(id));
     }
     @GetMapping("/play/{id}/availableTickets")
     public ResponseEntity<Long> getAllAvailableTickets(@PathVariable Long id){
-        return ResponseEntity.ok(ticketService.countAvailableTicketsByPlayId(id));
+        return ResponseEntity.ok(ticketServiceImplementingHazel.countAvailableTicketsByPlayId(id));
     }
     @GetMapping("/user/history")
     public ResponseEntity<List<TicketDTO>> getAllTicketsByUserId( @RequestHeader(value = "authorization") String header){
@@ -109,11 +113,12 @@ public class TicketController {
     @PostMapping("/play/{playId}/book")
     public ResponseEntity<BookResponse> bookTicket(@PathVariable(value = "playId") Long playId,
                                                    @RequestHeader(value = "authorization") String header){
-        return ResponseEntity.ok(ticketService.bookTicket(playId,header));
+        return ticketServiceImplementingHazel.bookTicket(playId,header);
     }
     @GetMapping("/play/{playId}/book/{userId}") //Just for the benchmarking
     public ResponseEntity<BookResponse> bookTicketTest(@PathVariable(value = "playId") Long playId,
                                                         @PathVariable("userId") Long userId){
+        //return ticketServiceImplementingHazel.bookTicket(playId,userId);
         return ResponseEntity.ok(ticketService.bookTicketHardWay(playId,userId));
         //return ticketService.tryBookTicketByPlayIdTest(playId,userId);
     }

@@ -35,7 +35,7 @@ public class TicketBookingTest implements Callable<String> {
         headers.setContentType(MediaType.APPLICATION_JSON);
         // set `accept` header
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.add("Authorization","Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJtYWR5LmNyb2l0b3Jlc2N1QGdtYWlsLmNvbSIsImlhdCI6MTU4OTUzMjcyMCwiZXhwIjoxNTg5NjE5MTIwfQ.dT-Lnfl_eFfheeFDeQb__ODI5iGbOGQxPxawQUlrkM83hzxE61rvkQ8m5sIiY0YkDh7kBr9CmCmDYmqeT8aGYg");
+        headers.add("Authorization","Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJtYWR5LmNyb2l0b3Jlc2N1QGdtYWlsLmNvbSIsImlhdCI6MTU5MDU2NDQxMywiZXhwIjoxNTkwNjUwODEzfQ.rT6IyIcrEQbEmS6G1wk-PYdWDtVhAh8m2NsmQXaFBxtztVk1toYo2VDMVQsXdlNsDpxZXZST1LpmJVLOP2wZhA");
         // build the request
         // create a map for post parameters
         HttpEntity request=new HttpEntity(headers);
@@ -44,7 +44,6 @@ public class TicketBookingTest implements Callable<String> {
             return response.getStatusCode()+": "+response.getBody();
         }
         catch(Exception ex){
-            System.out.println(ex.getStackTrace());
             return ex.getStackTrace().toString();
         }
 
