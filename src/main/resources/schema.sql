@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS `play` (
   `registered_date` timestamp DEFAULT CURRENT_TIMESTAMP(),
   `link` varchar(255),
   `nr_tickets` int DEFAULT 0,
-  `image_url` varchar(255)
+  `image_url` varchar(255),
+  INDEX(`available_date` ASC)
 );
 
 CREATE TABLE IF NOT EXISTS `ticket` (
