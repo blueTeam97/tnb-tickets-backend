@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS `user` (
   `email` varchar(255) NOT NULL,
   `password` varchar(255),
   `role_id` int,
-  `subscriber` boolean DEFAULT 0
+  `subscriber` boolean DEFAULT 0,
+  `last_book` timestamp NULL
 );
 
 CREATE TABLE IF NOT EXISTS `role` (

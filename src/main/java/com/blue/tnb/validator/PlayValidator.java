@@ -9,6 +9,7 @@ import com.blue.tnb.dto.PlayDTO;
 import com.blue.tnb.model.Play;
 import com.blue.tnb.repository.PlayRepository;
 import org.apache.commons.validator.GenericValidator;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -97,5 +98,10 @@ public class PlayValidator {
         }
         return dateTime;
     }
+
+    public boolean validateImageUrl(String imageUrl) {
+        return new UrlValidator().isValid(imageUrl);
+    }
+
 
 }
