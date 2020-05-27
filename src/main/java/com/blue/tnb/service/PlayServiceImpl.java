@@ -12,11 +12,14 @@ import com.blue.tnb.mapper.TicketMapperImpl;
 import com.blue.tnb.model.Play;
 import com.blue.tnb.model.Ticket;
 import com.blue.tnb.model.User;
+import com.blue.tnb.notification.Notification;
+import com.blue.tnb.notification.NotificationEmail;
 import com.blue.tnb.repository.PlayRepository;
 import com.blue.tnb.repository.TicketRepository;
 import com.blue.tnb.repository.UserRepository;
 import com.blue.tnb.validator.PlayValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,6 +27,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import com.blue.tnb.validator.PlayValidator;
@@ -52,6 +57,12 @@ public class PlayServiceImpl implements PlayService {
 
     @Autowired
     private PlayService playService;
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    private Notification notification;
 
     @Override
     public List<PlayDTO> getAllPlays() {
@@ -261,4 +272,22 @@ public class PlayServiceImpl implements PlayService {
                 .map(playMapperImpl::convertPlayToPlayDTO)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public boolean sendEmailNotification(Long id) {
+        List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
+        if (emails != null && emails.size() > 0) {
+            Optional<Play> optional = playRepository.getPlayIfTicketsFreeAndPlayAvailable(id);
+            if (optional.isPresent()) {
+                List<Play> plays = new ArrayList<>();
+                plays.add(optional.get());
+                String typeOfMessage = "Available tickets";
+                notification.constructAndSendEmail(emails, plays, typeOfMessage);
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }

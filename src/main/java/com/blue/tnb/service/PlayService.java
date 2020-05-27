@@ -24,4 +24,6 @@ public interface PlayService {
 
     UserPlaysPopulator populateUserWithPlays(String userCredential);
     List<PlayDTO> getAllBookedPlaysForLoggedUser(String userCredential);
+
+    boolean sendEmailNotification(Long id);
 }

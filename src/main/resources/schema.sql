@@ -34,6 +34,14 @@ CREATE TABLE IF NOT EXISTS `ticket` (
   `pickup_date` timestamp NULL
 );
 
+CREATE TABLE IF NOT EXISTS `shedlock` (
+  `name` VARCHAR(64),
+  `lock_until` TIMESTAMP(3) NULL,
+  `locked_at` TIMESTAMP(3) NULL,
+  `locked_by` VARCHAR(255),
+  PRIMARY KEY (name)
+);
+
 ALTER TABLE `user` ADD FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`);
 
 ALTER TABLE `ticket` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);

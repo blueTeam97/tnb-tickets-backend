@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -75,4 +76,14 @@ public class PlayController {
 
         return ResponseEntity.ok(playService.getAllBookedPlaysForLoggedUser(header));
     }
+
+    @GetMapping("/play/{id}/notification")
+    public ResponseEntity sendEmailNotification(@PathVariable(value = "id") @NotNull Long id){
+        boolean result=playService.sendEmailNotification(id);
+        if(result){
+            return ResponseEntity.ok().build();
+        }
+        else return ResponseEntity.badRequest().body("Failed to send emails");
+    }
+
 }
