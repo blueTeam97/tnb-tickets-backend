@@ -6,6 +6,7 @@ import com.blue.tnb.model.Play;
 import com.blue.tnb.service.PlayServiceImpl;
 import com.blue.tnb.service.TicketServiceImpl;
 import com.blue.tnb.service.UserDetailsServiceImpl;
+import net.javacrumbs.shedlock.core.SchedulerLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
@@ -18,9 +19,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class Notification {
@@ -52,34 +54,39 @@ public class Notification {
 
     //oneDayAheadBookReminder || tenSecondsSchedulerTEST
     @Scheduled(cron = "${tnb.app.notification.oneDayAheadBookReminder}")
+    @SchedulerLock(name = "TaskScheduler_oneDayAheadBookReminder",
+            lockAtLeastForString = "PT5M", lockAtMostForString = "PT14M")
     public void oneDayAheadBookReminder() {
+        System.out.println("IN SCHEDULER");
         List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
         if (emails != null && emails.size() > 0) {
             List<Play> plays = playService.getNextAvailablePlays(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2));
             if (plays != null && plays.size() > 0) {
-                String subject = "TNB tickets available tomorrow";
                 String typeOfEmail = "One day before";
-                constructAndSendEmail(emails, plays, subject, typeOfEmail);
+                constructAndSendEmail(emails, plays, typeOfEmail);
             }
         }
     }
 
     //oneHourAheadBookReminder || tenSecondsSchedulerTEST
     @Scheduled(cron = "${tnb.app.notification.oneHourAheadBookReminder}")
+    @SchedulerLock(name = "TaskScheduler_oneHourAheadBookReminder",
+            lockAtLeastForString = "PT5M", lockAtMostForString = "PT14M")
     public void oneHourAheadBookReminder() {
         List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
         if (emails != null && emails.size() > 0) {
             List<Play> plays = playService.getNextAvailablePlays(LocalDate.now(), LocalDate.now().plusDays(1));
             if (plays != null && plays.size() > 0) {
-                String subject = "TNB tickets available today";
                 String typeOfEmail = "One hour before";
-                constructAndSendEmail(emails, plays, subject, typeOfEmail);
+                constructAndSendEmail(emails, plays, typeOfEmail);
             }
         }
     }
 
     //thursdayAndFridayPickupReminder || tenSecondsSchedulerTEST
     @Scheduled(cron = "${tnb.app.notification.thursdayAndFridayPickupReminder}")
+    @SchedulerLock(name = "TaskScheduler_thursdayAndFridayPickupReminder",
+            lockAtLeastForString = "PT5M", lockAtMostForString = "PT14M")
     public void thursdayAndFridayPickupReminder() throws WrongDayOfTheWeekException {
 
         if (LocalDate.now().getDayOfWeek().getValue() == DayOfWeek.THURSDAY.getValue()) {
@@ -102,6 +109,8 @@ public class Notification {
 
     //fridayChangeStatus || tenSecondsSchedulerTEST
     @Scheduled(cron = "${tnb.app.notification.fridayChangeStatus}")
+    @SchedulerLock(name = "TaskScheduler_fridayChangeStatus",
+            lockAtLeastForString = "PT5M", lockAtMostForString = "PT14M")
     public void fridayChangeStatus() {
 
         List<Play> plays = playService.getPlaysWhereTicketsStatusFromBookToFree();
@@ -109,35 +118,48 @@ public class Notification {
             List<String> emails = userDetailsService.getAllSubscribersThatCanBookTickets();
             ticketService.updateTicketStatusToFree();
             if (emails != null) {
-                String subject = "TNB tickets available now";
-                String message = "Friday available tickets";
-                constructAndSendEmail(emails, plays, subject, message);
+                String message = "Available tickets";
+                constructAndSendEmail(emails, plays, message);
             }
         }
     }
 
-    private final void constructEmailMessage(String emailAddress, String subject, String message) {
-        final SimpleMailMessage email = new SimpleMailMessage();
-        email.setTo(emailAddress);
-        email.setSubject(subject);
-        email.setText(message);
-        email.setFrom(Objects.requireNonNull(env.getProperty("support.email")));
-//        email.setFrom("TNBTickets");
-        mailSender.send(email);
-    }
 
-    private void constructAndSendEmail(List<String> emails, List<Play> plays, String subject, String typeOfEmail) {
+//    private final void constructEmailMessage(String emailAddress, String subject, String message) {
+//        final SimpleMailMessage email = new SimpleMailMessage();
+//        email.setTo(emailAddress);
+//        email.setSubject(subject);
+//        email.setText(message);
+////        email.setFrom(Objects.requireNonNull(env.getProperty("support.email")));
+//        email.setFrom("TNBTickets");
+//        mailSender.send(email);
+//
+//        try {
+//            Thread.sleep(500);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        System.out.println("EMAIL SENT TO:    " + emailAddress);
+//    }
+
+
+    public void constructAndSendEmail(List<String> emails, List<Play> plays, String typeOfEmail) {
         StringBuilder message = new StringBuilder();
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        String subject = new String();
         for (String email : emails) {
             if (typeOfEmail.equals("One day before")) {
+                subject = "TNB tickets available tomorrow";
                 message = new StringBuilder();
                 message.append("Tomorrow the following tickets will become available to be booked: \n\n");
             } else if (typeOfEmail.equals("One hour before")) {
+                subject = "TNB tickets available today";
                 message = new StringBuilder();
                 message.append("There is one hour left until the tickets become available: \n\n");
-            } else if (typeOfEmail.equals("Friday available tickets")) {
+            } else if (typeOfEmail.equals("Available tickets")) {
+                subject = "TNB tickets available now";
                 message = new StringBuilder();
-                message.append("There are new tickets available for the following plays: \n\n");
+                message.append("There are tickets available for the following play: \n\n");
             }
             for (Play play : plays) {
                 String date = removeSecondsFromDate(play.getPlayDate().toString());
@@ -145,10 +167,37 @@ public class Notification {
             }
             System.out.println("===================================================================================================================");
             System.out.println(email);
-            constructEmailMessage(email, subject, message.toString());
+            executorService.execute(new NotificationEmail(subject, message.toString(), email, mailSender));
             System.out.println("********************************************************************************************************************");
         }
+        try {
+            executorService.shutdown();
+            if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
+
+//    @Async("emailTaskExecutor")
+//    private void sendEmail(String subject, String message, String mail) {
+//        final SimpleMailMessage email = new SimpleMailMessage();
+//        email.setTo(mail);
+//        email.setSubject(subject);
+//        email.setText(message);
+//        email.setFrom(Objects.requireNonNull(env.getProperty("support.email")));
+////        email.setFrom("TNBTickets");
+////        mailSender.send(email);
+//        System.out.println("EMAIL SENT TO:    " + Thread.currentThread().getName());
+//        try {
+//            Thread.sleep(1000);
+//            System.out.println("Email was sent" );
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
 
     private String removeSecondsFromDate(String _date) {
         String date = _date.replace("T", " ");
@@ -167,9 +216,10 @@ public class Notification {
         return formatDateTime.format(outputFormat);
     }
 
+
     private void constructAndSendEmail(String email, String playName, String date) throws WrongDayOfTheWeekException {
         String subject = "TNB tickets to pick-up";
-
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
         StringBuilder message;
         if (LocalDate.now().getDayOfWeek().getValue() == DayOfWeek.THURSDAY.getValue()) {
             message = new StringBuilder("You should pick-up your tickets for: \n\n");
@@ -181,7 +231,15 @@ public class Notification {
         }
         message.append(playName).append(" on ").append(removeSecondsFromDate(date)).append('\n');
         System.out.println("===================================================================================================================");
-        constructEmailMessage(email, subject, message.toString());
+        executorService.execute(new NotificationEmail(subject, message.toString(), email, mailSender));
         System.out.println("********************************************************************************************************************");
+        try {
+            executorService.shutdown();
+            if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
